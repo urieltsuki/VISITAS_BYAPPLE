@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Visitas por Vendedor
+{% endblock %}
+
+{% block contenido %}
+
+<h2>Visitas por Vendedor</h2>
+
+
+<form method="GET">
+
+    <div class="row mb-4">
+
+        <div class="col-md-3">
+
+            <label>Fecha Inicio</label>
+
+            <input
+                type="date"
+                name="fecha_inicio"
+                class="form-control"
+                value="{{ request.args.get('fecha_inicio','') }}">
+
+        </div>
+
+
+        <div class="col-md-3">
+
+            <label>Fecha Fin</label>
+
+            <input
+                type="date"
+                name="fecha_fin"
+                class="form-control"
+                value="{{ request.args.get('fecha_fin','') }}">
+
+        </div>
+
+
+        <div class="col-md-3 d-flex align-items-end">
+
+            <button
+                type="submit"
+                class="btn btn-primary me-2">
+
+                Consultar
+
+            </button>
+
+
+            <a href="/reporte_visitas_vendedor"
+               class="btn btn-secondary">
+
+                Limpiar
+
+            </a>
+
+        </div>
+
+    </div>
+
+</form>
+
+
+<div class="card mb-4">
+
+    <div class="card-body">
+
+        <h5 class="mb-3">
+            Visitas por Vendedor
+        </h5>
+
+        <canvas id="graficaVisitas"></canvas>
+
+    </div>
+
+</div>
+
+
+<div class="table-responsive">
+
+    <table class="table table-striped table-bordered">
+
+        <thead class="table-dark">
+
+            <tr>
+
+                <th>Vendedor</th>
+
+                <th>Visitas</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for fila in reporte %}
+
+            <tr>
+
+                <td>
+                    {{ fila.nombre }}
+                </td>
+
+                <td>
+                    {{ fila.visitas }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<div class="alert alert-primary mt-3">
+
+    <strong>
+        Total de Visitas:
+        {{ total_general }}
+    </strong>
+
+</div>
+
+
+<!-- Cargar Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+const ctx = document.getElementById('graficaVisitas');
+
+
+new Chart(ctx, {
+
+    type: 'bar',
+
+    data: {
+
+        labels: {{ labels|tojson }},
+
+        datasets: [{
+
+            label: 'Visitas',
+
+            data: {{ visitas|tojson }},
+
+            backgroundColor: '#0d6efd'
+
+        }]
+
+    },
+
+
+    options: {
+
+        responsive: true,
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
+
+{% endblock %}

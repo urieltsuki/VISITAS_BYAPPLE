@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Editar Visita
+{% endblock %}
+
+{% block contenido %}
+
+<h2>Editar Visita</h2>
+
+<form method="POST">
+
+    <div class="mb-3">
+
+        <label>Observaciones</label>
+
+        <textarea
+            name="observaciones"
+            class="form-control"
+            rows="5">{{ visita.observaciones }}</textarea>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>
+
+            <input
+                type="checkbox"
+                name="venta_realizada"
+                {% if visita.venta_realizada %}checked{% endif %}>
+
+            ¿Hubo venta?
+
+        </label>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Monto Venta</label>
+
+        <input
+            type="number"
+            step="0.01"
+            name="monto_venta"
+            class="form-control"
+            value="{{ visita.monto_venta }}">
+
+    </div>
+
+    <button
+        type="submit"
+        class="btn btn-success">
+
+        Guardar Cambios
+
+    </button>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Nueva Visita
+{% endblock %}
+
+{% block contenido %}
+
+<h2>Nueva Visita</h2>
+
+<form method="POST" enctype="multipart/form-data">
+
+<div class="mb-3">
+
+    <label>No. Cliente</label>
+
+    <input
+        type="text"
+        id="num_cliente"
+        class="form-control"
+        placeholder="Ingrese número de cliente">
+
+</div>
+
+<div class="mb-3">
+
+    <label>Nombre Cliente</label>
+
+    <input
+        type="text"
+        id="nombre_cliente"
+        class="form-control"
+        readonly>
+
+</div>
+
+<input
+    type="hidden"
+    name="cliente_id"
+    id="cliente_id">
+
+    <div class="mb-3">
+
+        <label>Observaciones</label>
+
+        <textarea
+            name="observaciones"
+            class="form-control"
+            rows="5"></textarea>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>
+
+            <input
+                type="checkbox"
+                name="venta_realizada">
+
+            ¿Hubo venta?
+
+        </label>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label>Monto Venta</label>
+
+        <input
+            type="number"
+            step="0.01"
+            name="monto_venta"
+            class="form-control">
+
+    </div>
+
+    <input
+    type="hidden"
+    name="latitud"
+    id="latitud">
+
+    <input
+    type="hidden"
+    name="longitud"
+    id="longitud">
+
+    <div class="mb-3">
+
+    <label>
+        Foto Evidencia
+    </label>
+
+    <input
+        type="file"
+        name="foto"
+        accept="image/*"
+        class="form-control">
+
+</div>
+
+    <div class="mb-3">
+
+        <label>Próxima Visita</label>
+
+        <input
+            type="date"
+            name="proxima_visita"
+            class="form-control">
+
+    </div>
+
+    <div class="mb-3">
+
+<br>
+    <button
+        type="submit"
+        class="btn btn-success">
+
+        Guardar Visita
+
+    </button>
+
+<script>
+
+const clientes = [
+
+{% for cliente in clientes %}
+
+{
+    id: "{{ cliente.id }}",
+    numero: "{{ cliente.num_cliente }}",
+    nombre: "{{ cliente.nombre }}"
+},
+
+{% endfor %}
+
+];
+
+</script>
+
+<script>
+
+let campoNumero =
+    document.getElementById('num_cliente');
+
+let campoNombre =
+    document.getElementById('nombre_cliente');
+
+let campoId =
+    document.getElementById('cliente_id');
+
+campoNumero.addEventListener(
+
+    'keyup',
+
+    function(){
+
+        let numero =
+            this.value.trim();
+
+        let cliente =
+            clientes.find(
+                c => c.numero === numero
+            );
+
+        if(cliente){
+
+            campoNombre.value =
+                cliente.nombre;
+
+            campoId.value =
+                cliente.id;
+
+        }
+        else{
+
+            campoNombre.value = '';
+
+            campoId.value = '';
+
+        }
+
+    }
+
+);
+
+</script>
+
+
+
+    <script>
+
+navigator.geolocation.getCurrentPosition(
+
+    function(posicion){
+
+        document.getElementById(
+            'latitud'
+        ).value =
+        posicion.coords.latitude;
+
+        document.getElementById(
+            'longitud'
+        ).value =
+        posicion.coords.longitude;
+
+    }
+
+);
+
+</script>
+
+
+</form>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    const selector =
+        document.getElementById('cliente_id');
+
+    const nombre =
+        document.getElementById('nombre_cliente');
+
+    function actualizarNombre() {
+
+        let opcion =
+            selector.options[
+                selector.selectedIndex
+            ];
+
+        nombre.value =
+            opcion.dataset.nombre;
+    }
+
+    actualizarNombre();
+
+    selector.addEventListener(
+        'change',
+        actualizarNombre
+    );
+
+});
+
+</script>
+
+{% endblock %}

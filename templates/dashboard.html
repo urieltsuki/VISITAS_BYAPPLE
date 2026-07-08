@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Dashboard
+{% endblock %}
+
+{% block contenido %}
+
+<h2 class="mb-4">
+    Dashboard
+</h2>
+
+<div class="row">
+
+    {% if admin %}
+    <div class="col-md-3 mb-3">
+
+        <div class="card bg-primary text-white">
+
+            <div class="card-body">
+
+                <h5>Clientes</h5>
+
+                <h2>{{ total_clientes }}</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+    {% endif %}
+
+
+    <div class="col-md-3 mb-3">
+
+        <div class="card bg-success text-white">
+
+            <div class="card-body">
+
+                <h5>Visitas Totales</h5>
+
+                <h2>{{ total_visitas }}</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-3 mb-3">
+
+        <div class="card bg-warning">
+
+            <div class="card-body">
+
+                <h5>Visitas del Mes</h5>
+
+                <h2>{{ visitas_mes }}</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {% if not admin %}
+    <div class="col-md-3 mb-3">
+
+        <div class="card bg-info text-white">
+
+            <div class="card-body">
+
+                <h5>Ventas del Mes</h5>
+
+                <h2>{{ ventas_mes }}</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+    {% endif %}
+
+
+    <div class="col-md-3 mb-3">
+
+        <div class="card bg-dark text-white">
+
+            <div class="card-body">
+
+                <h5>Venta del Mes</h5>
+
+                <h3>
+                    $ {{ "{:,.2f}".format(monto_mes or 0) }}
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{% if not admin %}
+
+<div class="card mt-4">
+
+    <div class="card-header bg-primary text-white">
+
+        Próximas Visitas
+
+    </div>
+
+    <div class="card-body">
+
+        {% if proximas_visitas %}
+
+            <ul class="list-group">
+
+                {% for visita in proximas_visitas %}
+
+                <li class="list-group-item">
+
+                    <strong>
+                        {{ visita.proxima_visita.strftime('%d/%m/%Y') }}
+                    </strong>
+
+                    <br>
+
+                    {{ visita.cliente.num_cliente }} - {{ visita.cliente.nombre }}
+
+                </li>
+
+                {% endfor %}
+
+            </ul>
+
+        {% else %}
+
+            <div class="alert alert-secondary mb-0">
+
+                No tienes visitas programadas.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

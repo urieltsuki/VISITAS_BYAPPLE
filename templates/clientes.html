@@ -1,0 +1,216 @@
+
+{% extends 'base.html' %}
+
+{% block titulo %}
+Clientes
+{% endblock %}
+
+{% block contenido %}
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+
+
+
+<div class="container mt-5">
+
+    <h2>Administración de Clientes</h2>
+
+    <p>
+
+    Total de registros:
+
+    <strong>
+        {{ clientes.total }}
+    </strong>
+
+</p>
+
+    <form method="POST">
+
+        <div class="mb-3">
+            <label>No. Cliente</label>
+            <input type="text"
+                   name="num_cliente"
+                   class="form-control"
+                   required>
+        </div>
+
+        <div class="mb-3">
+            <label>Nombre</label>
+            <input type="text"
+                   name="nombre"
+                   class="form-control"
+                   required>
+        </div>
+
+        <div class="mb-3">
+            <label>Grupo</label>
+            <input type="text"
+                   name="grupo"
+                   class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label>Canal</label>
+            <input type="text"
+                   name="canal"
+                   class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label>Vendedor</label>
+            <input type="text"
+                   name="vendedor"
+                   class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            Guardar Cliente
+        </button>
+
+    </form>
+
+    <hr>
+
+    <form method="GET">
+
+        <div class="row mb-3">
+
+            <div class="col-md-8">
+
+                <input
+                    type="text"
+                    name="buscar"
+                    class="form-control"
+                    placeholder="Buscar por número, nombre, grupo, canal o vendedor">
+
+            </div>
+
+            <div class="col-md-2">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary">
+                    Buscar
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+    <table class="table table-striped table-hover">
+
+        <thead class="table-dark">
+
+            <tr>
+                <th>No Cliente</th>
+                <th>Nombre</th>
+                <th>Grupo</th>
+                <th>Canal</th>
+                
+                <th>Acciones</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for cliente in clientes.items %}
+
+            <tr>
+
+                <td>{{ cliente.num_cliente }}</td>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.grupo }}</td>
+                <td>{{ cliente.canal }}</td>
+                
+
+                <td>
+
+                    <a href="/cliente/editar/{{ cliente.id }}"
+                       class="btn btn-warning btn-sm">
+                        Editar
+                    </a>
+
+                    <a href="/cliente/eliminar/{{ cliente.id }}"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('¿Eliminar este cliente?');">
+                        Eliminar
+                    </a>
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+    <nav aria-label="Paginación de clientes">
+
+    <ul class="pagination">
+
+        {% if clientes.has_prev %}
+
+        <li class="page-item">
+            <a class="page-link"
+               href="{{ url_for('clientes', page=clientes.prev_num) }}">
+                Anterior
+            </a>
+        </li>
+
+        {% endif %}
+
+        {% for num in clientes.iter_pages() %}
+
+            {% if num %}
+
+                <li class="page-item {% if num == clientes.page %}active{% endif %}">
+                    <a class="page-link"
+                       href="{{ url_for('clientes', page=num) }}">
+                        {{ num }}
+                    </a>
+                </li>
+
+            {% else %}
+
+                <li class="page-item disabled">
+                    <span class="page-link">…</span>
+                </li>
+
+            {% endif %}
+
+        {% endfor %}
+
+        {% if clientes.has_next %}
+
+        <li class="page-item">
+            <a class="page-link"
+               href="{{ url_for('clientes', page=clientes.next_num) }}">
+                Siguiente
+            </a>
+        </li>
+
+        {% endif %}
+
+    </ul>
+
+</nav>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}

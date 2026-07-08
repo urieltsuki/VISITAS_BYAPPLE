@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Editar Usuario
+{% endblock %}
+
+{% block contenido %}
+
+<h2>Editar Usuario</h2>
+
+<div class="card">
+
+    <div class="card-body">
+
+        <form method="POST">
+
+            <div class="mb-3">
+
+                <label>Nombre</label>
+
+                <input
+                    type="text"
+                    name="nombre"
+                    class="form-control"
+                    value="{{ usuario.nombre }}"
+                    required>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Correo</label>
+
+                <input
+                    type="email"
+                    name="correo"
+                    class="form-control"
+                    value="{{ usuario.correo }}"
+                    required>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Nueva Contraseña</label>
+
+                <input
+                    type="password"
+                    name="password"
+                    class="form-control">
+
+                <small class="text-muted">
+                    Dejar en blanco para conservar la contraseña actual
+                </small>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Rol</label>
+
+                <select
+                    name="rol"
+                    class="form-control">
+
+                    <option
+                        value="admin"
+                        {% if usuario.rol == 'admin' %}selected{% endif %}>
+                        Administrador
+                    </option>
+
+                    <option
+                        value="vendedor"
+                        {% if usuario.rol == 'vendedor' %}selected{% endif %}>
+                        Vendedor
+                    </option>
+
+                </select>
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-success">
+
+                Guardar Cambios
+
+            </button>
+
+            <a href="/usuarios" class="btn btn-secondary">
+    Cancelar
+</a>
+
+            </a>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

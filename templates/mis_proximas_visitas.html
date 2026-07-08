@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Mis Próximas Visitas
+{% endblock %}
+
+{% block contenido %}
+
+<h2>Mis Próximas Visitas</h2>
+
+<div class="table-responsive">
+
+    <table class="table table-striped">
+
+        <thead class="table-dark">
+
+            <tr>
+
+                <th>Fecha</th>
+                <th>No. Cliente</th>
+                <th>Cliente</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for visita in visitas %}
+
+            <tr>
+
+                <td>
+                    {{ visita.proxima_visita.strftime('%d/%m/%Y') }}
+                </td>
+
+                <td>
+                    {{ visita.cliente.num_cliente }}
+                </td>
+
+                <td>
+                    {{ visita.cliente.nombre }}
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}
