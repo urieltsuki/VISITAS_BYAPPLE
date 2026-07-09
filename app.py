@@ -32,7 +32,6 @@ app = Flask(__name__)
 # Configuración
 import os
 
-
 database_url = os.getenv("DATABASE_URL")
 
 if database_url and database_url.startswith("postgres://"):
@@ -42,14 +41,17 @@ if database_url and database_url.startswith("postgres://"):
         1
     )
 
+app.config['SECRET_KEY'] = os.getenv(
+    'SECRET_KEY',
+    'desarrollo-local'
+)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     database_url or 'sqlite:///bitacora.db'
 )
 
-
 # Base de datos
 db.init_app(app)
-
 
 with app.app_context():
     db.create_all()
