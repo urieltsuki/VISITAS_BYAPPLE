@@ -315,7 +315,7 @@ def visitas():
             request.form['proxima_visita'],
             '%Y-%m-%d'
         ).date()
-
+        print("CLIENTE ID:", request.form.get('cliente_id'))
         visita = Visita(
 
             

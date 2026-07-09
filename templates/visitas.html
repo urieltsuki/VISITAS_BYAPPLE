@@ -10,42 +10,35 @@ Nueva Visita
 
 <form method="POST" enctype="multipart/form-data">
 
-<div class="mb-3">
+    <div class="mb-3">
 
-    <label>Cliente</label>
+        <label>Cliente</label>
 
-    <input
-        type="text"
-        id="cliente_busqueda"
-        class="form-control"
-        list="clientesList"
-        placeholder="Buscar por número o nombre"
-        autocomplete="off">
+        <input
+            type="text"
+            id="cliente_busqueda"
+            class="form-control"
+            list="clientesList"
+            placeholder="Buscar por número o nombre"
+            autocomplete="off"
+            required>
 
-    <datalist id="clientesList">
+        <datalist id="clientesList">
 
-        {% for cliente in clientes %}
+            {% for cliente in clientes %}
 
-        <option
-            value="{{ cliente.num_cliente }} - {{ cliente.nombre }}">
-        </option>
+            <option value="{{ cliente.num_cliente }} - {{ cliente.nombre }}"></option>
 
-        {% endfor %}
+            {% endfor %}
 
-    </datalist>
+        </datalist>
 
-    <input
-        type="hidden"
-        name="cliente_id"
-        id="cliente_id">
+        <input
+            type="hidden"
+            name="cliente_id"
+            id="cliente_id">
 
-</div>
-
-
-<input
-    type="hidden"
-    name="cliente_id"
-    id="cliente_id">
+    </div>
 
     <div class="mb-3">
 
@@ -85,28 +78,26 @@ Nueva Visita
     </div>
 
     <input
-    type="hidden"
-    name="latitud"
-    id="latitud">
+        type="hidden"
+        name="latitud"
+        id="latitud">
 
     <input
-    type="hidden"
-    name="longitud"
-    id="longitud">
+        type="hidden"
+        name="longitud"
+        id="longitud">
 
     <div class="mb-3">
 
-    <label>
-        Foto Evidencia
-    </label>
+        <label>Foto Evidencia</label>
 
-    <input
-        type="file"
-        name="foto"
-        accept="image/*"
-        class="form-control">
+        <input
+            type="file"
+            name="foto"
+            accept="image/*"
+            class="form-control">
 
-</div>
+    </div>
 
     <div class="mb-3">
 
@@ -119,9 +110,8 @@ Nueva Visita
 
     </div>
 
-    <div class="mb-3">
+    <br>
 
-<br>
     <button
         type="submit"
         class="btn btn-success">
@@ -130,126 +120,77 @@ Nueva Visita
 
     </button>
 
+</form>
+
 <script>
 
+// Obtener ubicación GPS
+navigator.geolocation.getCurrentPosition(
+
+    function(posicion){
+
+        document.getElementById("latitud").value =
+            posicion.coords.latitude;
+
+        document.getElementById("longitud").value =
+            posicion.coords.longitude;
+
+    },
+
+    function(error){
+
+        console.log("No fue posible obtener la ubicación.");
+
+    }
+
+);
+
+// Lista de clientes enviada desde Flask
 const clientes = [
 
 {% for cliente in clientes %}
 
 {
     id: "{{ cliente.id }}",
-    numero: "{{ cliente.num_cliente }}",
-    nombre: "{{ cliente.nombre }}"
+    texto: "{{ cliente.num_cliente }} - {{ cliente.nombre }}"
 },
 
 {% endfor %}
 
 ];
 
-</script>
+// Buscar cliente y guardar su ID
+const buscador = document.getElementById("cliente_busqueda");
+const clienteId = document.getElementById("cliente_id");
 
-<script>
+buscador.addEventListener("input", function () {
 
-let campoNumero =
-    document.getElementById('num_cliente');
+    const valor = this.value.trim();
 
-let campoNombre =
-    document.getElementById('nombre_cliente');
+    const cliente = clientes.find(c => c.texto === valor);
 
-let campoId =
-    document.getElementById('cliente_id');
+    if (cliente) {
 
-campoNumero.addEventListener(
+        clienteId.value = cliente.id;
 
-    'keyup',
+    } else {
 
-    function(){
-
-        let numero =
-            this.value.trim();
-
-        let cliente =
-            clientes.find(
-                c => c.numero === numero
-            );
-
-        if(cliente){
-
-            campoNombre.value =
-                cliente.nombre;
-
-            campoId.value =
-                cliente.id;
-
-        }
-        else{
-
-            campoNombre.value = '';
-
-            campoId.value = '';
-
-        }
+        clienteId.value = "";
 
     }
 
-);
+});
 
-</script>
+// Validar antes de enviar el formulario
+document.querySelector("form").addEventListener("submit", function(e){
 
+    if(clienteId.value === ""){
 
+        alert("Debe seleccionar un cliente válido de la lista.");
 
-    <script>
-
-navigator.geolocation.getCurrentPosition(
-
-    function(posicion){
-
-        document.getElementById(
-            'latitud'
-        ).value =
-        posicion.coords.latitude;
-
-        document.getElementById(
-            'longitud'
-        ).value =
-        posicion.coords.longitude;
+        e.preventDefault();
 
     }
-
-);
-
-</script>
-
-
-</form>
-
-<script>
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    const selector =
-        document.getElementById('cliente_id');
-
-    const nombre =
-        document.getElementById('nombre_cliente');
-
-    function actualizarNombre() {
-
-        let opcion =
-            selector.options[
-                selector.selectedIndex
-            ];
-
-        nombre.value =
-            opcion.dataset.nombre;
-    }
-
-    actualizarNombre();
-
-    selector.addEventListener(
-        'change',
-        actualizarNombre
-    );
 
 });
 
