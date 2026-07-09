@@ -32,15 +32,28 @@ app = Flask(__name__)
 # Configuración
 import os
 
-app.config['SECRET_KEY'] = os.environ.get(
-    'SECRET_KEY',
-    'desarrollo-local'
+
+database_url = os.getenv("DATABASE_URL")
+
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace(
+        "postgres://",
+        "postgresql://",
+        1
+    )
+
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    database_url or 'sqlite:///bitacora.db'
 )
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
 # Base de datos
 db.init_app(app)
+
+
+with app.app_context():
+    db.create_all()
+
 
 # Crear tablas
 with app.app_context():
@@ -869,8 +882,13 @@ app.config[
     'UPLOAD_FOLDER'
 ] = UPLOAD_FOLDER
 
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+with app.app_context():
+    db.create_all()
+
 if __name__ == '__main__':
-    
     app.run(
         host='0.0.0.0',
         port=5000,
