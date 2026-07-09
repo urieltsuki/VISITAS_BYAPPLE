@@ -1,17 +1,22 @@
+from werkzeug.security import generate_password_hash
+
 from app import app
 from models import db, Usuario
-from werkzeug.security import generate_password_hash
 
 with app.app_context():
 
-    usuario = Usuario(
-        nombre="Administrador",
-        correo="uriel.luna@applecosmetics.com.mx",
-        password=generate_password_hash("uri26"),
-        rol="admin"
-    )
+    usuario = Usuario.query.filter_by(
+        correo="uriel.luna@applecosmetics.com.mx"
+    ).first()
 
-    db.session.add(usuario)
-    db.session.commit()
+    if usuario:
 
-    print("Administrador creado correctamente")
+        usuario.password = generate_password_hash("uri26")
+        usuario.rol = "admin"
+
+        db.session.commit()
+
+        print("Password actualizada")
+
+    else:
+        print("No existe el usuario")

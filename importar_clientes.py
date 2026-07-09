@@ -3,26 +3,29 @@ import pandas as pd
 from app import app
 from models import db, Cliente
 
-archivo = "clientes.xlsx"
-
-df = pd.read_excel(archivo)
+ARCHIVO = "Clientes.xlsx"
 
 with app.app_context():
+
+    df = pd.read_excel(ARCHIVO)
+
+    print(f"Registros encontrados: {len(df)}")
+
+    clientes = []
 
     for _, fila in df.iterrows():
 
         cliente = Cliente(
-            
             num_cliente=str(fila['Num Cliente']).strip(),
             nombre=str(fila['Nombre']).strip(),
-            grupo='' if pd.isna(fila['Grupo']) else str(fila['Grupo']).strip(),
-            canal='' if pd.isna(fila['Canal']) else str(fila['Canal']).strip(),
-            vendedor='' if pd.isna(fila['Vendedor']) else str(fila['Vendedor']).strip()
-
+            grupo=str(fila['Grupo']).strip() if pd.notna(fila['Grupo']) else None,
+            canal=str(fila['Canal']).strip() if pd.notna(fila['Canal']) else None,
+            vendedor=int(fila['Vendedor']) if pd.notna(fila['Vendedor']) else None
         )
 
-        db.session.add(cliente)
+        clientes.append(cliente)
 
+    db.session.bulk_save_objects(clientes)
     db.session.commit()
 
-print("Clientes importados correctamente")
+    print(f"Clientes importados: {len(clientes)}")

@@ -53,14 +53,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 # Base de datos
 db.init_app(app)
 
-with app.app_context():
-    db.create_all()
-
-
 # Crear tablas
 with app.app_context():
     db.create_all()
-
+print("DB:", app.config['SQLALCHEMY_DATABASE_URI'])
 # Flask Login
 login_manager = LoginManager()
 
@@ -117,6 +113,8 @@ def login():
 
 
 # Dashboard protegido
+from sqlalchemy import func, extract
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -131,24 +129,23 @@ def dashboard():
         total_visitas = Visita.query.count()
 
         visitas_mes = Visita.query.filter(
-            func.strftime('%Y', Visita.fecha) == str(hoy.year),
-            func.strftime('%m', Visita.fecha) == f"{hoy.month:02}"
+            extract('year', Visita.fecha) == hoy.year,
+            extract('month', Visita.fecha) == hoy.month
         ).count()
 
         monto_mes = db.session.query(
             func.sum(Visita.monto_venta)
         ).filter(
-            func.strftime('%Y', Visita.fecha) == str(hoy.year),
-            func.strftime('%m', Visita.fecha) == f"{hoy.month:02}"
+            extract('year', Visita.fecha) == hoy.year,
+            extract('month', Visita.fecha) == hoy.month
         ).scalar() or 0
 
         clientes_con_venta = db.session.query(
-        Visita.cliente_id
+            Visita.cliente_id
         ).filter(
-            
             Visita.venta_realizada == True,
-            func.strftime('%Y', Visita.fecha) == str(hoy.year),
-            func.strftime('%m', Visita.fecha) == f"{hoy.month:02}"
+            extract('year', Visita.fecha) == hoy.year,
+            extract('month', Visita.fecha) == hoy.month
         ).distinct().count()
 
         return render_template(
@@ -158,31 +155,34 @@ def dashboard():
             visitas_mes=visitas_mes,
             monto_mes=monto_mes,
             clientes_con_venta=clientes_con_venta,
-            admin=current_user.rol in ['admin', 'supervisor']
+            admin=True
         )
 
     # VENDEDOR
+
     total_visitas = Visita.query.filter(
         Visita.usuario_id == current_user.id
     ).count()
 
     visitas_mes = Visita.query.filter(
         Visita.usuario_id == current_user.id,
-        func.strftime('%Y', Visita.fecha) == str(hoy.year),
-        func.strftime('%m', Visita.fecha) == f"{hoy.month:02}"
+        extract('year', Visita.fecha) == hoy.year,
+        extract('month', Visita.fecha) == hoy.month
     ).count()
 
     ventas_mes = Visita.query.filter(
         Visita.usuario_id == current_user.id,
-        Visita.venta_realizada == True
+        Visita.venta_realizada == True,
+        extract('year', Visita.fecha) == hoy.year,
+        extract('month', Visita.fecha) == hoy.month
     ).count()
 
     monto_mes = db.session.query(
         func.sum(Visita.monto_venta)
     ).filter(
         Visita.usuario_id == current_user.id,
-        func.strftime('%Y', Visita.fecha) == str(hoy.year),
-        func.strftime('%m', Visita.fecha) == f"{hoy.month:02}"
+        extract('year', Visita.fecha) == hoy.year,
+        extract('month', Visita.fecha) == hoy.month
     ).scalar() or 0
 
     proximas_visitas = Visita.query.filter(
@@ -193,26 +193,24 @@ def dashboard():
     ).limit(5).all()
 
     clientes_con_venta = db.session.query(
-    Visita.cliente_id
+        Visita.cliente_id
     ).filter(
         Visita.usuario_id == current_user.id,
         Visita.venta_realizada == True,
-        func.strftime('%Y', Visita.fecha) == str(hoy.year),
-        func.strftime('%m', Visita.fecha) == f"{hoy.month:02}"
+        extract('year', Visita.fecha) == hoy.year,
+        extract('month', Visita.fecha) == hoy.month
     ).distinct().count()
 
-    
     return render_template(
-    'dashboard.html',
-    total_visitas=total_visitas,
-    visitas_mes=visitas_mes,
-    monto_mes=monto_mes,
-    clientes_con_venta=clientes_con_venta,
-    proximas_visitas=proximas_visitas,
-    admin=False
-)
-
-    
+        'dashboard.html',
+        total_visitas=total_visitas,
+        visitas_mes=visitas_mes,
+        ventas_mes=ventas_mes,
+        monto_mes=monto_mes,
+        clientes_con_venta=clientes_con_venta,
+        proximas_visitas=proximas_visitas,
+        admin=False
+    )
 
 
 # Logout
@@ -889,6 +887,23 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 with app.app_context():
     db.create_all()
+
+
+from models import Usuario
+
+with app.app_context():
+    print("Usuarios:", Usuario.query.count())
+
+from models import Usuario
+
+with app.app_context():
+
+    usuarios = Usuario.query.all()
+
+    for u in usuarios:
+        print(
+            f"ID={u.id} | Nombre={u.nombre} | Correo={u.correo} | Rol={u.rol}"
+        )
 
 if __name__ == '__main__':
     app.run(
