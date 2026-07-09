@@ -127,12 +127,22 @@ def dashboard():
             func.strftime('%m', Visita.fecha) == f"{hoy.month:02}"
         ).scalar() or 0
 
+        clientes_con_venta = db.session.query(
+        Visita.cliente_id
+        ).filter(
+            
+            Visita.venta_realizada == True,
+            func.strftime('%Y', Visita.fecha) == str(hoy.year),
+            func.strftime('%m', Visita.fecha) == f"{hoy.month:02}"
+        ).distinct().count()
+
         return render_template(
             'dashboard.html',
             total_clientes=total_clientes,
             total_visitas=total_visitas,
             visitas_mes=visitas_mes,
             monto_mes=monto_mes,
+            clientes_con_venta=clientes_con_venta,
             admin=current_user.rol in ['admin', 'supervisor']
         )
 
@@ -167,15 +177,28 @@ def dashboard():
         Visita.proxima_visita.asc()
     ).limit(5).all()
 
+    clientes_con_venta = db.session.query(
+    Visita.cliente_id
+    ).filter(
+        Visita.usuario_id == current_user.id,
+        Visita.venta_realizada == True,
+        func.strftime('%Y', Visita.fecha) == str(hoy.year),
+        func.strftime('%m', Visita.fecha) == f"{hoy.month:02}"
+    ).distinct().count()
+
+    
     return render_template(
-        'dashboard.html',
-        total_visitas=total_visitas,
-        visitas_mes=visitas_mes,
-        ventas_mes=ventas_mes,
-        monto_mes=monto_mes,
-        proximas_visitas=proximas_visitas,
-        admin=False
-    )
+    'dashboard.html',
+    total_visitas=total_visitas,
+    visitas_mes=visitas_mes,
+    monto_mes=monto_mes,
+    clientes_con_venta=clientes_con_venta,
+    proximas_visitas=proximas_visitas,
+    admin=False
+)
+
+    
+
 
 # Logout
 @app.route('/logout')
@@ -316,7 +339,12 @@ def visitas():
             proxima_visita = None
 
     if request.form.get('proxima_visita'):
+        if not request.form.get('proxima_visita'):
 
+            return '''
+            <h3>Debe seleccionar una fecha de próxima visita</h3>
+            /visitasRegresar</a>
+            '''
         proxima_visita = datetime.strptime(
             request.form['proxima_visita'],
             '%Y-%m-%d'
