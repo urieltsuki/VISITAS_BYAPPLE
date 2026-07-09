@@ -12,27 +12,35 @@ Nueva Visita
 
 <div class="mb-3">
 
-    <label>No. Cliente</label>
+    <label>Cliente</label>
 
     <input
         type="text"
-        id="num_cliente"
+        id="cliente_busqueda"
         class="form-control"
-        placeholder="Ingrese número de cliente">
+        list="clientesList"
+        placeholder="Buscar por número o nombre"
+        autocomplete="off">
 
-</div>
+    <datalist id="clientesList">
 
-<div class="mb-3">
+        {% for cliente in clientes %}
 
-    <label>Nombre Cliente</label>
+        <option
+            value="{{ cliente.num_cliente }} - {{ cliente.nombre }}">
+        </option>
+
+        {% endfor %}
+
+    </datalist>
 
     <input
-        type="text"
-        id="nombre_cliente"
-        class="form-control"
-        readonly>
+        type="hidden"
+        name="cliente_id"
+        id="cliente_id">
 
 </div>
+
 
 <input
     type="hidden"
