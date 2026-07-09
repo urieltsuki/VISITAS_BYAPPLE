@@ -17,6 +17,7 @@ class Usuario(UserMixin, db.Model):
 
     rol = db.Column(db.String(20), default='vendedor')
 
+    activo = db.Column(db.Boolean, default=True)
 
 
 class Cliente(db.Model):

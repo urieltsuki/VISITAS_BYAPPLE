@@ -78,10 +78,16 @@ def login():
             correo=correo
         ).first()
 
-        if usuario and check_password_hash(
-            usuario.password,
-            password
+        
+        if (
+            usuario
+            and usuario.activo
+            and check_password_hash(
+                usuario.password,
+                password
+            )
         ):
+
 
             login_user(usuario)
 
@@ -103,7 +109,7 @@ def dashboard():
     hoy = datetime.now()
 
     # ADMINISTRADOR
-    if current_user.rol == 'admin':
+    if current_user.rol in ['admin', 'supervisor']:
 
         total_clientes = Cliente.query.count()
 
@@ -127,7 +133,7 @@ def dashboard():
             total_visitas=total_visitas,
             visitas_mes=visitas_mes,
             monto_mes=monto_mes,
-            admin=True
+            admin=current_user.rol in ['admin', 'supervisor']
         )
 
     # VENDEDOR
@@ -185,7 +191,7 @@ def logout():
 @login_required
 def clientes():
 
-    if current_user.rol != 'admin':
+    if current_user.rol not in ['admin', 'supervisor']:
         return "Acceso denegado"
 
     buscar = request.args.get('buscar', '')
@@ -364,11 +370,10 @@ def historial_visitas():
     cliente = request.args.get('cliente', '')
     vendedor = request.args.get('vendedor', '')
 
-    # Consulta inicial
     consulta = Visita.query
 
-    # Si NO es administrador, solo verá sus visitas
-    if current_user.rol != 'admin':
+    # Solo los vendedores ven sus propias visitas
+    if current_user.rol == 'vendedor':
 
         consulta = consulta.filter(
             Visita.usuario_id == current_user.id
@@ -376,20 +381,24 @@ def historial_visitas():
 
     # Filtro por fecha
     if fecha:
+
         consulta = consulta.filter(
             db.func.date(Visita.fecha) == fecha
         )
 
     # Filtro por cliente
-    
     if cliente:
+
         consulta = consulta.join(Cliente).filter(
             Cliente.num_cliente.contains(cliente)
         )
 
+    # Filtro por vendedor
+    if (
+        vendedor and
+        current_user.rol in ['admin', 'supervisor']
+    ):
 
-    # Filtro por vendedor (solo admin)
-    if vendedor and current_user.rol == 'admin':
         consulta = consulta.join(Usuario).filter(
             Usuario.nombre.contains(vendedor)
         )
@@ -418,8 +427,8 @@ def editar_visita(id):
     visita = Visita.query.get_or_404(id)
 
     if (
-        current_user.rol != 'admin'
-        and visita.usuario_id != current_user.id
+    current_user.rol == 'vendedor'
+    and visita.usuario_id != current_user.id
     ):
         return "Acceso denegado"
 
@@ -556,7 +565,7 @@ def eliminar_visita(id):
 @login_required
 def reportes():
 
-    if current_user.rol != 'admin':
+    if current_user.rol not in ['admin', 'supervisor']:
         return "Acceso denegado"
 
     return render_template(
@@ -567,7 +576,7 @@ def reportes():
 @login_required
 def reporte_ventas_vendedor():
 
-    if current_user.rol != 'admin':
+    if current_user.rol not in ['admin', 'supervisor']:
         return "Acceso denegado"
 
     fecha_inicio = request.args.get('fecha_inicio')
@@ -635,7 +644,7 @@ def reporte_ventas_vendedor():
 @login_required
 def reporte_visitas_vendedor():
 
-    if current_user.rol != 'admin':
+    if current_user.rol not in ['admin', 'supervisor']:
         return "Acceso denegado"
 
     fecha_inicio = request.args.get('fecha_inicio')
@@ -697,7 +706,7 @@ def reporte_visitas_vendedor():
 @login_required
 def reporte_proximas_visitas():
 
-    if current_user.rol != 'admin':
+    if current_user.rol not in ['admin', 'supervisor']:
         return "Acceso denegado"
 
     fecha_inicio = request.args.get('fecha_inicio')
@@ -743,6 +752,88 @@ def mis_proximas_visitas():
         'mis_proximas_visitas.html',
         visitas=visitas
     )
+
+@app.route('/usuario/desactivar/<int:id>')
+@login_required
+def desactivar_usuario(id):
+
+    if current_user.rol != 'admin':
+        return "Acceso denegado"
+
+    usuario = Usuario.query.get_or_404(id)
+
+    if usuario.id == current_user.id:
+
+        return (
+            "No puedes "
+            "desactivar tu propio usuario"
+        )
+
+    usuario.activo = False
+
+    db.session.commit()
+
+    return redirect('/usuarios')
+
+@app.route('/usuario/activar/<int:id>')
+@login_required
+def reactivar_usuario(id):
+
+    if current_user.rol != 'admin':
+        return "Acceso denegado"
+
+    usuario = Usuario.query.get_or_404(id)
+
+    usuario.activo = True
+
+    db.session.commit()
+
+    return redirect('/usuarios')
+
+@app.route('/cambiar_password', methods=['GET', 'POST'])
+@login_required
+def cambiar_password():
+
+    mensaje = ''
+
+    if request.method == 'POST':
+
+        password_actual = request.form['password_actual']
+
+        nueva_password = request.form['nueva_password']
+
+        confirmar_password = request.form[
+            'confirmar_password'
+        ]
+
+        if not check_password_hash(
+            current_user.password,
+            password_actual
+        ):
+
+            mensaje = 'La contraseña actual es incorrecta'
+
+        elif nueva_password != confirmar_password:
+
+            mensaje = 'Las contraseñas no coinciden'
+
+        else:
+
+            current_user.password = (
+                generate_password_hash(
+                    nueva_password
+                )
+            )
+
+            db.session.commit()
+
+            mensaje = 'Contraseña actualizada correctamente'
+
+    return render_template(
+        'cambiar_password.html',
+        mensaje=mensaje
+    )
+
 
 UPLOAD_FOLDER = 'uploads'
 

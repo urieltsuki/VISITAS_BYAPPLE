@@ -81,54 +81,92 @@
 
             <hr>
 
+            <!-- Dashboard -->
             <a href="/dashboard"
                class="btn btn-outline-primary w-100 mb-2">
+
                 Dashboard
+
             </a>
 
+            <!-- Clientes -->
             {% if current_user.rol == 'admin' %}
 
             <a href="/clientes"
                class="btn btn-outline-secondary w-100 mb-2">
+
                 Administración Clientes
-            </a>
 
-            <a href="/usuarios"
-               class="btn btn-outline-secondary w-100 mb-2">
-                Administración Usuarios
-            </a>
-
-            <a href="/reportes"
-               class="btn btn-outline-secondary w-100 mb-2">
-                Reportes
             </a>
 
             {% endif %}
 
-            <a href="/visitas"
+            <!-- Usuarios -->
+            {% if current_user.rol == 'admin' %}
+
+            <a href="/usuarios"
                class="btn btn-outline-secondary w-100 mb-2">
-                Nueva Visita
+
+                Administración Usuarios
+
             </a>
 
-            {% if current_user.rol != 'admin' %}
+            {% endif %}
+
+            <!-- Reportes -->
+            {% if current_user.rol in ['admin', 'supervisor'] %}
+
+            <a href="/reportes"
+               class="btn btn-outline-secondary w-100 mb-2">
+
+                Reportes
+
+            </a>
+
+            {% endif %}
+
+            <!-- Nueva Visita -->
+            <a href="/visitas"
+               class="btn btn-outline-secondary w-100 mb-2">
+
+                Nueva Visita
+
+            </a>
+
+            <!-- Próximas Visitas -->
+            {% if current_user.rol == 'vendedor' %}
 
             <a href="/mis_proximas_visitas"
-            class="btn btn-outline-secondary w-100 mb-2">
+               class="btn btn-outline-secondary w-100 mb-2">
 
                 Mis Próximas Visitas
 
             </a>
 
             {% endif %}
-            
+
+            <!-- Historial -->
             <a href="/historial_visitas"
                class="btn btn-outline-secondary w-100 mb-2">
+
                 Historial Visitas
+
             </a>
 
+              <!-- Cambiar Contraseña -->
+            <a href="/cambiar_password"
+               class="btn btn-outline-secondary w-100 mb-2">
+
+                Cambiar Contraseña
+
+            </a>
+
+            <!-- Cerrar sesión -->
             <a href="/logout"
                class="btn btn-outline-danger w-100">
+
                 Cerrar Sesión
+
             </a>
 
         </div>
@@ -137,8 +175,10 @@
 
     <!-- Contenido -->
     <div class="container mt-4">
+
         {% block contenido %}
         {% endblock %}
+
     </div>
 
     <!-- Bootstrap JS -->

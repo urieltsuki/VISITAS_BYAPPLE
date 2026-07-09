@@ -6,7 +6,7 @@ with app.app_context():
 
     usuario = Usuario(
         nombre="Administrador",
-        correo="admin@applecosmetics.com.mx",
+        correo="uriel.luna@applecosmetics.com.mx",
         password=generate_password_hash("uri26"),
         rol="admin"
     )
