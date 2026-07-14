@@ -1,4 +1,4 @@
-```html
+
 {% extends 'base.html' %}
 
 {% block contenido %}
@@ -10,7 +10,7 @@
     </h2>
 
 
-    <a href="{{ url_for('nuevo_objetivo') }}" 
+    <a href="{{ url_for('nuevo_objetivo') }}"
        class="btn btn-primary mb-3">
 
         Nuevo Objetivo
@@ -44,7 +44,6 @@
 
 
             {% for o in objetivos %}
-
 
                 <tr>
 
@@ -80,11 +79,19 @@
                         </a>
 
 
+                        <a href="{{ url_for('eliminar_objetivo', id=o.id) }}"
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('¿Deseas eliminar este objetivo?');">
+
+                            Eliminar
+
+                        </a>
+
+
                     </td>
 
 
                 </tr>
-
 
 
             {% else %}
@@ -117,4 +124,4 @@
 
 
 {% endblock %}
-```
+

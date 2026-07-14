@@ -1,164 +1,516 @@
+
 {% extends 'base.html' %}
 
 {% block titulo %}
 Dashboard
 {% endblock %}
 
+
 {% block contenido %}
+
 
 <h2 class="mb-4">
     Dashboard
 </h2>
 
+
+
+<!-- TARJETAS GENERALES -->
+
 <div class="row">
 
 
-{% if admin %}
-<div class="col-md-3 mb-3">
-    <div class="card bg-primary text-white shadow-sm">
-        <div class="card-body">
-            <h5>Clientes Totales</h5>
-            <h2>{{ total_clientes }}</h2>
-        </div>
-    </div>
-</div>
-{% endif %}
+    {% if admin %}
 
+    <div class="col-md-3 mb-3">
 
-<div class="col-md-3 mb-3">
-    <div class="card bg-success text-white shadow-sm">
-        <div class="card-body">
-            <h5>Visitas Totales</h5>
-            <h2>{{ total_visitas }}</h2>
-        </div>
-    </div>
-</div>
+        <div class="card bg-primary text-white shadow-sm">
 
+            <div class="card-body">
 
-<div class="col-md-3 mb-3">
-    <div class="card bg-warning shadow-sm">
-        <div class="card-body">
-            <h5>Visitas del Mes</h5>
-            <h2>{{ visitas_mes }}</h2>
-        </div>
-    </div>
-</div>
+                <h5>Clientes Totales</h5>
 
+                <h2>
+                    {{ total_clientes or 0 }}
+                </h2>
 
-<div class="col-md-3 mb-3">
-    <div class="card bg-info text-white shadow-sm">
-        <div class="card-body">
-            <h5>Clientes con Venta</h5>
-            <h2>
-                {{ clientes_con_venta }}
-            </h2>
-        </div>
-    </div>
-</div>
-
-
-<div class="col-md-3 mb-3">
-    <div class="card bg-dark text-white shadow-sm">
-        <div class="card-body">
-            <h5>Venta del Mes</h5>
-
-            <h3>
-                $ {{ "{:,.2f}".format(monto_mes or 0) }}
-            </h3>
+            </div>
 
         </div>
-    </div>
-</div>
-
-
-</div>
-
-<div class="card mt-3 shadow-sm">
-
-
-<div class="card-body">
-
-    <h4>
-        Objetivo Mensual
-    </h4>
-
-    <h2>
-        ${{ "{:,.0f}".format(objetivo or 0) }}
-    </h2>
-
-    <p>
-        Venta Actual:
-        ${{ "{:,.0f}".format(monto_mes or 0) }}
-    </p>
-
-
-    <div class="progress">
-
-        <div class="progress-bar"
-             role="progressbar"
-             style="width: {{ [cumplimiento, 100]|min }}%;">
-
-            {{ cumplimiento }}%
-
-        </div>
-
-    </div>
-
-</div>
-
-
-</div>
-
-{% if not admin %}
-
-<div class="card mt-4 shadow-sm">
-
-
-<div class="card-header bg-primary text-white">
-    Próximas Visitas
-</div>
-
-
-<div class="card-body">
-
-    {% if proximas_visitas %}
-
-    <ul class="list-group">
-
-        {% for visita in proximas_visitas %}
-
-        <li class="list-group-item">
-
-            <strong>
-                {{ visita.proxima_visita.strftime('%d/%m/%Y') }}
-            </strong>
-
-            <br>
-
-            {{ visita.cliente.num_cliente }} -
-            {{ visita.cliente.nombre }}
-
-        </li>
-
-        {% endfor %}
-
-    </ul>
-
-
-    {% else %}
-
-    <div class="alert alert-secondary mb-0">
-
-        No tienes visitas programadas.
 
     </div>
 
     {% endif %}
 
-</div>
+
+
+
+    <div class="col-md-3 mb-3">
+
+        <div class="card bg-success text-white shadow-sm">
+
+            <div class="card-body">
+
+                <h5>Visitas Totales</h5>
+
+                <h2>
+                    {{ total_visitas or 0 }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
+    <div class="col-md-3 mb-3">
+
+        <div class="card bg-warning shadow-sm">
+
+            <div class="card-body">
+
+                <h5>Visitas del Mes</h5>
+
+                <h2>
+                    {{ visitas_mes or 0 }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
+    <div class="col-md-3 mb-3">
+
+        <div class="card bg-info text-white shadow-sm">
+
+            <div class="card-body">
+
+                <h5>Clientes con Venta</h5>
+
+                <h2>
+                    {{ clientes_con_venta or 0 }}
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
+    <div class="col-md-3 mb-3">
+
+        <div class="card bg-dark text-white shadow-sm">
+
+            <div class="card-body">
+
+                <h5>Venta del Mes</h5>
+
+                <h3>
+                    ${{ "{:,.2f}".format(monto_mes or 0) }}
+                </h3>
+
+            </div>
+
+        </div>
+
+    </div>
+
 
 </div>
+
+
+
+
+
+
+<!-- OBJETIVO MENSUAL SOLO VENDEDORES -->
+
+{% if not admin %}
+
+
+<div class="card mt-3 shadow-sm">
+
+    <div class="card-body">
+
+
+        <h4>
+            Objetivo Mensual
+        </h4>
+
+
+
+        <h2>
+            ${{ "{:,.0f}".format(objetivo or 0) }}
+        </h2>
+
+
+
+        <p>
+            Venta Actual:
+
+            ${{ "{:,.0f}".format(monto_mes or 0) }}
+        </p>
+
+
+
+
+        <div class="progress">
+
+
+            <div class="progress-bar"
+                 role="progressbar"
+                 style="width: {{ [cumplimiento or 0, 100]|min }}%;">
+
+                {{ cumplimiento or 0 }}%
+
+            </div>
+
+
+        </div>
+
+
+
+    </div>
+
+
+</div>
+
 
 {% endif %}
+
+
+
+
+
+
+<!-- INFORMACION ADMINISTRADOR -->
+
+{% if admin %}
+
+
+
+<div class="card mt-4 shadow-sm">
+
+
+    <div class="card-body">
+
+
+        <h3>
+            Meta Empresa
+        </h3>
+
+
+
+        <p>
+            <strong>
+                Meta:
+            </strong>
+
+            ${{ "{:,.0f}".format(meta_empresa or 0) }}
+
+        </p>
+
+
+
+
+        <p>
+            <strong>
+                Venta:
+            </strong>
+
+            ${{ "{:,.0f}".format(venta_empresa or 0) }}
+
+        </p>
+
+
+
+
+        <h2 class="text-primary">
+
+            {{ cumplimiento_empresa or 0 }}%
+
+        </h2>
+
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+<div class="mt-4">
+
+
+    <h3>
+        Ranking de Cumplimiento
+    </h3>
+
+
+
+
+    <div class="table-responsive">
+
+
+        <table class="table table-striped table-bordered">
+
+
+            <thead class="table-dark">
+
+
+                <tr>
+
+                    <th>
+                        Vendedor
+                    </th>
+
+
+                    <th>
+                        Meta
+                    </th>
+
+
+                    <th>
+                        Venta
+                    </th>
+
+
+                    <th>
+                        Cumplimiento
+                    </th>
+
+                </tr>
+
+
+            </thead>
+
+
+
+
+
+            <tbody>
+
+
+
+            {% for v in cumplimiento_vendedores %}
+
+
+
+                <tr>
+
+
+                    <td>
+                        {{ v['nombre'] }}
+                    </td>
+
+
+
+                    <td>
+                        ${{ "{:,.0f}".format(v['meta'] or 0) }}
+                    </td>
+
+
+
+                    <td>
+                        ${{ "{:,.0f}".format(v['venta'] or 0) }}
+                    </td>
+
+
+
+                    <td>
+
+
+                        {% if v['porcentaje'] >= 100 %}
+
+                            🟢
+
+
+                        {% elif v['porcentaje'] >= 80 %}
+
+                            🟡
+
+
+                        {% else %}
+
+                            🔴
+
+
+                        {% endif %}
+
+
+
+                        {{ v['porcentaje'] }}%
+
+
+
+                    </td>
+
+
+                </tr>
+
+
+
+
+            {% else %}
+
+
+
+                <tr>
+
+                    <td colspan="4" class="text-center">
+
+                        No hay vendedores registrados.
+
+                    </td>
+
+                </tr>
+
+
+
+            {% endfor %}
+
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+
+{% endif %}
+
+
+
+
+
+
+<!-- PROXIMAS VISITAS SOLO VENDEDORES -->
+
+
+{% if not admin %}
+
+
+
+<div class="card mt-4 shadow-sm">
+
+
+
+    <div class="card-header bg-primary text-white">
+
+        Próximas Visitas
+
+    </div>
+
+
+
+
+    <div class="card-body">
+
+
+
+        {% if proximas_visitas %}
+
+
+
+
+        <ul class="list-group">
+
+
+
+            {% for visita in proximas_visitas %}
+
+
+
+
+            <li class="list-group-item">
+
+
+                <strong>
+
+                    {{ visita.proxima_visita.strftime('%d/%m/%Y') }}
+
+                </strong>
+
+
+
+                <br>
+
+
+
+                {{ visita.cliente.num_cliente }} -
+
+                {{ visita.cliente.nombre }}
+
+
+
+            </li>
+
+
+
+            {% endfor %}
+
+
+
+
+        </ul>
+
+
+
+
+        {% else %}
+
+
+
+
+        <div class="alert alert-secondary mb-0">
+
+            No tienes visitas programadas.
+
+        </div>
+
+
+
+
+        {% endif %}
+
+
+
+    </div>
+
+
+
+</div>
+
+
+
+{% endif %}
+
+
+
+
 
 {% endblock %}

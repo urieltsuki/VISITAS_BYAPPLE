@@ -157,6 +157,70 @@ def dashboard():
         ).distinct().count()
 
 
+        cumplimiento_vendedores = []
+
+        usuarios = Usuario.query.filter(
+            Usuario.activo == True,
+            Usuario.rol == 'vendedor'
+        ).all()
+
+        for usuario in usuarios:
+
+            objetivo_usuario = Objetivo.query.filter_by(
+                usuario_id=usuario.id,
+                anio=hoy.year,
+                mes=hoy.month
+            ).first()
+
+            meta = objetivo_usuario.objetivo if objetivo_usuario else 0
+
+            venta = db.session.query(
+                func.sum(Visita.monto_venta)
+            ).filter(
+                Visita.usuario_id == usuario.id,
+                extract('year', Visita.fecha) == hoy.year,
+                extract('month', Visita.fecha) == hoy.month
+            ).scalar() or 0
+
+            porcentaje = 0
+
+            if meta > 0:
+                porcentaje = round(
+                    (venta / meta) * 100,
+                    2
+                )
+
+            cumplimiento_vendedores.append({
+                'nombre': usuario.nombre,
+                'meta': meta,
+                'venta': venta,
+                'porcentaje': porcentaje
+            })
+
+        cumplimiento_vendedores.sort(
+            key=lambda x: x['porcentaje'],
+            reverse=True
+        )
+
+        meta_empresa = sum(
+            x['meta']
+            for x in cumplimiento_vendedores
+        )
+
+        venta_empresa = sum(
+            x['venta']
+            for x in cumplimiento_vendedores
+        )
+
+        cumplimiento_empresa = 0
+
+        if meta_empresa > 0:
+
+            cumplimiento_empresa = round(
+                (venta_empresa / meta_empresa) * 100,
+                2
+            )
+
         objetivo = Objetivo.query.filter_by(
             anio=hoy.year,
             mes=hoy.month
@@ -181,6 +245,10 @@ def dashboard():
             clientes_con_venta=clientes_con_venta,
             objetivo=objetivo.objetivo if objetivo else 0,
             cumplimiento=cumplimiento,
+            meta_empresa=meta_empresa,
+            venta_empresa=venta_empresa,
+            cumplimiento_empresa=cumplimiento_empresa,
+            cumplimiento_vendedores=cumplimiento_vendedores,
             admin=True
         )
 
@@ -973,6 +1041,20 @@ def nuevo_objetivo():
             objetivo=request.form['objetivo']
         )
 
+        existe = Objetivo.query.filter_by(
+            usuario_id=request.form['usuario_id'],
+            anio=request.form['anio'],
+            mes=request.form['mes']
+        ).first()
+
+        if existe:
+            return '''
+            <h3>
+            Ya existe un objetivo para ese usuario,
+            año y mes.
+            </h3>
+            '''
+
         db.session.add(objetivo)
         db.session.commit()
 
@@ -1017,6 +1099,22 @@ def editar_objetivo(id):
         objetivo=objetivo,
         usuarios=usuarios
     )
+
+
+@app.route('/objetivos/eliminar/<int:id>')
+@login_required
+def eliminar_objetivo(id):
+
+    if current_user.rol not in ['admin', 'supervisor']:
+        return redirect('/dashboard')
+
+    objetivo = Objetivo.query.get_or_404(id)
+
+    db.session.delete(objetivo)
+    db.session.commit()
+
+    return redirect('/objetivos')
+
 
 UPLOAD_FOLDER = 'uploads'
 
