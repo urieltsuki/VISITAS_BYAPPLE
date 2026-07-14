@@ -12,71 +12,93 @@ Dashboard
 
 <div class="row">
 
-    {% if admin %}
-    <div class="col-md-3 mb-3">
 
-        <div class="card bg-primary text-white">
-
-            <div class="card-body">
-
-                <h5>Clientes Totales</h5>
-
-                <h2>{{ total_clientes }}</h2>
-
-            </div>
-
+{% if admin %}
+<div class="col-md-3 mb-3">
+    <div class="card bg-primary text-white shadow-sm">
+        <div class="card-body">
+            <h5>Clientes Totales</h5>
+            <h2>{{ total_clientes }}</h2>
         </div>
-
     </div>
-    {% endif %}
+</div>
+{% endif %}
 
-
-    <div class="col-md-3 mb-3">
-
-        <div class="card bg-success text-white">
-
-            <div class="card-body">
-
-                <h5>Visitas Totales</h5>
-
-                <h2>{{ total_visitas }}</h2>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="col-md-3 mb-3">
-
-        <div class="card bg-warning">
-
-            <div class="card-body">
-
-                <h5>Visitas del Mes</h5>
-
-                <h2>{{ visitas_mes }}</h2>
-
-            </div>
-
-        </div>
-
-    </div>
 
 <div class="col-md-3 mb-3">
-
-    <div class="card bg-primary text-white shadow-sm">
-
+    <div class="card bg-success text-white shadow-sm">
         <div class="card-body">
+            <h5>Visitas Totales</h5>
+            <h2>{{ total_visitas }}</h2>
+        </div>
+    </div>
+</div>
 
+
+<div class="col-md-3 mb-3">
+    <div class="card bg-warning shadow-sm">
+        <div class="card-body">
+            <h5>Visitas del Mes</h5>
+            <h2>{{ visitas_mes }}</h2>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-md-3 mb-3">
+    <div class="card bg-info text-white shadow-sm">
+        <div class="card-body">
             <h5>Clientes con Venta</h5>
-
-            <h2 class="text-white">
-
+            <h2>
                 {{ clientes_con_venta }}
-
             </h2>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-md-3 mb-3">
+    <div class="card bg-dark text-white shadow-sm">
+        <div class="card-body">
+            <h5>Venta del Mes</h5>
+
+            <h3>
+                $ {{ "{:,.2f}".format(monto_mes or 0) }}
+            </h3>
+
+        </div>
+    </div>
+</div>
+
+
+</div>
+
+<div class="card mt-3 shadow-sm">
+
+
+<div class="card-body">
+
+    <h4>
+        Objetivo Mensual
+    </h4>
+
+    <h2>
+        ${{ "{:,.0f}".format(objetivo or 0) }}
+    </h2>
+
+    <p>
+        Venta Actual:
+        ${{ "{:,.0f}".format(monto_mes or 0) }}
+    </p>
+
+
+    <div class="progress">
+
+        <div class="progress-bar"
+             role="progressbar"
+             style="width: {{ [cumplimiento, 100]|min }}%;">
+
+            {{ cumplimiento }}%
 
         </div>
 
@@ -84,72 +106,57 @@ Dashboard
 
 </div>
 
-    <div class="col-md-3 mb-3">
-
-        <div class="card bg-dark text-white">
-
-            <div class="card-body">
-
-                <h5>Venta del Mes</h5>
-
-                <h3>
-                    $ {{ "{:,.2f}".format(monto_mes or 0) }}
-                </h3>
-
-            </div>
-
-        </div>
-
-    </div>
 
 </div>
-
 
 {% if not admin %}
 
-<div class="card mt-4">
+<div class="card mt-4 shadow-sm">
 
-    <div class="card-header bg-primary text-white">
 
-        Próximas Visitas
+<div class="card-header bg-primary text-white">
+    Próximas Visitas
+</div>
 
-    </div>
 
-    <div class="card-body">
+<div class="card-body">
 
-        {% if proximas_visitas %}
+    {% if proximas_visitas %}
 
-            <ul class="list-group">
+    <ul class="list-group">
 
-                {% for visita in proximas_visitas %}
+        {% for visita in proximas_visitas %}
 
-                <li class="list-group-item">
+        <li class="list-group-item">
 
-                    <strong>
-                        {{ visita.proxima_visita.strftime('%d/%m/%Y') }}
-                    </strong>
+            <strong>
+                {{ visita.proxima_visita.strftime('%d/%m/%Y') }}
+            </strong>
 
-                    <br>
+            <br>
 
-                    {{ visita.cliente.num_cliente }} - {{ visita.cliente.nombre }}
+            {{ visita.cliente.num_cliente }} -
+            {{ visita.cliente.nombre }}
 
-                </li>
+        </li>
 
-                {% endfor %}
+        {% endfor %}
 
-            </ul>
+    </ul>
 
-        {% else %}
 
-            <div class="alert alert-secondary mb-0">
+    {% else %}
 
-                No tienes visitas programadas.
+    <div class="alert alert-secondary mb-0">
 
-            </div>
-
-        {% endif %}
+        No tienes visitas programadas.
 
     </div>
+
+    {% endif %}
+
+</div>
+
 
 </div>
 

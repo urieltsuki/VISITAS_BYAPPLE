@@ -14,7 +14,7 @@ from sqlalchemy import or_
 from werkzeug.security import check_password_hash
 
 from models import db
-from models import Usuario, Cliente, Visita
+from models import Usuario, Cliente, Visita, Objetivo
 
 import os
 from werkzeug.utils import secure_filename
@@ -115,23 +115,30 @@ def login():
 # Dashboard protegido
 from sqlalchemy import func, extract
 
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
 
     hoy = datetime.now()
 
-    # ADMINISTRADOR
+
+    # ==========================
+    # ADMINISTRADOR / SUPERVISOR
+    # ==========================
+
     if current_user.rol in ['admin', 'supervisor']:
 
         total_clientes = Cliente.query.count()
 
         total_visitas = Visita.query.count()
 
+
         visitas_mes = Visita.query.filter(
             extract('year', Visita.fecha) == hoy.year,
             extract('month', Visita.fecha) == hoy.month
         ).count()
+
 
         monto_mes = db.session.query(
             func.sum(Visita.monto_venta)
@@ -140,13 +147,30 @@ def dashboard():
             extract('month', Visita.fecha) == hoy.month
         ).scalar() or 0
 
+
         clientes_con_venta = db.session.query(
             Visita.cliente_id
         ).filter(
-            Visita.venta_realizada == True,
+            Visita.venta_realizada.is_(True),
             extract('year', Visita.fecha) == hoy.year,
             extract('month', Visita.fecha) == hoy.month
         ).distinct().count()
+
+
+        objetivo = Objetivo.query.filter_by(
+            anio=hoy.year,
+            mes=hoy.month
+        ).first()
+
+
+        cumplimiento = 0
+
+        if objetivo and objetivo.objetivo > 0:
+            cumplimiento = round(
+                (monto_mes / objetivo.objetivo) * 100,
+                2
+            )
+
 
         return render_template(
             'dashboard.html',
@@ -155,14 +179,22 @@ def dashboard():
             visitas_mes=visitas_mes,
             monto_mes=monto_mes,
             clientes_con_venta=clientes_con_venta,
+            objetivo=objetivo.objetivo if objetivo else 0,
+            cumplimiento=cumplimiento,
             admin=True
         )
 
+
+
+    # ==========================
     # VENDEDOR
+    # ==========================
 
     total_visitas = Visita.query.filter(
         Visita.usuario_id == current_user.id
     ).count()
+
+
 
     visitas_mes = Visita.query.filter(
         Visita.usuario_id == current_user.id,
@@ -170,12 +202,16 @@ def dashboard():
         extract('month', Visita.fecha) == hoy.month
     ).count()
 
+
+
     ventas_mes = Visita.query.filter(
         Visita.usuario_id == current_user.id,
-        Visita.venta_realizada == True,
+        Visita.venta_realizada.is_(True),
         extract('year', Visita.fecha) == hoy.year,
         extract('month', Visita.fecha) == hoy.month
     ).count()
+
+
 
     monto_mes = db.session.query(
         func.sum(Visita.monto_venta)
@@ -185,21 +221,46 @@ def dashboard():
         extract('month', Visita.fecha) == hoy.month
     ).scalar() or 0
 
-    proximas_visitas = Visita.query.filter(
-        Visita.usuario_id == current_user.id,
-        Visita.proxima_visita != None
-    ).order_by(
-        Visita.proxima_visita.asc()
-    ).limit(5).all()
+
 
     clientes_con_venta = db.session.query(
         Visita.cliente_id
     ).filter(
         Visita.usuario_id == current_user.id,
-        Visita.venta_realizada == True,
+        Visita.venta_realizada.is_(True),
         extract('year', Visita.fecha) == hoy.year,
         extract('month', Visita.fecha) == hoy.month
     ).distinct().count()
+
+
+
+    proximas_visitas = Visita.query.filter(
+        Visita.usuario_id == current_user.id,
+        Visita.proxima_visita.isnot(None)
+    ).order_by(
+        Visita.proxima_visita.asc()
+    ).limit(5).all()
+
+
+
+    objetivo = Objetivo.query.filter_by(
+        usuario_id=current_user.id,
+        anio=hoy.year,
+        mes=hoy.month
+    ).first()
+
+
+
+    cumplimiento = 0
+
+    if objetivo and objetivo.objetivo > 0:
+
+        cumplimiento = round(
+            (monto_mes / objetivo.objetivo) * 100,
+            2
+        )
+
+
 
     return render_template(
         'dashboard.html',
@@ -209,6 +270,8 @@ def dashboard():
         monto_mes=monto_mes,
         clientes_con_venta=clientes_con_venta,
         proximas_visitas=proximas_visitas,
+        objetivo=objetivo.objetivo if objetivo else 0,
+        cumplimiento=cumplimiento,
         admin=False
     )
 
@@ -351,19 +414,19 @@ def visitas():
 
             proxima_visita = None
 
-    if request.form.get('proxima_visita'):
-        if not request.form.get('proxima_visita'):
+        if request.form.get('proxima_visita'):
+            if not request.form.get('proxima_visita'):
 
-            return '''
-            <h3>Debe seleccionar una fecha de próxima visita</h3>
-            /visitasRegresar</a>
-            '''
-        proxima_visita = datetime.strptime(
-            request.form['proxima_visita'],
-            '%Y-%m-%d'
-        ).date()
-        print("CLIENTE ID:", request.form.get('cliente_id'))
-        visita = Visita(
+                return '''
+                <h3>Debe seleccionar una fecha de próxima visita</h3>
+                /visitasRegresar</a>
+                '''
+            proxima_visita = datetime.strptime(
+                request.form['proxima_visita'],
+                '%Y-%m-%d'
+            ).date()
+            print("CLIENTE ID:", request.form.get('cliente_id'))
+            visita = Visita(
 
             
 

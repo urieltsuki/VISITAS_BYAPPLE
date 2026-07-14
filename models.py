@@ -63,8 +63,6 @@ class Visita(db.Model):
         primary_key=True
     )
 
-    from datetime import datetime
-
     fecha = db.Column(
         db.DateTime,
         default=datetime.now
@@ -119,4 +117,38 @@ class Visita(db.Model):
     usuario = db.relationship(
         'Usuario',
         backref='visitas'
+    )
+
+class Objetivo(db.Model):
+
+    __tablename__ = 'objetivos'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    usuario_id = db.Column(
+        db.Integer,
+        db.ForeignKey('usuarios.id')
+    )
+
+    anio = db.Column(
+        db.Integer,
+        nullable=False
+    )
+
+    mes = db.Column(
+        db.Integer,
+        nullable=False
+    )
+
+    objetivo = db.Column(
+        db.Float,
+        nullable=False
+    )
+
+    usuario = db.relationship(
+        'Usuario',
+        backref='objetivos'
     )

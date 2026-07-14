@@ -11,7 +11,7 @@ with app.app_context():
 
     if usuario:
 
-        usuario.password = generate_password_hash("uri26")
+        usuario.password = generate_password_hash("Admin123")
         usuario.rol = "admin"
 
         db.session.commit()
