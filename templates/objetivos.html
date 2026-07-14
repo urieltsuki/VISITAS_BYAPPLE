@@ -1,0 +1,120 @@
+```html
+{% extends 'base.html' %}
+
+{% block contenido %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">
+        Objetivos Mensuales
+    </h2>
+
+
+    <a href="{{ url_for('nuevo_objetivo') }}" 
+       class="btn btn-primary mb-3">
+
+        Nuevo Objetivo
+
+    </a>
+
+
+
+    <div class="table-responsive">
+
+        <table class="table table-striped table-bordered align-middle">
+
+
+            <thead class="table-dark">
+
+                <tr>
+
+                    <th>Usuario</th>
+                    <th>Año</th>
+                    <th>Mes</th>
+                    <th>Objetivo</th>
+                    <th>Acciones</th>
+
+                </tr>
+
+            </thead>
+
+
+
+            <tbody>
+
+
+            {% for o in objetivos %}
+
+
+                <tr>
+
+
+                    <td>
+                        {{ o.usuario.nombre }}
+                    </td>
+
+
+                    <td>
+                        {{ o.anio }}
+                    </td>
+
+
+                    <td>
+                        {{ o.mes }}
+                    </td>
+
+
+                    <td>
+                        ${{ "{:,.0f}".format(o.objetivo or 0) }}
+                    </td>
+
+
+
+                    <td>
+
+                        <a href="{{ url_for('editar_objetivo', id=o.id) }}"
+                           class="btn btn-warning btn-sm">
+
+                            Editar
+
+                        </a>
+
+
+                    </td>
+
+
+                </tr>
+
+
+
+            {% else %}
+
+
+                <tr>
+
+                    <td colspan="5" class="text-center">
+
+                        No hay objetivos registrados.
+
+                    </td>
+
+                </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+    </div>
+
+
+</div>
+
+
+{% endblock %}
+```

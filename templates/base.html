@@ -113,6 +113,18 @@
 
             {% endif %}
 
+            <!-- Objetivos -->
+            {% if current_user.rol == 'admin' %}
+
+            <a href="/objetivos"
+               class="btn btn-outline-secondary w-100 mb-2">
+
+                Administración Objetivos
+
+            </a>
+
+            {% endif %}
+
             <!-- Reportes -->
             {% if current_user.rol in ['admin', 'supervisor'] %}
 

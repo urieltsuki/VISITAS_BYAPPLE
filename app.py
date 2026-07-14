@@ -939,6 +939,85 @@ def cambiar_password():
     )
 
 
+@app.route('/objetivos')
+@login_required
+def objetivos():
+
+    if current_user.rol not in ['admin', 'supervisor']:
+        return redirect('/dashboard')
+
+    objetivos = Objetivo.query.order_by(
+        Objetivo.anio.desc(),
+        Objetivo.mes.desc()
+    ).all()
+
+    return render_template(
+        'objetivos.html',
+        objetivos=objetivos
+    )
+
+
+@app.route('/objetivos/nuevo', methods=['GET', 'POST'])
+@login_required
+def nuevo_objetivo():
+
+    if current_user.rol not in ['admin', 'supervisor']:
+        return redirect('/dashboard')
+
+    if request.method == 'POST':
+
+        objetivo = Objetivo(
+            usuario_id=request.form['usuario_id'],
+            anio=request.form['anio'],
+            mes=request.form['mes'],
+            objetivo=request.form['objetivo']
+        )
+
+        db.session.add(objetivo)
+        db.session.commit()
+
+        return redirect('/objetivos')
+
+    usuarios = Usuario.query.filter_by(
+        activo=True
+    ).all()
+
+    return render_template(
+        'objetivo_nuevo.html',
+        usuarios=usuarios
+    )
+
+
+@app.route('/objetivos/editar/<int:id>', methods=['GET', 'POST'])
+@login_required
+def editar_objetivo(id):
+
+    if current_user.rol not in ['admin', 'supervisor']:
+        return redirect('/dashboard')
+
+    objetivo = Objetivo.query.get_or_404(id)
+
+    if request.method == 'POST':
+
+        objetivo.usuario_id = request.form['usuario_id']
+        objetivo.anio = request.form['anio']
+        objetivo.mes = request.form['mes']
+        objetivo.objetivo = request.form['objetivo']
+
+        db.session.commit()
+
+        return redirect('/objetivos')
+
+    usuarios = Usuario.query.filter_by(
+        activo=True
+    ).all()
+
+    return render_template(
+        'editar_objetivo.html',
+        objetivo=objetivo,
+        usuarios=usuarios
+    )
+
 UPLOAD_FOLDER = 'uploads'
 
 app.config[
