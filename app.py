@@ -56,7 +56,7 @@ db.init_app(app)
 # Crear tablas
 with app.app_context():
     db.create_all()
-print("DB:", app.config['SQLALCHEMY_DATABASE_URI'])
+
 # Flask Login
 login_manager = LoginManager()
 
