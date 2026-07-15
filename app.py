@@ -26,6 +26,15 @@ from sqlalchemy import func
 
 from werkzeug.security import generate_password_hash
 
+import cloudinary
+
+cloudinary.config(
+    cloud_name="fokkk3pw",
+    api_key="935536672772111",
+    api_secret="eVSElegD3vhdVGjzsW-9Rp2im0k",
+    secure=True
+)
+
 
 app = Flask(__name__)
 
@@ -460,6 +469,11 @@ def visitas():
 
         print(request.files)
 
+        archivo = request.files.get('foto')
+
+        print("ARCHIVO:", archivo)
+
+
         # FOTO
         archivo = request.files.get('foto')
 
@@ -471,12 +485,13 @@ def visitas():
                 archivo.filename
             )
 
-            archivo.save(
-                os.path.join(
-                    app.config['UPLOAD_FOLDER'],
-                    nombre_archivo
-                )
+            import cloudinary.uploader
+
+            resultado = cloudinary.uploader.upload(
+                archivo
             )
+
+            nombre_archivo = resultado["secure_url"]
 
         # VISITA
 

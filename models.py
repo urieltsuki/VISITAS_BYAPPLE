@@ -13,7 +13,7 @@ class Usuario(UserMixin, db.Model):
 
     correo = db.Column(db.String(120), unique=True, nullable=False)
 
-    password = db.Column(db.String(255), nullable=False)
+    password = db.Column(db.String(500), nullable=False)
 
     rol = db.Column(db.String(20), default='vendedor')
 
