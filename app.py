@@ -14,7 +14,7 @@ from sqlalchemy import or_
 from werkzeug.security import check_password_hash
 
 from models import db
-from models import Usuario, Cliente, Visita, Objetivo
+from models import Usuario, Cliente, Visita, Objetivo, Prospecto
 
 import os
 from werkzeug.utils import secure_filename
@@ -1142,6 +1142,70 @@ def eliminar_objetivo(id):
     return redirect('/objetivos')
 
 
+
+@app.route('/prospectos')
+@login_required
+def prospectos():
+
+    if current_user.rol in ['admin', 'supervisor']:
+
+        prospectos = Prospecto.query.order_by(
+            Prospecto.fecha_registro.desc()
+        ).all()
+
+    else:
+
+        prospectos = Prospecto.query.filter_by(
+            usuario_id=current_user.id
+        ).order_by(
+            Prospecto.fecha_registro.desc()
+        ).all()
+
+    return render_template(
+        'prospectos.html',
+        prospectos=prospectos
+    )
+
+@app.route(
+    '/prospectos/nuevo',
+    methods=['GET', 'POST']
+)
+@login_required
+def nuevo_prospecto():
+
+    if request.method == 'POST':
+
+        prospecto = Prospecto(
+
+            nombre=request.form['nombre'],
+
+            contacto=request.form['contacto'],
+
+            telefono=request.form['telefono'],
+
+            direccion=request.form['direccion'],
+
+            observaciones=request.form['observaciones'],
+
+            estatus=request.form['estatus'],
+
+            usuario_id=current_user.id
+        )
+
+        db.session.add(
+            prospecto
+        )
+
+        db.session.commit()
+
+        return redirect('/prospectos')
+
+    return render_template(
+        'nuevo_prospecto.html'
+    )
+
+
+
 UPLOAD_FOLDER = 'uploads'
 
 app.config[
@@ -1150,10 +1214,6 @@ app.config[
 
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-with app.app_context():
-    db.create_all()
-
 
 from models import Usuario
 

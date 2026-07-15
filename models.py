@@ -152,3 +152,55 @@ class Objetivo(db.Model):
         'Usuario',
         backref='objetivos'
     )
+
+from datetime import datetime
+
+class Prospecto(db.Model):
+
+    __tablename__ = 'prospectos'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    nombre = db.Column(
+        db.String(200),
+        nullable=False
+    )
+
+    contacto = db.Column(
+        db.String(150)
+    )
+
+    telefono = db.Column(
+        db.String(50)
+    )
+
+    direccion = db.Column(
+        db.Text
+    )
+
+    observaciones = db.Column(
+        db.Text
+    )
+
+    estatus = db.Column(
+        db.String(50),
+        default='Nuevo'
+    )
+
+    usuario_id = db.Column(
+        db.Integer,
+        db.ForeignKey('usuarios.id')
+    )
+
+    fecha_registro = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+    usuario = db.relationship(
+        'Usuario',
+        backref='prospectos'
+    )

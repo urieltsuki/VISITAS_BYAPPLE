@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+
+<h2>Prospectos</h2>
+
+<a href="{{ url_for('nuevo_prospecto') }}" class="btn btn-primary mb-3">
+    Nuevo Prospecto
+</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Registró</th>
+            <th>Nombre</th>
+            <th>Contacto</th>
+            <th>Teléfono</th>
+            <th>Estatus</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for p in prospectos %}
+        <tr>
+            <td>{{ p.usuario.nombre }}</td>
+            <td>{{ p.nombre }}</td>
+            <td>{{ p.contacto }}</td>
+            <td>{{ p.telefono }}</td>
+            <td>{{ p.estatus }}</td>
+            <td>
+                {% if p.fecha_registro %}
+                    {{ p.fecha_registro.strftime('%d/%m/%Y') }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5" class="text-center">
+                No hay prospectos registrados.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

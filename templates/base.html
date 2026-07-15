@@ -65,123 +65,75 @@
 
         <div class="offcanvas-body">
 
-            <div class="text-center mb-3">
+    <div class="text-center mb-3">
+        <strong>{{ current_user.nombre }}</strong><br>
+        <small class="text-muted">{{ current_user.rol }}</small>
+    </div>
 
-                <strong>
-                    {{ current_user.nombre }}
-                </strong>
+    <hr>
 
-                <br>
+    <!-- Dashboard -->
+    <a href="/dashboard" class="btn btn-outline-primary w-100 mb-2">
+        Dashboard
+    </a>
 
-                <small class="text-muted">
-                    {{ current_user.rol }}
-                </small>
+    <!-- Menú Administrador -->
+    {% if current_user.rol == 'admin' %}
 
-            </div>
+    <a href="/clientes" class="btn btn-outline-secondary w-100 mb-2">
+        Administración Clientes
+    </a>
 
-            <hr>
+    <a href="/usuarios" class="btn btn-outline-secondary w-100 mb-2">
+        Administración Usuarios
+    </a>
 
-            <!-- Dashboard -->
-            <a href="/dashboard"
-               class="btn btn-outline-primary w-100 mb-2">
+    <a href="/objetivos" class="btn btn-outline-secondary w-100 mb-2">
+        Administración Objetivos
+    </a>
 
-                Dashboard
+    {% endif %}
 
-            </a>
+    <!-- Reportes -->
+    {% if current_user.rol in ['admin', 'supervisor'] %}
+    <a href="/reportes" class="btn btn-outline-secondary w-100 mb-2">
+        Reportes
+    </a>
+    {% endif %}
 
-            <!-- Clientes -->
-            {% if current_user.rol == 'admin' %}
+    <!-- Nueva Visita -->
+    <a href="/visitas" class="btn btn-outline-secondary w-100 mb-2">
+        Nueva Visita
+    </a>
 
-            <a href="/clientes"
-               class="btn btn-outline-secondary w-100 mb-2">
+    <!-- Nuevo Prospecto -->
+    <a href="/prospectos" class="btn btn-outline-secondary w-100 mb-2">
+        Prospectos
+    </a>
 
-                Administración Clientes
+    <!-- Próximas Visitas -->
+    {% if current_user.rol == 'vendedor' %}
+    <a href="/mis_proximas_visitas" class="btn btn-outline-secondary w-100 mb-2">
+        Mis Próximas Visitas
+    </a>
+    {% endif %}
 
-            </a>
+    <!-- Historial -->
+    <a href="/historial_visitas" class="btn btn-outline-secondary w-100 mb-2">
+        Historial Visitas
+    </a>
 
-            {% endif %}
+    <!-- Cambiar Contraseña -->
+    <a href="/cambiar_password" class="btn btn-outline-secondary w-100 mb-2">
+        Cambiar Contraseña
+    </a>
 
-            <!-- Usuarios -->
-            {% if current_user.rol == 'admin' %}
+    <!-- Cerrar sesión -->
+    <a href="/logout" class="btn btn-outline-danger w-100">
+        Cerrar Sesión
+    </a>
 
-            <a href="/usuarios"
-               class="btn btn-outline-secondary w-100 mb-2">
-
-                Administración Usuarios
-
-            </a>
-
-            {% endif %}
-
-            <!-- Objetivos -->
-            {% if current_user.rol == 'admin' %}
-
-            <a href="/objetivos"
-               class="btn btn-outline-secondary w-100 mb-2">
-
-                Administración Objetivos
-
-            </a>
-
-            {% endif %}
-
-            <!-- Reportes -->
-            {% if current_user.rol in ['admin', 'supervisor'] %}
-
-            <a href="/reportes"
-               class="btn btn-outline-secondary w-100 mb-2">
-
-                Reportes
-
-            </a>
-
-            {% endif %}
-
-            <!-- Nueva Visita -->
-            <a href="/visitas"
-               class="btn btn-outline-secondary w-100 mb-2">
-
-                Nueva Visita
-
-            </a>
-
-            <!-- Próximas Visitas -->
-            {% if current_user.rol == 'vendedor' %}
-
-            <a href="/mis_proximas_visitas"
-               class="btn btn-outline-secondary w-100 mb-2">
-
-                Mis Próximas Visitas
-
-            </a>
-
-            {% endif %}
-
-            <!-- Historial -->
-            <a href="/historial_visitas"
-               class="btn btn-outline-secondary w-100 mb-2">
-
-                Historial Visitas
-
-            </a>
-
-              <!-- Cambiar Contraseña -->
-            <a href="/cambiar_password"
-               class="btn btn-outline-secondary w-100 mb-2">
-
-                Cambiar Contraseña
-
-            </a>
-
-            <!-- Cerrar sesión -->
-            <a href="/logout"
-               class="btn btn-outline-danger w-100">
-
-                Cerrar Sesión
-
-            </a>
-
-        </div>
+</div>
 
     </div>
 

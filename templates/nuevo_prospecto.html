@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">Nuevo Prospecto</h2>
+
+    <form method="POST">
+
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input
+                type="text"
+                class="form-control"
+                id="nombre"
+                name="nombre"
+                required>
+        </div>
+
+        <div class="mb-3">
+            <label for="contacto" class="form-label">Contacto</label>
+            <input
+                type="text"
+                class="form-control"
+                id="contacto"
+                name="contacto">
+        </div>
+
+        <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input
+                type="text"
+                class="form-control"
+                id="telefono"
+                name="telefono">
+        </div>
+
+        <div class="mb-3">
+            <label for="direccion" class="form-label">Dirección</label>
+            <textarea
+                class="form-control"
+                id="direccion"
+                name="direccion"
+                rows="3"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="observaciones" class="form-label">Observaciones</label>
+            <textarea
+                class="form-control"
+                id="observaciones"
+                name="observaciones"
+                rows="4"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="estatus" class="form-label">Estatus</label>
+            <select
+                class="form-select"
+                id="estatus"
+                name="estatus">
+
+                <option value="Nuevo" selected>Nuevo</option>
+                <option value="Visitado">Visitado</option>
+                <option value="Cotizado">Cotizado</option>
+                <option value="Negociacion">Negociación</option>
+                <option value="Convertido">Convertido</option>
+                <option value="Perdido">Perdido</option>
+
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Guardar Prospecto
+        </button>
+
+        <a href="{{ url_for('prospectos') }}" class="btn btn-secondary">
+            Cancelar
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}
