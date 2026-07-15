@@ -40,10 +40,6 @@ Dashboard
 
     </div>
 
-    {% endif %}
-
-
-
 
     <div class="col-md-3 mb-3">
 
@@ -63,26 +59,28 @@ Dashboard
 
     </div>
 
-
-
-
+    {% endif %}
 
     <div class="col-md-3 mb-3">
-
-        <div class="card bg-warning shadow-sm">
-
+        <div class="card shadow-sm h-100" style="background-color: #0B3D91; color: white;">
             <div class="card-body">
+                <h5>Prospectos del Mes</h5>
+                <h2>
+                    {{ prospectos_mes or 0 }}
+                </h2>
+            </div>
+        </div>
+    </div>
 
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning shadow-sm">
+            <div class="card-body">
                 <h5>Visitas del Mes</h5>
-
                 <h2>
                     {{ visitas_mes or 0 }}
                 </h2>
-
             </div>
-
         </div>
-
     </div>
 
 

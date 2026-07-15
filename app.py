@@ -250,6 +250,18 @@ def dashboard():
                 2
             )
 
+        prospectos_mes = Prospecto.query.filter(
+            extract(
+                'year',
+                Prospecto.fecha_registro
+            ) == hoy.year,
+
+            extract(
+                'month',
+                Prospecto.fecha_registro
+            ) == hoy.month
+        ).count()
+
 
         return render_template(
             'dashboard.html',
@@ -264,6 +276,7 @@ def dashboard():
             venta_empresa=venta_empresa,
             cumplimiento_empresa=cumplimiento_empresa,
             cumplimiento_vendedores=cumplimiento_vendedores,
+            prospectos_mes=prospectos_mes,
             admin=True
         )
 
@@ -343,6 +356,20 @@ def dashboard():
             2
         )
 
+    prospectos_mes = Prospecto.query.filter(
+        Prospecto.usuario_id == current_user.id,
+
+        extract(
+            'year',
+            Prospecto.fecha_registro
+        ) == hoy.year,
+
+        extract(
+            'month',
+            Prospecto.fecha_registro
+        ) == hoy.month
+    ).count()
+
 
 
     return render_template(
@@ -355,6 +382,7 @@ def dashboard():
         proximas_visitas=proximas_visitas,
         objetivo=objetivo.objetivo if objetivo else 0,
         cumplimiento=cumplimiento,
+        prospectos_mes=prospectos_mes,
         admin=False
     )
 
@@ -1204,7 +1232,26 @@ def nuevo_prospecto():
         'nuevo_prospecto.html'
     )
 
+@app.route(
+    '/prospectos/cambiar_estatus/<int:id>',
+    methods=['POST']
+)
+@login_required
+def cambiar_estatus_prospecto(id):
 
+    prospecto = Prospecto.query.get_or_404(id)
+
+    if (
+        current_user.rol == 'vendedor'
+        and prospecto.usuario_id != current_user.id
+    ):
+        return redirect('/prospectos')
+
+    prospecto.estatus = request.form['estatus']
+
+    db.session.commit()
+
+    return redirect('/prospectos')
 
 UPLOAD_FOLDER = 'uploads'
 

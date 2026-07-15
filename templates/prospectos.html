@@ -27,7 +27,29 @@
             <td>{{ p.nombre }}</td>
             <td>{{ p.contacto }}</td>
             <td>{{ p.telefono }}</td>
-            <td>{{ p.estatus }}</td>
+            <td>
+                <form
+                    method="POST"
+                    action="{{ url_for('cambiar_estatus_prospecto', id=p.id) }}"
+                >
+
+                    <select
+                        name="estatus"
+                        class="form-select form-select-sm"
+                        onchange="this.form.submit()"
+                    >
+
+                        <option value="Nuevo" {% if p.estatus == 'Nuevo' %}selected{% endif %}>Nuevo</option>
+                        <option value="Visitado" {% if p.estatus == 'Visitado' %}selected{% endif %}>Visitado</option>
+                        <option value="Cotizado" {% if p.estatus == 'Cotizado' %}selected{% endif %}>Cotizado</option>
+                        <option value="Negociacion" {% if p.estatus == 'Negociacion' %}selected{% endif %}>Negociación</option>
+                        <option value="Convertido" {% if p.estatus == 'Convertido' %}selected{% endif %}>Convertido</option>
+                        <option value="Perdido" {% if p.estatus == 'Perdido' %}selected{% endif %}>Perdido</option>
+
+                    </select>
+
+                </form>
+            </td>
             <td>
                 {% if p.fecha_registro %}
                     {{ p.fecha_registro.strftime('%d/%m/%Y') }}
