@@ -26,6 +26,12 @@ from sqlalchemy import func
 
 from werkzeug.security import generate_password_hash
 
+import io
+
+from PIL import Image
+
+import cloudinary.uploader
+
 import cloudinary
 
 cloudinary.config(
@@ -462,56 +468,58 @@ def visitas():
 
     if request.method == 'POST':
 
-        
         print("LATITUD:", request.form.get('latitud'))
         print("LONGITUD:", request.form.get('longitud'))
-
-
-        print(request.files)
 
         archivo = request.files.get('foto')
 
         print("ARCHIVO:", archivo)
 
-
-        # FOTO
-        archivo = request.files.get('foto')
-
         nombre_archivo = None
 
+        # FOTO CLOUDINARY
         if archivo and archivo.filename:
 
-            nombre_archivo = secure_filename(
-                archivo.filename
+            imagen = Image.open(archivo)
+
+            imagen.thumbnail(
+                (1200, 1200)
             )
 
-            import cloudinary.uploader
+            buffer = io.BytesIO()
+
+            imagen.save(
+                buffer,
+                format="JPEG",
+                quality=85,
+                optimize=True
+            )
+
+            buffer.seek(0)
 
             resultado = cloudinary.uploader.upload(
-                archivo
+                buffer,
+                folder="bitacora_visitas"
             )
 
             nombre_archivo = resultado["secure_url"]
 
-        # VISITA
-
-            proxima_visita = None
+        # FECHA PRÓXIMA VISITA
+        proxima_visita = None
 
         if request.form.get('proxima_visita'):
-            if not request.form.get('proxima_visita'):
 
-                return '''
-                <h3>Debe seleccionar una fecha de próxima visita</h3>
-                /visitasRegresar</a>
-                '''
             proxima_visita = datetime.strptime(
                 request.form['proxima_visita'],
                 '%Y-%m-%d'
             ).date()
-            print("CLIENTE ID:", request.form.get('cliente_id'))
-            visita = Visita(
 
-            
+        print(
+            "CLIENTE ID:",
+            request.form.get('cliente_id')
+        )
+
+        visita = Visita(
 
             cliente_id=request.form['cliente_id'],
 
@@ -533,10 +541,13 @@ def visitas():
             longitud=request.form.get('longitud'),
 
             usuario_id=current_user.id
-
         )
 
-        print("Próxima visita:", proxima_visita)
+        print(
+            "Próxima visita:",
+            proxima_visita
+        )
+
         db.session.add(visita)
 
         db.session.commit()
