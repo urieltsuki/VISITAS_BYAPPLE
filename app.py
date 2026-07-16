@@ -1253,6 +1253,70 @@ def cambiar_estatus_prospecto(id):
 
     return redirect('/prospectos')
 
+
+@app.route(
+    '/prospectos/editar/<int:id>',
+    methods=['GET', 'POST']
+)
+@login_required
+def editar_prospecto(id):
+
+    prospecto = Prospecto.query.get_or_404(id)
+
+    if (
+        current_user.rol == 'vendedor'
+        and prospecto.usuario_id != current_user.id
+    ):
+        return redirect('/prospectos')
+
+    if request.method == 'POST':
+
+        prospecto.nombre = request.form['nombre']
+
+        prospecto.contacto = request.form['contacto']
+
+        prospecto.telefono = request.form['telefono']
+
+        prospecto.direccion = request.form['direccion']
+
+        prospecto.observaciones = request.form['observaciones']
+
+        prospecto.estatus = request.form['estatus']
+
+        db.session.commit()
+
+        return redirect('/prospectos')
+
+    return render_template(
+        'editar_prospecto.html',
+        prospecto=prospecto
+    )
+
+@app.route('/prospectos/eliminar/<int:id>')
+@login_required
+def eliminar_prospecto(id):
+
+    if current_user.rol not in [
+        'admin',
+        'supervisor'
+    ]:
+        return redirect('/prospectos')
+
+    prospecto = Prospecto.query.get_or_404(id)
+
+    db.session.delete(prospecto)
+
+    db.session.commit()
+
+    return redirect('/prospectos')
+
+
+
+
+
+
+
+
 UPLOAD_FOLDER = 'uploads'
 
 app.config[

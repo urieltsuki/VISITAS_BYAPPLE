@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block contenido %}
+
+<div class="container py-4">
+
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Editar Prospecto</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input
+                            type="text"
+                            name="nombre"
+                            class="form-control"
+                            value="{{ prospecto.nombre }}"
+                            required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Contacto</label>
+                        <input
+                            type="text"
+                            name="contacto"
+                            class="form-control"
+                            value="{{ prospecto.contacto }}">
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Teléfono</label>
+                        <input
+                            type="text"
+                            name="telefono"
+                            class="form-control"
+                            value="{{ prospecto.telefono }}">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Estatus</label>
+
+                        <select
+                            name="estatus"
+                            class="form-select">
+
+                            <option value="Nuevo"
+                                {% if prospecto.estatus == 'Nuevo' %}selected{% endif %}>
+                                Nuevo
+                            </option>
+
+                            <option value="Visitado"
+                                {% if prospecto.estatus == 'Visitado' %}selected{% endif %}>
+                                Visitado
+                            </option>
+
+                            <option value="Cotizado"
+                                {% if prospecto.estatus == 'Cotizado' %}selected{% endif %}>
+                                Cotizado
+                            </option>
+
+                            <option value="Negociacion"
+                                {% if prospecto.estatus == 'Negociacion' %}selected{% endif %}>
+                                Negociación
+                            </option>
+
+                            <option value="Convertido"
+                                {% if prospecto.estatus == 'Convertido' %}selected{% endif %}>
+                                Convertido
+                            </option>
+
+                            <option value="Perdido"
+                                {% if prospecto.estatus == 'Perdido' %}selected{% endif %}>
+                                Perdido
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Dirección</label>
+                    <textarea
+                        name="direccion"
+                        class="form-control"
+                        rows="3">{{ prospecto.direccion }}</textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Observaciones</label>
+                    <textarea
+                        name="observaciones"
+                        class="form-control"
+                        rows="4">{{ prospecto.observaciones }}</textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+
+                    <a
+                        href="{{ url_for('prospectos') }}"
+                        class="btn btn-secondary">
+                        Cancelar
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+                        Guardar Cambios
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
