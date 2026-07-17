@@ -78,35 +78,38 @@ Clientes
 
     </form>
 
-    <hr>
+            <hr>
 
-    <form method="GET">
+            <form method="GET">
+            <div class="row mb-3">
 
-        <div class="row mb-3">
+                <div class="col-md-7">
+                    <input
+                        type="text"
+                        name="buscar"
+                        class="form-control"
+                        value="{{ request.args.get('buscar', '') }}"
+                        placeholder="Buscar por número, nombre, grupo, canal o vendedor">
+                </div>
 
-            <div class="col-md-8">
+                <div class="col-md-2">
+                    <button
+                        type="submit"
+                        class="btn btn-primary w-100">
+                        Buscar
+                    </button>
+                </div>
 
-                <input
-                    type="text"
-                    name="buscar"
-                    class="form-control"
-                    placeholder="Buscar por número, nombre, grupo, canal o vendedor">
+                <div class="col-md-2">
+                    <a
+                        href="{{ url_for('clientes') }}"
+                        class="btn btn-secondary w-100">
+                        Limpiar
+                    </a>
+                </div>
 
             </div>
-
-            <div class="col-md-2">
-
-                <button
-                    type="submit"
-                    class="btn btn-primary">
-                    Buscar
-                </button>
-
-            </div>
-
-        </div>
-
-    </form>
+        </form>
 
     <table class="table table-striped table-hover">
 
