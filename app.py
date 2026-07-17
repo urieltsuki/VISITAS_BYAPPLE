@@ -404,7 +404,58 @@ def clientes():
     if current_user.rol not in ['admin', 'supervisor']:
         return "Acceso denegado"
 
-    buscar = request.args.get('buscar', '')
+    # GUARDAR CLIENTE
+    if request.method == 'POST':
+
+        existe = Cliente.query.filter_by(
+            num_cliente=request.form['num_cliente']
+        ).first()
+
+        if existe:
+
+            return '''
+            <h3>
+            El número de cliente ya existe.
+            </h3>
+            /clientes
+                Regresar
+            </a>
+            '''
+
+        cliente = Cliente(
+
+            num_cliente=request.form['num_cliente'].strip(),
+
+            nombre=request.form['nombre'].strip(),
+
+            grupo=request.form.get(
+                'grupo',
+                ''
+            ).strip(),
+
+            canal=request.form.get(
+                'canal',
+                ''
+            ).strip(),
+
+            vendedor=request.form.get(
+                'vendedor',
+                ''
+            ).strip()
+
+        )
+
+        db.session.add(cliente)
+
+        db.session.commit()
+
+        return redirect('/clientes')
+
+    # BUSCADOR
+    buscar = request.args.get(
+        'buscar',
+        ''
+    )
 
     pagina = request.args.get(
         'page',
@@ -417,17 +468,31 @@ def clientes():
         lista_clientes = Cliente.query.filter(
 
             or_(
-                Cliente.num_cliente.contains(buscar),
-                Cliente.nombre.contains(buscar),
-                Cliente.grupo.contains(buscar),
-                Cliente.canal.contains(buscar),
-                Cliente.vendedor.contains(buscar)
+                Cliente.num_cliente.contains(
+                    buscar
+                ),
+
+                Cliente.nombre.contains(
+                    buscar
+                ),
+
+                Cliente.grupo.contains(
+                    buscar
+                ),
+
+                Cliente.canal.contains(
+                    buscar
+                )
             )
 
+        ).order_by(
+            Cliente.nombre
         ).paginate(
+
             page=pagina,
             per_page=25,
             error_out=False
+
         )
 
     else:
@@ -435,9 +500,11 @@ def clientes():
         lista_clientes = Cliente.query.order_by(
             Cliente.nombre
         ).paginate(
+
             page=pagina,
             per_page=25,
             error_out=False
+
         )
 
     return render_template(
