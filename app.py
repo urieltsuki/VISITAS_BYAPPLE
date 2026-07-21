@@ -328,11 +328,12 @@ def dashboard():
         extract('month', Visita.fecha) == hoy.month
     ).distinct().count()
 
-
+    from datetime import date
 
     proximas_visitas = Visita.query.filter(
         Visita.usuario_id == current_user.id,
-        Visita.proxima_visita.isnot(None)
+        Visita.proxima_visita.isnot(None),
+        Visita.proxima_visita >= date.today()
     ).order_by(
         Visita.proxima_visita.asc()
     ).limit(5).all()
@@ -995,6 +996,7 @@ def reporte_visitas_vendedor():
         visitas=visitas
     )
 
+from datetime import date
 @app.route('/reporte_proximas_visitas')
 @login_required
 def reporte_proximas_visitas():
@@ -1006,7 +1008,8 @@ def reporte_proximas_visitas():
     fecha_fin = request.args.get('fecha_fin')
 
     consulta = Visita.query.filter(
-        Visita.proxima_visita != None
+        Visita.proxima_visita.isnot(None),
+        Visita.proxima_visita >= date.today()
     )
 
     if fecha_inicio:
@@ -1030,13 +1033,15 @@ def reporte_proximas_visitas():
         visitas=visitas
     )
 
+from datetime import date
 @app.route('/mis_proximas_visitas')
 @login_required
 def mis_proximas_visitas():
 
     visitas = Visita.query.filter(
         Visita.usuario_id == current_user.id,
-        Visita.proxima_visita != None
+        Visita.proxima_visita.isnot(None),
+        Visita.proxima_visita >= date.today()
     ).order_by(
         Visita.proxima_visita.asc()
     ).all()
