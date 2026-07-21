@@ -105,7 +105,7 @@
                                     Editar
                                 </a>
 
-                                {% if current_user.rol in ['admin', 'supervisor'] %}
+                                {% if current_user.rol in ['admin'] %}
 
                                 <a
                                     href="{{ url_for('eliminar_prospecto', id=p.id) }}"
