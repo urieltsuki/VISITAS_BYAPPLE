@@ -641,3 +641,176 @@ textarea {
 
 
 }
+/* =====================================================
+   HISTORIAL DE VISITAS
+   ===================================================== */
+
+
+.table td {
+
+    max-width:250px;
+
+}
+
+
+.table td:nth-child(4){
+
+    white-space:normal;
+
+}
+
+
+
+.modal-content {
+
+    border-radius:20px;
+
+    border:none;
+
+}
+
+
+
+.modal-header {
+
+    background:#f8f9fa;
+
+    border-bottom:none;
+
+}
+
+
+
+img {
+
+    max-height:70vh;
+
+}
+
+
+
+/* avatar vendedor */
+
+.avatar-circle {
+
+
+    flex-shrink:0;
+
+
+}
+
+/* =====================================================
+   MENU LATERAL
+   ===================================================== */
+
+
+.offcanvas {
+
+    width:280px;
+
+}
+
+
+
+.offcanvas-body {
+
+    padding:20px;
+
+}
+
+
+
+.menu-title {
+
+    font-size:.75rem;
+
+    font-weight:700;
+
+    color:#6c757d;
+
+    margin:25px 0 10px;
+
+    letter-spacing:1px;
+
+}
+
+
+
+.menu-link {
+
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:12px 15px;
+
+    margin-bottom:8px;
+
+    border-radius:12px;
+
+    color:#343a40;
+
+    text-decoration:none;
+
+    transition:.25s;
+
+
+}
+
+
+
+.menu-link i {
+
+    font-size:1.2rem;
+
+    color:#2563eb;
+
+}
+
+
+
+.menu-link:hover {
+
+
+    background:#eef4ff;
+
+    color:#2563eb;
+
+    transform:translateX(5px);
+
+
+}
+
+
+
+.menu-link.text-danger i {
+
+
+    color:#dc3545;
+
+}
+
+
+
+/* Navbar */
+
+.navbar {
+
+
+    min-height:65px;
+
+
+}
+
+
+
+.navbar-brand {
+
+
+    font-size:1.2rem;
+
+
+}
