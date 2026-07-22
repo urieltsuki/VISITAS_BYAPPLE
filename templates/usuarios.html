@@ -6,83 +6,116 @@ Usuarios
 
 {% block contenido %}
 
-<h2>Administración de Usuarios</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-<div class="card mb-4">
+    <div>
+
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-people-fill text-primary"></i>
+            Administración de Usuarios
+        </h2>
+
+        <p class="text-muted mb-0">
+            Administra los usuarios, roles y permisos del sistema.
+        </p>
+
+    </div>
+
+</div>
+
+<!-- Formulario -->
+
+<div class="card shadow-sm border-0 rounded-4 mb-4">
+
+    <div class="card-header bg-primary text-white py-3">
+
+        <h5 class="mb-0">
+
+            <i class="bi bi-person-plus-fill"></i>
+
+            Nuevo Usuario
+
+        </h5>
+
+    </div>
 
     <div class="card-body">
 
         <form method="POST">
 
-            <div class="row">
+            <div class="row g-3">
 
-                <div class="col-md-3">
+                <div class="col-lg-3">
 
-                    <label>Nombre</label>
+                    <label class="form-label fw-semibold">
+                        Nombre
+                    </label>
 
                     <input
                         type="text"
                         name="nombre"
                         class="form-control"
+                        placeholder="Nombre completo"
                         required>
 
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-lg-3">
 
-                    <label>Correo</label>
+                    <label class="form-label fw-semibold">
+                        Correo
+                    </label>
 
                     <input
                         type="email"
                         name="correo"
                         class="form-control"
+                        placeholder="correo@empresa.com"
                         required>
 
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-lg-2">
 
-                    <label>Contraseña</label>
+                    <label class="form-label fw-semibold">
+                        Contraseña
+                    </label>
 
                     <input
                         type="password"
                         name="password"
                         class="form-control"
+                        placeholder="********"
                         required>
 
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-lg-2">
 
-                    <label>Rol</label>
+                    <label class="form-label fw-semibold">
+                        Rol
+                    </label>
 
                     <select
                         name="rol"
-                        class="form-control">
+                        class="form-select">
 
-                        <option value="vendedor">
-                            Vendedor
-                        </option>
-
-                        <option value="supervisor">
-                            Supervisor
-                        </option>
-
-                        <option value="admin">
-                            Administrador
-                        </option>
+                        <option value="vendedor">Vendedor</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="admin">Administrador</option>
 
                     </select>
 
                 </div>
 
-                <div class="col-md-1 d-flex align-items-end">
+                <div class="col-lg-2 d-grid align-self-end">
 
                     <button
-                        type="submit"
                         class="btn btn-success">
 
-                        Guardar
+                        <i class="bi bi-plus-circle"></i>
+
+                        Crear Usuario
 
                     </button>
 
@@ -96,102 +129,152 @@ Usuarios
 
 </div>
 
-<div class="table-responsive">
+<!-- Tabla -->
 
-    <table class="table table-striped table-bordered">
+<div class="card shadow-sm border-0 rounded-4">
 
-        <thead class="table-dark">
+    <div class="card-header bg-light">
 
-            <tr>
+        <h5 class="mb-0">
 
-                <th>Nombre</th>
-                <th>Correo</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Acciones</th>
+            <i class="bi bi-person-lines-fill text-primary"></i>
 
-            </tr>
+            Usuarios Registrados
 
-        </thead>
+        </h5>
 
-        <tbody>
+    </div>
 
-            {% for usuario in usuarios %}
+    <div class="table-responsive">
 
-            <tr>
+        <table class="table table-hover align-middle mb-0">
 
-                <td>{{ usuario.nombre }}</td>
+            <thead class="table-primary">
 
-                <td>{{ usuario.correo }}</td>
+                <tr>
 
-                <td>{{ usuario.rol }}</td>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th class="text-center">Estado</th>
+                    <th class="text-center">Acciones</th>
 
-                <td>
+                </tr>
 
-                    {% if usuario.activo %}
+            </thead>
+
+            <tbody>
+
+                {% for usuario in usuarios %}
+
+                <tr>
+
+                    <td>
+
+                        <strong>{{ usuario.nombre }}</strong>
+
+                    </td>
+
+                    <td>
+
+                        {{ usuario.correo }}
+
+                    </td>
+
+                    <td>
+
+                        {% if usuario.rol == "admin" %}
+
+                        <span class="badge bg-danger">
+                            Administrador
+                        </span>
+
+                        {% elif usuario.rol == "supervisor" %}
+
+                        <span class="badge bg-warning text-dark">
+                            Supervisor
+                        </span>
+
+                        {% else %}
+
+                        <span class="badge bg-primary">
+                            Vendedor
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td class="text-center">
+
+                        {% if usuario.activo %}
 
                         <span class="badge bg-success">
+                            <i class="bi bi-check-circle-fill"></i>
                             Activo
                         </span>
 
-                    {% else %}
+                        {% else %}
 
-                        <span class="badge bg-danger">
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-x-circle-fill"></i>
                             Inactivo
                         </span>
 
-                    {% endif %}
+                        {% endif %}
 
-                </td>
+                    </td>
 
-                <td>
+                    <td class="text-center">
 
-                    <a href="{{ url_for('editar_usuario', id=usuario.id) }}"
-                       class="btn btn-warning btn-sm">
+                        <a href="{{ url_for('editar_usuario', id=usuario.id) }}"
+                           class="btn btn-outline-warning btn-sm">
 
-                        Editar
+                            <i class="bi bi-pencil-square"></i>
 
-                    </a>
+                        </a>
 
-                    {% if usuario.activo %}
+                        {% if usuario.activo %}
 
                         <a href="{{ url_for('desactivar_usuario', id=usuario.id) }}"
-                           class="btn btn-secondary btn-sm"
+                           class="btn btn-outline-secondary btn-sm"
                            onclick="return confirm('¿Desea desactivar este usuario?');">
 
-                            Desactivar
+                            <i class="bi bi-person-dash-fill"></i>
 
                         </a>
 
-                    {% else %}
+                        {% else %}
 
                         <a href="{{ url_for('reactivar_usuario', id=usuario.id) }}"
-                           class="btn btn-success btn-sm"
+                           class="btn btn-outline-success btn-sm"
                            onclick="return confirm('¿Desea reactivar este usuario?');">
 
-                            Reactivar
+                            <i class="bi bi-person-check-fill"></i>
 
                         </a>
 
-                    {% endif %}
+                        {% endif %}
 
-                    <a href="{{ url_for('eliminar_usuario', id=usuario.id) }}"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('¿Está seguro de eliminar este usuario definitivamente? Esta acción no se puede deshacer.');">
+                        <a href="{{ url_for('eliminar_usuario', id=usuario.id) }}"
+                           class="btn btn-outline-danger btn-sm"
+                           onclick="return confirm('¿Eliminar definitivamente este usuario?');">
 
-                        Eliminar
+                            <i class="bi bi-trash-fill"></i>
 
-                    </a>
+                        </a>
 
-                </td>
+                    </td>
 
-            </tr>
+                </tr>
 
-            {% endfor %}
+                {% endfor %}
 
-        </tbody>
+            </tbody>
 
-    </table>
+        </table>
+
+    </div>
 
 </div>
 

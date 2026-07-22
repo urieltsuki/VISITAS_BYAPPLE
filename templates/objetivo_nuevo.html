@@ -1,125 +1,214 @@
 
 {% extends 'base.html' %}
 
+{% block titulo %}
+Nuevo Objetivo
+{% endblock %}
+
 {% block contenido %}
 
-<div class="container mt-4">
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-    <h2 class="mb-4">
-        Nuevo Objetivo
-    </h2>
+    <div>
 
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-bullseye text-primary"></i>
+            Nuevo Objetivo Mensual
+        </h2>
 
-    <form method="POST">
+        <p class="text-muted mb-0">
+            Asigna una meta de ventas para un usuario.
+        </p>
 
-        <div class="mb-3">
-
-            <label class="form-label">
-                Usuario
-            </label>
-
-            <select 
-                name="usuario_id" 
-                class="form-select"
-                required>
-
-                <option value="">
-                    Seleccione un usuario
-                </option>
-
-                {% for u in usuarios %}
-
-                <option value="{{ u.id }}">
-                    {{ u.nombre }}
-                </option>
-
-                {% endfor %}
-
-            </select>
-
-        </div>
-
-
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Año
-            </label>
-
-            <input
-                type="number"
-                name="anio"
-                class="form-control"
-                value="{{ anio_actual or '' }}"
-                min="2020"
-                required
-            >
-
-        </div>
-
-
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Mes
-            </label>
-
-            <input
-                type="number"
-                name="mes"
-                class="form-control"
-                min="1"
-                max="12"
-                required
-            >
-
-        </div>
-
-
-
-        <div class="mb-3">
-
-            <label class="form-label">
-                Objetivo
-            </label>
-
-            <input
-                type="number"
-                step="0.01"
-                min="0"
-                name="objetivo"
-                class="form-control"
-                placeholder="Ejemplo: 50000"
-                required
-            >
-
-        </div>
-
-
-
-        <button 
-            type="submit"
-            class="btn btn-success">
-
-            Guardar
-
-        </button>
-
-
-        <a 
-            href="{{ url_for('objetivos') }}"
-            class="btn btn-secondary">
-
-            Cancelar
-
-        </a>
-
-
-    </form>
+    </div>
 
 </div>
 
+<div class="row justify-content-center">
+
+    <div class="col-lg-7">
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-header bg-primary text-white py-3">
+
+                <h5 class="mb-0">
+
+                    <i class="bi bi-plus-circle-fill"></i>
+
+                    Información del Objetivo
+
+                </h5>
+
+            </div>
+
+            <div class="card-body p-4">
+
+                <form method="POST">
+
+                    <div class="mb-4">
+
+                        <label class="form-label fw-semibold">
+
+                            <i class="bi bi-person-fill text-primary"></i>
+
+                            Usuario
+
+                        </label>
+
+                        <select
+                            name="usuario_id"
+                            class="form-select"
+                            required>
+
+                            <option value="">
+                                Seleccione un usuario
+                            </option>
+
+                            {% for u in usuarios %}
+
+                            <option value="{{ u.id }}">
+                                {{ u.nombre }}
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <div class="mb-4">
+
+                                <label class="form-label fw-semibold">
+
+                                    <i class="bi bi-calendar3 text-primary"></i>
+
+                                    Año
+
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="anio"
+                                    class="form-control"
+                                    value="{{ anio_actual or '' }}"
+                                    min="2020"
+                                    required>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="mb-4">
+
+                                <label class="form-label fw-semibold">
+
+                                    <i class="bi bi-calendar-month text-primary"></i>
+
+                                    Mes
+
+                                </label>
+
+                                <select
+                                    name="mes"
+                                    class="form-select"
+                                    required>
+
+                                    <option value="">Seleccione...</option>
+
+                                    <option value="1">Enero</option>
+                                    <option value="2">Febrero</option>
+                                    <option value="3">Marzo</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Mayo</option>
+                                    <option value="6">Junio</option>
+                                    <option value="7">Julio</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Septiembre</option>
+                                    <option value="10">Octubre</option>
+                                    <option value="11">Noviembre</option>
+                                    <option value="12">Diciembre</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <label class="form-label fw-semibold">
+
+                            <i class="bi bi-cash-stack text-success"></i>
+
+                            Objetivo de Venta
+
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+
+                                $
+
+                            </span>
+
+                            <input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                name="objetivo"
+                                class="form-control"
+                                placeholder="0.00"
+                                required>
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <a
+                            href="{{ url_for('objetivos') }}"
+                            class="btn btn-outline-secondary rounded-pill px-4">
+
+                            <i class="bi bi-arrow-left"></i>
+
+                            Cancelar
+
+                        </a>
+
+                        <button
+                            type="submit"
+                            class="btn btn-success rounded-pill px-4">
+
+                            <i class="bi bi-check-circle-fill"></i>
+
+                            Guardar Objetivo
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}
+

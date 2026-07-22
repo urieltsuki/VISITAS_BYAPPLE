@@ -6,20 +6,41 @@ Reportes
 
 {% block contenido %}
 
-<h2>Reportes</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-file-earmark-bar-graph-fill text-primary"></i>
+            Centro de Reportes
+        </h2>
+        <p class="text-muted mb-0">
+            Consulta reportes y estadísticas del sistema.
+        </p>
+    </div>
+</div>
 
-<div class="row">
+<div class="row g-4">
 
-    <div class="col-md-4">
+    <div class="col-lg-4 col-md-6">
 
-        <div class="card">
+        <div class="card report-card h-100">
 
-            <div class="card-body">
+            <div class="card-body text-center">
 
-                <h5>Visitas por Vendedor</h5>
+                <div class="report-icon bg-primary">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+
+                <h4 class="mt-3">
+                    Visitas por Vendedor
+                </h4>
+
+                <p class="text-muted">
+                    Consulta el número de visitas realizadas por cada vendedor.
+                </p>
 
                 <a href="/reporte_visitas_vendedor"
-                   class="btn btn-primary">
+                   class="btn btn-primary rounded-pill px-4">
+                    <i class="bi bi-bar-chart-line"></i>
                     Ver Reporte
                 </a>
 
@@ -29,17 +50,27 @@ Reportes
 
     </div>
 
+    <div class="col-lg-4 col-md-6">
 
-    <div class="col-md-4">
+        <div class="card report-card h-100">
 
-        <div class="card">
+            <div class="card-body text-center">
 
-            <div class="card-body">
+                <div class="report-icon bg-success">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
 
-                <h5>Ventas por Vendedor</h5>
+                <h4 class="mt-3">
+                    Ventas por Vendedor
+                </h4>
+
+                <p class="text-muted">
+                    Revisa el desempeño comercial y las ventas registradas.
+                </p>
 
                 <a href="/reporte_ventas_vendedor"
-                   class="btn btn-primary">
+                   class="btn btn-success rounded-pill px-4">
+                    <i class="bi bi-graph-up-arrow"></i>
                     Ver Reporte
                 </a>
 
@@ -49,17 +80,27 @@ Reportes
 
     </div>
 
+    <div class="col-lg-4 col-md-6">
 
-    <div class="col-md-4">
+        <div class="card report-card h-100">
 
-        <div class="card">
+            <div class="card-body text-center">
 
-            <div class="card-body">
+                <div class="report-icon bg-warning">
+                    <i class="bi bi-calendar-event-fill text-dark"></i>
+                </div>
 
-                <h5>Próximas Visitas</h5>
+                <h4 class="mt-3">
+                    Próximas Visitas
+                </h4>
+
+                <p class="text-muted">
+                    Consulta las visitas programadas para los próximos días.
+                </p>
 
                 <a href="/reporte_proximas_visitas"
-                   class="btn btn-primary">
+                   class="btn btn-warning rounded-pill px-4">
+                    <i class="bi bi-calendar-check"></i>
                     Ver Reporte
                 </a>
 

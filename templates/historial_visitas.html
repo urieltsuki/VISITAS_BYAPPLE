@@ -6,228 +6,490 @@ Historial de Visitas
 
 {% block contenido %}
 
-<h2 class="mb-4">Historial de Visitas</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-<form method="GET">
+    <div>
 
-    <div class="row g-3 mb-4">
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-clock-history text-primary"></i>
+            Historial de Visitas
+        </h2>
 
-        <div class="col-md-3">
-
-            <label class="form-label">Fecha</label>
-
-            <input
-                type="date"
-                name="fecha"
-                class="form-control"
-                value="{{ request.args.get('fecha', '') }}">
-
-        </div>
-
-        <div class="col-md-3">
-
-            <label class="form-label">Numero de Cliente</label>
-
-            <input
-                type="text"
-                name="cliente"
-                class="form-control"
-                placeholder="Numero de cliente"
-                value="{{ request.args.get('cliente', '') }}">
-
-        </div>
-
-        {% if current_user.rol == 'admin' %}
-
-        <div class="col-md-3">
-
-            <label class="form-label">Vendedor</label>
-
-            <input
-                type="text"
-                name="vendedor"
-                class="form-control"
-                placeholder="Nombre del vendedor"
-                value="{{ request.args.get('vendedor', '') }}">
-
-        </div>
-
-        {% endif %}
-
-        <div class="col-md-3 d-flex align-items-end">
-
-            <button
-                type="submit"
-                class="btn btn-primary me-2">
-                Buscar
-            </button>
-
-            <a href="{{ url_for('historial_visitas') }}"
-               class="btn btn-secondary">
-                Limpiar
-            </a>
-
-        </div>
+        <p class="text-muted mb-0">
+            Consulta y administra las visitas realizadas a clientes.
+        </p>
 
     </div>
 
-</form>
+</div>
 
-<div class="table-responsive">
 
-    <table class="table table-striped table-bordered table-hover">
+<!-- FILTROS -->
 
-        <thead class="table-dark">
+<div class="card shadow-sm border-0 rounded-4 mb-4">
 
-            <tr>
-                <th>Fecha</th>
-                <th>Cliente</th>
-                <th>Vendedor</th>
-                <th>Observaciones</th>
-                <th>Venta</th>
-                <th>Monto</th>
-                <th>Evidencia</th>
-                <th>Acciones</th>
-            </tr>
+    <div class="card-header bg-light">
 
-        </thead>
+        <h5 class="mb-0">
 
-        <tbody>
+            <i class="bi bi-funnel-fill text-primary"></i>
 
-            {% for visita in visitas %}
+            Filtros de búsqueda
 
-            <tr>
+        </h5>
 
-                <td>
-                    {{ visita.fecha.strftime('%d/%m/%Y %H:%M') }}
-                </td>
+    </div>
 
-                <td>
-                    {{ visita.cliente.num_cliente }} - {{ visita.cliente.nombre }}
-                </td>
 
-                <td>
-                    {{ visita.usuario.nombre }}
-                </td>
+    <div class="card-body">
 
-                <td>
-                    {{ visita.observaciones }}
-                </td>
+        <form method="GET">
 
-                <td>
-                    {% if visita.venta_realizada %}
-                        <span class="badge bg-success">Sí</span>
-                    {% else %}
-                        <span class="badge bg-secondary">No</span>
-                    {% endif %}
-                </td>
+            <div class="row g-3">
 
-                <td>
-                    {% if visita.monto_venta %}
-                        $ {{ "%.2f"|format(visita.monto_venta) }}
-                    {% else %}
-                        $ 0.00
-                    {% endif %}
-                </td>
-                    
-                <td>
 
-    {% if visita.foto %}
+                <div class="col-lg-3">
 
-    <button
-        type="button"
-        class="btn btn-sm btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#modalFoto{{ visita.id }}">
-        Ver evidencia
-    </button>
+                    <label class="form-label fw-semibold">
 
-    <!-- Modal -->
-    <div class="modal fade"
-         id="modalFoto{{ visita.id }}"
-         tabindex="-1"
-         aria-hidden="true">
+                        Fecha
 
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+                    </label>
 
-            <div class="modal-content">
+                    <input
+                        type="date"
+                        name="fecha"
+                        class="form-control"
+                        value="{{ request.args.get('fecha','') }}">
 
-                <div class="modal-header">
+                </div>
 
-                    <h5 class="modal-title">
-                        Evidencia de la visita
-                    </h5>
 
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
+                <div class="col-lg-3">
+
+                    <label class="form-label fw-semibold">
+
+                        Cliente
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="cliente"
+                        class="form-control"
+                        placeholder="Número de cliente"
+                        value="{{ request.args.get('cliente','') }}">
+
+                </div>
+
+
+                {% if current_user.rol == 'admin' %}
+
+                <div class="col-lg-3">
+
+                    <label class="form-label fw-semibold">
+
+                        Vendedor
+
+                    </label>
+
+                    <input
+                        type="text"
+                        name="vendedor"
+                        class="form-control"
+                        placeholder="Nombre del vendedor"
+                        value="{{ request.args.get('vendedor','') }}">
+
+                </div>
+
+                {% endif %}
+
+
+                <div class="col-lg-3 d-flex align-items-end gap-2">
+
+                    <button class="btn btn-primary flex-fill">
+
+                        <i class="bi bi-search"></i>
+
+                        Buscar
+
                     </button>
 
+
+                    <a href="{{ url_for('historial_visitas') }}"
+                       class="btn btn-outline-secondary flex-fill">
+
+                        <i class="bi bi-x-circle"></i>
+
+                        Limpiar
+
+                    </a>
+
                 </div>
 
-                <div class="modal-body text-center">
-
-                    <img
-                        src="{{ visita.foto }}"
-                        class="img-fluid rounded"
-                        alt="Evidencia">
-
-                </div>
 
             </div>
 
-        </div>
+        </form>
 
     </div>
 
-    {% else %}
+</div>
 
-    <span class="text-muted">
-        Sin evidencia
-    </span>
 
-    {% endif %}
 
-</td>
+<!-- TABLA -->
+
+<div class="card shadow-sm border-0 rounded-4">
+
+<div class="table-responsive">
+
+
+<table class="table table-hover align-middle mb-0">
+
+
+<thead class="table-primary">
+
+<tr>
+
+<th>Fecha</th>
+
+<th>Cliente</th>
+
+<th>Vendedor</th>
+
+<th>Observaciones</th>
+
+<th class="text-center">Venta</th>
+
+<th class="text-end">Monto</th>
+
+<th class="text-center">Evidencia</th>
+
+<th class="text-center">Acciones</th>
+
+</tr>
+
+</thead>
+
+
+<tbody>
+
+
+{% for visita in visitas %}
+
+
+<tr>
 
 
 <td>
 
-    <a href="/visita/editar/{{ visita.id }}"
-       class="btn btn-warning btn-sm">
-        Editar
-    </a>
+<span class="fw-semibold">
 
-    {% if current_user.rol == 'admin' %}
+{{ visita.fecha.strftime('%d/%m/%Y') }}
 
-    <a href="/visita/eliminar/{{ visita.id }}"
-       class="btn btn-danger btn-sm"
-       onclick="return confirm('¿Está seguro de eliminar esta visita?');">
-        Eliminar
-    </a>
+</span>
 
-    {% endif %}
+<br>
 
-            </td>
-            </tr>
+<small class="text-muted">
 
-            {% else %}
+{{ visita.fecha.strftime('%H:%M') }}
 
-            <tr>
-                <td colspan="7" class="text-center">
-                    No hay visitas registradas.
-                </td>
-            </tr>
+</small>
 
-            
 
-            {% endfor %}
+</td>
 
-        </tbody>
 
-    </table>
+
+<td>
+
+
+<strong>
+
+{{ visita.cliente.num_cliente }}
+
+</strong>
+
+<br>
+
+<span class="text-muted">
+
+{{ visita.cliente.nombre }}
+
+</span>
+
+
+</td>
+
+
+
+<td>
+
+<div class="d-flex align-items-center">
+
+
+<div class="avatar-circle me-2">
+
+{{ visita.usuario.nombre[:1]|upper }}
 
 </div>
+
+
+{{ visita.usuario.nombre }}
+
+
+</div>
+
+</td>
+
+
+
+<td>
+
+{% if visita.observaciones %}
+
+{{ visita.observaciones }}
+
+{% else %}
+
+<span class="text-muted">
+
+Sin observaciones
+
+</span>
+
+{% endif %}
+
+
+</td>
+
+
+
+<td class="text-center">
+
+
+{% if visita.venta_realizada %}
+
+
+<span class="badge bg-success">
+
+<i class="bi bi-check-circle"></i>
+
+Venta
+
+</span>
+
+
+{% else %}
+
+
+<span class="badge bg-secondary">
+
+Sin venta
+
+</span>
+
+
+{% endif %}
+
+
+</td>
+
+
+
+<td class="text-end fw-bold">
+
+
+$ {{ "%.2f"|format(visita.monto_venta or 0) }}
+
+
+</td>
+
+
+
+<td class="text-center">
+
+
+{% if visita.foto %}
+
+
+<button
+class="btn btn-outline-primary btn-sm"
+data-bs-toggle="modal"
+data-bs-target="#modalFoto{{ visita.id }}">
+
+
+<i class="bi bi-image-fill"></i>
+
+Ver
+
+
+</button>
+
+
+<div class="modal fade"
+id="modalFoto{{ visita.id }}"
+tabindex="-1">
+
+
+<div class="modal-dialog modal-lg modal-dialog-centered">
+
+
+<div class="modal-content">
+
+
+<div class="modal-header">
+
+
+<h5 class="modal-title">
+
+Evidencia de visita
+
+</h5>
+
+
+<button
+class="btn-close"
+data-bs-dismiss="modal">
+
+</button>
+
+
+</div>
+
+
+<div class="modal-body text-center">
+
+
+<img
+src="{{ visita.foto }}"
+class="img-fluid rounded-4">
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+{% else %}
+
+
+<span class="text-muted">
+
+<i class="bi bi-image"></i>
+
+Sin foto
+
+</span>
+
+
+{% endif %}
+
+
+</td>
+
+
+
+
+<td class="text-center">
+
+
+<a href="/visita/editar/{{ visita.id }}"
+class="btn btn-outline-warning btn-sm"
+title="Editar">
+
+
+<i class="bi bi-pencil-square"></i>
+
+
+</a>
+
+
+
+{% if current_user.rol == 'admin' %}
+
+
+<a href="/visita/eliminar/{{ visita.id }}"
+class="btn btn-outline-danger btn-sm"
+onclick="return confirm('¿Eliminar esta visita?');"
+title="Eliminar">
+
+
+<i class="bi bi-trash-fill"></i>
+
+
+</a>
+
+
+{% endif %}
+
+
+</td>
+
+
+
+</tr>
+
+
+
+{% else %}
+
+
+<tr>
+
+<td colspan="8">
+
+
+<div class="text-center py-5">
+
+
+<i class="bi bi-calendar-x display-1 text-secondary"></i>
+
+
+<h5 class="mt-3">
+
+No hay visitas registradas
+
+</h5>
+
+
+<p class="text-muted">
+
+No se encontraron resultados con los filtros seleccionados.
+
+</p>
+
+
+</div>
+
+
+</td>
+
+
+</tr>
+
+
+{% endfor %}
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+</div>
+
 
 {% endblock %}
