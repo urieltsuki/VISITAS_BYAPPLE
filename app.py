@@ -554,32 +554,30 @@ def editar_cliente(id):
         cliente=cliente
     )
 
-@app.route('/visitas', methods=['GET', 'POST'])
+@app.route('/visita/nueva', methods=['GET', 'POST'])
 @login_required
-def visitas():
+def nueva_visita():
 
     clientes = Cliente.query.order_by(
         Cliente.nombre
     ).all()
 
-    if request.method == 'POST':
 
-        print("LATITUD:", request.form.get('latitud'))
-        print("LONGITUD:", request.form.get('longitud'))
+    if request.method == 'POST':
 
         archivo = request.files.get('foto')
 
-        print("ARCHIVO:", archivo)
-
         nombre_archivo = None
 
+
         # FOTO CLOUDINARY
+
         if archivo and archivo.filename:
 
             imagen = Image.open(archivo)
 
             imagen.thumbnail(
-                (1200, 1200)
+                (1200,1200)
             )
 
             buffer = io.BytesIO()
@@ -593,15 +591,19 @@ def visitas():
 
             buffer.seek(0)
 
+
             resultado = cloudinary.uploader.upload(
                 buffer,
                 folder="bitacora_visitas"
             )
 
+
             nombre_archivo = resultado["secure_url"]
 
-        # FECHA PRÓXIMA VISITA
+
+
         proxima_visita = None
+
 
         if request.form.get('proxima_visita'):
 
@@ -610,50 +612,77 @@ def visitas():
                 '%Y-%m-%d'
             ).date()
 
-        print(
-            "CLIENTE ID:",
-            request.form.get('cliente_id')
-        )
+
 
         visita = Visita(
 
             cliente_id=request.form['cliente_id'],
 
-            observaciones=request.form['observaciones'],
+            observaciones=request.form.get('observaciones'),
 
             venta_realizada=
                 'venta_realizada' in request.form,
 
+
             monto_venta=float(
-                request.form['monto_venta'] or 0
+                request.form.get('monto_venta') or 0
             ),
+
 
             proxima_visita=proxima_visita,
 
+
             foto=nombre_archivo,
+
 
             latitud=request.form.get('latitud'),
 
             longitud=request.form.get('longitud'),
 
+
             usuario_id=current_user.id
+
         )
 
-        print(
-            "Próxima visita:",
-            proxima_visita
-        )
 
         db.session.add(visita)
 
         db.session.commit()
 
+
         return redirect('/visitas')
+
+
+
+    return render_template(
+        'nueva_visita.html',
+        clientes=clientes
+    )
+
+@app.route('/visitas')
+@login_required
+def visitas():
+
+    if current_user.rol == 'admin':
+
+        visitas = Visita.query.order_by(
+            Visita.fecha.desc()
+        ).all()
+
+    else:
+
+        visitas = Visita.query.filter_by(
+            usuario_id=current_user.id
+        ).order_by(
+            Visita.fecha.desc()
+        ).all()
+
 
     return render_template(
         'visitas.html',
-        clientes=clientes
+        visitas=visitas
     )
+
 
 
 @app.route('/historial_visitas')

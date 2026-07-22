@@ -1,186 +1,244 @@
 {% extends 'base.html' %}
 
 {% block titulo %}
-Nueva Visita
+Visitas
 {% endblock %}
+
 
 {% block contenido %}
 
-<div class="row justify-content-center">
 
-    <div class="col-lg-8">
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-        <div class="card shadow-lg border-0 rounded-4">
 
-            <div class="card-header bg-primary text-white py-3 rounded-top-4">
+<div>
 
-                <h3 class="mb-0">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    Registrar Nueva Visita
-                </h3>
+<h2 class="fw-bold mb-1">
 
-                <small>Captura la información de la visita realizada al cliente.</small>
+<i class="bi bi-geo-alt-fill text-primary"></i>
 
-            </div>
+Visitas
 
-            <div class="card-body p-4">
+</h2>
 
-                <form method="POST" enctype="multipart/form-data">
 
-                    <!-- Cliente -->
-                    <div class="mb-4">
+<p class="text-muted">
 
-                        <label class="form-label fw-semibold">
-                            <i class="bi bi-person-fill text-primary"></i>
-                            Cliente
-                        </label>
+Gestiona visitas nuevas y consulta el historial.
 
-                        <input
-                            type="text"
-                            id="cliente_busqueda"
-                            class="form-control form-control-lg"
-                            list="clientesList"
-                            placeholder="Buscar por número o nombre"
-                            autocomplete="off"
-                            required>
+</p>
 
-                        <datalist id="clientesList">
-                            {% for cliente in clientes %}
-                            <option value="{{ cliente.num_cliente }} - {{ cliente.nombre }}"></option>
-                            {% endfor %}
-                        </datalist>
-
-                        <input
-                            type="hidden"
-                            name="cliente_id"
-                            id="cliente_id">
-
-                    </div>
-
-                    <!-- Observaciones -->
-                    <div class="mb-4">
-
-                        <label class="form-label fw-semibold">
-                            <i class="bi bi-chat-left-text-fill text-primary"></i>
-                            Observaciones
-                        </label>
-
-                        <textarea
-                            name="observaciones"
-                            rows="5"
-                            class="form-control"
-                            placeholder="Escriba los detalles de la visita..."></textarea>
-
-                    </div>
-
-                    <!-- Venta -->
-                    <div class="row">
-
-                        <div class="col-md-4">
-
-                            <div class="form-check form-switch mt-2">
-
-                                <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    id="venta_realizada"
-                                    name="venta_realizada">
-
-                                <label class="form-check-label fw-semibold">
-
-                                    ¿Hubo venta?
-
-                                </label>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-8">
-
-                            <label class="form-label fw-semibold">
-
-                                <i class="bi bi-currency-dollar text-success"></i>
-
-                                Monto de la Venta
-
-                            </label>
-
-                            <input
-                                type="number"
-                                step="0.01"
-                                name="monto_venta"
-                                class="form-control">
-
-                        </div>
-
-                    </div>
-
-                    <!-- Foto -->
-                    <div class="mt-4">
-
-                        <label class="form-label fw-semibold">
-
-                            <i class="bi bi-camera-fill text-primary"></i>
-
-                            Evidencia Fotográfica
-
-                        </label>
-
-                        <input
-                            type="file"
-                            name="foto"
-                            accept="image/*"
-                            class="form-control">
-
-                    </div>
-
-                    <!-- Próxima visita -->
-                    <div class="mt-4">
-
-                        <label class="form-label fw-semibold">
-
-                            <i class="bi bi-calendar-event-fill text-primary"></i>
-
-                            Próxima Visita
-
-                        </label>
-
-                        <input
-                            type="date"
-                            name="proxima_visita"
-                            class="form-control"
-                            required>
-
-                    </div>
-
-                    <input type="hidden" name="latitud" id="latitud">
-                    <input type="hidden" name="longitud" id="longitud">
-
-                    <hr class="my-4">
-
-                    <div class="d-grid">
-
-                        <button
-                            type="submit"
-                            class="btn btn-success btn-lg rounded-pill">
-
-                            <i class="bi bi-check-circle-fill"></i>
-
-                            Guardar Visita
-
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-        </div>
-
-    </div>
 
 </div>
+
+
+
+<a href="{{ url_for('nueva_visita') }}"
+class="btn btn-primary rounded-pill px-4">
+
+
+<i class="bi bi-plus-circle-fill"></i>
+
+Nueva Visita
+
+
+</a>
+
+
+</div>
+
+
+
+
+<div class="card shadow-sm border-0 rounded-4">
+
+
+<div class="card-header bg-light">
+
+
+<h5 class="mb-0">
+
+<i class="bi bi-clock-history text-primary"></i>
+
+Historial de Visitas
+
+</h5>
+
+
+</div>
+
+
+
+<div class="card-body">
+
+
+<div class="table-responsive">
+
+
+<table class="table table-hover align-middle">
+
+
+<thead class="table-primary">
+
+
+<tr>
+
+<th>Fecha</th>
+
+<th>Cliente</th>
+
+<th>Vendedor</th>
+
+<th>Venta</th>
+
+<th>Monto</th>
+
+<th>Acciones</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+<tbody>
+
+
+{% for visita in visitas %}
+
+
+<tr>
+
+
+<td>
+
+{{ visita.fecha.strftime('%d/%m/%Y %H:%M') }}
+
+</td>
+
+
+
+<td>
+
+
+<strong>
+
+{{ visita.cliente.num_cliente }}
+
+</strong>
+
+<br>
+
+{{ visita.cliente.nombre }}
+
+
+</td>
+
+
+
+<td>
+
+{{ visita.usuario.nombre }}
+
+</td>
+
+
+
+
+<td>
+
+
+{% if visita.venta_realizada %}
+
+<span class="badge bg-success">
+
+Venta
+
+</span>
+
+
+{% else %}
+
+<span class="badge bg-secondary">
+
+Sin venta
+
+</span>
+
+
+{% endif %}
+
+
+</td>
+
+
+
+
+<td>
+
+
+$ {{ "%.2f"|format(visita.monto_venta or 0) }}
+
+
+</td>
+
+
+
+<td>
+
+
+<a href="/visita/editar/{{ visita.id }}"
+class="btn btn-warning btn-sm">
+
+
+<i class="bi bi-pencil"></i>
+
+
+</a>
+
+
+</td>
+
+
+
+</tr>
+
+
+{% else %}
+
+
+<tr>
+
+<td colspan="6"
+class="text-center py-4 text-muted">
+
+No hay visitas registradas.
+
+
+</td>
+
+</tr>
+
+
+{% endfor %}
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
 
 {% endblock %}
