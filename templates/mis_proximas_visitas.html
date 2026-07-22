@@ -1,55 +1,335 @@
 {% extends 'base.html' %}
 
+
 {% block titulo %}
 Mis Próximas Visitas
 {% endblock %}
 
+
+
 {% block contenido %}
 
-<h2>Mis Próximas Visitas</h2>
 
-<div class="table-responsive">
 
-    <table class="table table-striped">
+<div class="container py-4">
 
-        <thead class="table-dark">
 
-            <tr>
 
-                <th>Fecha</th>
-                <th>No. Cliente</th>
-                <th>Cliente</th>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-            </tr>
 
-        </thead>
+        <div>
 
-        <tbody>
 
-            {% for visita in visitas %}
+            <h2 class="fw-bold mb-1">
 
-            <tr>
+                <i class="bi bi-calendar-check-fill text-primary"></i>
 
-                <td>
-                    {{ visita.proxima_visita.strftime('%d/%m/%Y') }}
-                </td>
+                Mis Próximas Visitas
 
-                <td>
-                    {{ visita.cliente.num_cliente }}
-                </td>
+            </h2>
 
-                <td>
-                    {{ visita.cliente.nombre }}
-                </td>
 
-            </tr>
+            <p class="text-muted mb-0">
 
-            {% endfor %}
+                Agenda tus próximas actividades con clientes.
 
-        </tbody>
+            </p>
 
-    </table>
+
+        </div>
+
+
+
+        <a href="{{ url_for('visitas') }}"
+           class="btn btn-secondary rounded-pill">
+
+
+            <i class="bi bi-arrow-left"></i>
+
+            Visitas
+
+
+        </a>
+
+
+
+    </div>
+
+
+
+
+
+
+
+    <div class="card shadow-sm border-0 rounded-4">
+
+
+        <div class="card-header bg-primary text-white rounded-top-4">
+
+
+            <h5 class="mb-0">
+
+
+                <i class="bi bi-clock-history"></i>
+
+                Agenda pendiente
+
+
+            </h5>
+
+
+        </div>
+
+
+
+
+
+
+        <div class="card-body">
+
+
+
+
+
+            <div class="table-responsive">
+
+
+
+                <table class="table table-hover align-middle mb-0">
+
+
+
+
+
+                    <thead class="table-light">
+
+
+                        <tr>
+
+
+                            <th>
+
+                                Fecha
+
+                            </th>
+
+
+                            <th>
+
+                                No. Cliente
+
+                            </th>
+
+
+                            <th>
+
+                                Cliente
+
+                            </th>
+
+
+                            <th>
+
+                                Acción
+
+                            </th>
+
+
+                        </tr>
+
+
+                    </thead>
+
+
+
+
+
+
+
+                    <tbody>
+
+
+
+
+
+                    {% for visita in visitas %}
+
+
+
+
+
+                        <tr>
+
+
+
+
+                            <td>
+
+
+                                <span class="badge bg-primary-subtle text-primary px-3 py-2">
+
+
+                                    <i class="bi bi-calendar-event"></i>
+
+
+                                    {{ visita.proxima_visita.strftime('%d/%m/%Y') }}
+
+
+                                </span>
+
+
+
+                            </td>
+
+
+
+
+
+
+                            <td>
+
+
+                                <strong>
+
+
+                                    {{ visita.cliente.num_cliente }}
+
+
+                                </strong>
+
+
+
+                            </td>
+
+
+
+
+
+
+                            <td>
+
+
+                                <i class="bi bi-person-fill text-primary"></i>
+
+
+                                {{ visita.cliente.nombre }}
+
+
+
+                            </td>
+
+
+
+
+
+
+                            <td>
+
+
+                                <a href="{{ url_for('nueva_visita') }}"
+
+                                   class="btn btn-sm btn-success rounded-pill">
+
+
+                                    <i class="bi bi-plus-circle"></i>
+
+
+                                    Registrar visita
+
+
+                                </a>
+
+
+                            </td>
+
+
+
+
+
+
+                        </tr>
+
+
+
+
+
+
+
+                    {% else %}
+
+
+
+
+
+
+                        <tr>
+
+
+                            <td colspan="4"
+
+                                class="text-center text-muted py-5">
+
+
+                                <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+
+
+                                No tienes visitas programadas.
+
+
+
+                            </td>
+
+
+                        </tr>
+
+
+
+
+
+
+                    {% endfor %}
+
+
+
+
+
+
+
+                    </tbody>
+
+
+
+
+
+                </table>
+
+
+
+
+
+            </div>
+
+
+
+
+
+        </div>
+
+
+
+
+
+    </div>
+
+
+
+
 
 </div>
+
+
+
+
 
 {% endblock %}
