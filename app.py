@@ -28,7 +28,7 @@ from werkzeug.security import generate_password_hash
 
 import io
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 import cloudinary.uploader
 
@@ -576,9 +576,20 @@ def nueva_visita():
 
             imagen = Image.open(archivo)
 
+
+            # Corregir orientación del celular (EXIF)
+            imagen = ImageOps.exif_transpose(imagen)
+
+
+            # Convertir a RGB para JPEG
+            if imagen.mode != "RGB":
+                imagen = imagen.convert("RGB")
+
+
             imagen.thumbnail(
-                (1200,1200)
+                (1200, 1200)
             )
+
 
             buffer = io.BytesIO()
 
