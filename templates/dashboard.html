@@ -15,175 +15,801 @@ Dashboard
     </div>
 </div>
 <!-- TARJETAS GENERALES -->
-<div class="row">
-    {% if admin %}
-    <div class="col-md-3 mb-3">
-        <div class="card bg-primary text-white shadow-sm">
-            <div class="card-body">
-                <h5>Clientes Totales</h5>
-                <h2>
-                    {{ total_clientes or 0 }}
-                </h2>
+<div class="row g-2">
+
+
+{% if admin %}
+
+
+<!-- CLIENTES TOTALES -->
+
+<div class="col-xl-3 col-md-6">
+
+    <div class="card kpi-card bg-primary text-white shadow">
+
+
+        <div class="card-body">
+
+
+            <div class="d-flex justify-content-between align-items-center">
+
+
+                <div>
+
+                    <small>
+                        Clientes Totales
+                    </small>
+
+
+                    <h2 class="fw-bold mb-0">
+
+                        {{ total_clientes or 0 }}
+
+                    </h2>
+
+
+                </div>
+
+
+                <div class="kpi-icon">
+
+                    <i class="bi bi-people-fill"></i>
+
+                </div>
+
+
             </div>
+
+
         </div>
+
+
     </div>
-    <div class="col-md-3 mb-3">
-        <div class="card bg-success text-white shadow-sm">
-            <div class="card-body">
-                <h5>Visitas Totales</h5>
-                <h2>
-                    {{ total_visitas or 0 }}
-                </h2>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm h-100" style="background-color: #0B3D91; color: white;">
-            <div class="card-body">
-                <h5>Prospectos del Mes</h5>
-                <h2>
-                    {{ prospectos_mes or 0 }}
-                </h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card bg-warning shadow-sm">
-            <div class="card-body">
-                <h5>Visitas del Mes</h5>
-                <h2>
-                    {{ visitas_mes or 0 }}
-                </h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card bg-info text-white shadow-sm">
-            <div class="card-body">
-                <h5>Clientes con Venta</h5>
-                <h2>
-                    {{ clientes_con_venta or 0 }}
-                </h2>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card bg-dark text-white shadow-sm">
-            <div class="card-body">
-                <h5>Venta del Mes</h5>
-                <h3>
-                    ${{ "{:,.2f}".format(monto_mes or 0) }}
-                </h3>
-            </div>
-        </div>
-    </div>
+
 </div>
+
+
+
+<!-- VISITAS TOTALES -->
+
+<div class="col-xl-3 col-md-6">
+
+
+    <div class="card kpi-card bg-success text-white shadow">
+
+
+        <div class="card-body">
+
+
+            <div class="d-flex justify-content-between align-items-center">
+
+
+                <div>
+
+                    <small>
+                        Visitas Totales
+                    </small>
+
+
+                    <h2 class="fw-bold mb-0">
+
+                        {{ total_visitas or 0 }}
+
+                    </h2>
+
+
+                </div>
+
+
+                <div class="kpi-icon">
+
+                    <i class="bi bi-calendar-check-fill"></i>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+{% endif %}
+
+
+
+
+<!-- PROSPECTOS MES -->
+
+
+<div class="col-xl-3 col-md-6">
+
+
+    <div class="card kpi-card prospectos-card text-white shadow">
+
+
+        <div class="card-body">
+
+
+            <div class="d-flex justify-content-between align-items-center">
+
+
+                <div>
+
+
+                    <small>
+                        Prospectos del Mes
+                    </small>
+
+
+                    <h2 class="fw-bold mb-0">
+
+                        {{ prospectos_mes or 0 }}
+
+                    </h2>
+
+
+                </div>
+
+
+                <div class="kpi-icon">
+
+                    <i class="bi bi-person-plus-fill"></i>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+<!-- VISITAS MES -->
+
+
+<div class="col-xl-3 col-md-6">
+
+
+    <div class="card kpi-card bg-warning shadow">
+
+
+        <div class="card-body">
+
+
+            <div class="d-flex justify-content-between align-items-center">
+
+
+                <div>
+
+
+                    <small>
+                        Visitas del Mes
+                    </small>
+
+
+                    <h2 class="fw-bold mb-0">
+
+                        {{ visitas_mes or 0 }}
+
+                    </h2>
+
+
+                </div>
+
+
+                <div class="kpi-icon">
+
+                    <i class="bi bi-geo-alt-fill"></i>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+<!-- CLIENTES CON VENTA -->
+
+
+<div class="col-xl-3 col-md-6">
+
+
+    <div class="card kpi-card bg-info text-white shadow">
+
+
+        <div class="card-body">
+
+
+            <div class="d-flex justify-content-between align-items-center">
+
+
+                <div>
+
+
+                    <small>
+                        Clientes con Venta
+                    </small>
+
+
+                    <h2 class="fw-bold mb-0">
+
+                        {{ clientes_con_venta or 0 }}
+
+                    </h2>
+
+
+                </div>
+
+
+                <div class="kpi-icon">
+
+                    <i class="bi bi-cart-check-fill"></i>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+<!-- VENTA DEL MES -->
+
+
+<div class="col-xl-3 col-md-6">
+
+
+    <div class="card kpi-card bg-dark text-white shadow">
+
+
+        <div class="card-body">
+
+
+            <div class="d-flex justify-content-between align-items-center">
+
+
+                <div>
+
+
+                    <small>
+                        Venta del Mes
+                    </small>
+
+
+                    <h3 class="fw-bold mb-0">
+
+                        ${{ "{:,.2f}".format(monto_mes or 0) }}
+
+                    </h3>
+
+
+                </div>
+
+
+                <div class="kpi-icon">
+
+                    <i class="bi bi-currency-dollar"></i>
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+</div>
+
 <!-- OBJETIVO MENSUAL SOLO VENDEDORES -->
 {% if not admin %}
-<div class="card mt-3 shadow-sm">
+<div class="card objetivo-horizontal mt-4 shadow">
+
     <div class="card-body">
-        <h4>
-            Objetivo Mensual
-        </h4>
-        <h2>
-            ${{ "{:,.0f}".format(objetivo or 0) }}
-        </h2>
-        <p>
-            Venta Actual:
-            ${{ "{:,.0f}".format(monto_mes or 0) }}
-        </p>
-        <div class="progress">
-            <div class="progress-bar"
-                 role="progressbar"
-                 style="width: {{ [cumplimiento or 0, 100]|min }}%;">
-                {{ cumplimiento or 0 }}%
+
+
+        <div class="row align-items-center">
+
+
+            <!-- TITULO -->
+
+            <div class="col-lg-3">
+
+                <div class="d-flex align-items-center">
+
+
+                    <div class="objetivo-icon-small me-3">
+
+                        <i class="bi bi-bullseye"></i>
+
+                    </div>
+
+
+                    <div>
+
+                        <h5 class="text-white fw-bold mb-0">
+
+                            Objetivo Mensual
+
+                        </h5>
+
+
+                        <small class="text-white-50">
+
+                            Cumplimiento comercial
+
+                        </small>
+
+                    </div>
+
+
+                </div>
+
+
             </div>
+
+
+
+
+            <!-- OBJETIVO -->
+
+            <div class="col-lg-3 text-center">
+
+                <small class="text-white-50">
+
+                    Objetivo
+
+                </small>
+
+
+                <h4 class="fw-bold text-white mb-0">
+
+                    ${{ "{:,.0f}".format(objetivo or 0) }}
+
+                </h4>
+
+
+            </div>
+
+
+
+
+            <!-- VENTA -->
+
+            <div class="col-lg-3 text-center">
+
+
+                <small class="text-white-50">
+
+                    Venta Actual
+
+                </small>
+
+
+                <h4 class="fw-bold text-white mb-0">
+
+                    ${{ "{:,.0f}".format(monto_mes or 0) }}
+
+                </h4>
+
+
+            </div>
+
+
+
+
+            <!-- CUMPLIMIENTO -->
+
+            <div class="col-lg-3">
+
+
+                <div class="d-flex justify-content-between">
+
+                    <small class="text-white-50">
+
+                        Avance
+
+                    </small>
+
+
+                    <strong class="text-white">
+
+                        {{ cumplimiento or 0 }}%
+
+                    </strong>
+
+
+                </div>
+
+
+                <div class="progress objetivo-bar mt-2">
+
+
+                    <div
+
+                        class="progress-bar bg-success"
+
+                        style="width: {{ [cumplimiento or 0,100]|min }}%;">
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
         </div>
+
+
     </div>
+
 </div>
+
 {% endif %}
 <!-- INFORMACION ADMINISTRADOR -->
 {% if admin %}
-<div class="card mt-4 shadow-sm">
-    <div class="card-body">
-        <h3>
-            Canal Tradicional
-        </h3>
-        <p>
-            <strong>
-                Meta:
-            </strong>
+<div class="card canal-card mt-4 shadow">
 
-            ${{ "{:,.0f}".format(meta_empresa or 0) }}
-        </p>
-        <p>
-            <strong>
-                Venta:
-            </strong>
-            ${{ "{:,.0f}".format(venta_empresa or 0) }}
-        </p>
-        <h2 class="text-primary">
-            {{ cumplimiento_empresa or 0 }}%
-        </h2>
+    <div class="card-body p-4">
+
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+
+            <div>
+
+                <h3 class="fw-bold text-white mb-1">
+
+                    <i class="bi bi-shop me-2"></i>
+
+                    Canal Tradicional
+
+                </h3>
+
+
+                <small class="text-white-50">
+
+                    Cumplimiento general de ventas
+
+                </small>
+
+
+            </div>
+
+
+            <div class="canal-icon">
+
+                <i class="bi bi-bar-chart-fill"></i>
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="row text-center">
+
+
+            <div class="col-md-4">
+
+                <small class="text-white-50">
+
+                    Meta
+
+                </small>
+
+
+                <h3 class="fw-bold text-white">
+
+                    ${{ "{:,.0f}".format(meta_empresa or 0) }}
+
+                </h3>
+
+
+            </div>
+
+
+
+
+            <div class="col-md-4">
+
+                <small class="text-white-50">
+
+                    Venta
+
+                </small>
+
+
+                <h3 class="fw-bold text-white">
+
+                    ${{ "{:,.0f}".format(venta_empresa or 0) }}
+
+                </h3>
+
+
+            </div>
+
+
+
+
+            <div class="col-md-4">
+
+                <small class="text-white-50">
+
+                    Cumplimiento
+
+                </small>
+
+
+                <h1 class="fw-bold text-white">
+
+                    {{ cumplimiento_empresa or 0 }}%
+
+                </h1>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <div class="progress mt-4" style="height:25px;">
+
+
+            <div 
+                class="progress-bar bg-success progress-bar-striped progress-bar-animated"
+                role="progressbar"
+                style="width: {{ [cumplimiento_empresa or 0,100]|min }}%;">
+
+                {{ cumplimiento_empresa or 0 }}%
+
+            </div>
+
+
+        </div>
+
+
     </div>
+
 </div>
-<div class="mt-4">
-    <h3>
-        Ranking de Cumplimiento
-    </h3>
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>
-                        Vendedor
-                    </th>
-                    <th>
-                        Meta
-                    </th>
-                    <th>
-                        Venta
-                    </th>
-                    <th>
-                        Cumplimiento
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for v in cumplimiento_vendedores %}
-                <tr>
-                    <td>
-                        {{ v['nombre'] }}
-                    </td>
-                    <td>
-                        ${{ "{:,.0f}".format(v['meta'] or 0) }}
-                    </td>
-                    <td>
-                        ${{ "{:,.0f}".format(v['venta'] or 0) }}
-                    </td>
-                    <td>
-                        {% if v['porcentaje'] >= 100 %}
-                            🟢
-                        {% elif v['porcentaje'] >= 80 %}
-                            🟡
-                        {% else %}
-                            🔴
-                        {% endif %}
-                        {{ v['porcentaje'] }}%
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="4" class="text-center">
-                        No hay vendedores registrados.
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+
+<div class="card ranking-card mt-4 shadow">
+
+    <div class="card-header ranking-header text-white">
+
+        <h3 class="mb-0">
+
+            <i class="bi bi-trophy-fill me-2"></i>
+
+            Ranking de Cumplimiento
+
+        </h3>
+
+        <small class="text-white-50">
+
+            Desempeño mensual por vendedor
+
+        </small>
+
     </div>
+
+
+
+    <div class="card-body p-0">
+
+
+        <div class="table-responsive">
+
+
+            <table class="table ranking-table mb-0">
+
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Vendedor
+                        </th>
+
+                        <th class="text-center">
+                            Meta
+                        </th>
+
+                        <th class="text-center">
+                            Venta
+                        </th>
+
+                        <th class="text-center">
+                            Cumplimiento
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                {% for v in cumplimiento_vendedores %}
+
+
+                    <tr>
+
+
+                        <td>
+
+                            <div class="d-flex align-items-center">
+
+
+                                <div class="seller-icon me-3">
+
+                                    <i class="bi bi-person-fill"></i>
+
+                                </div>
+
+
+                                <strong>
+
+                                    {{ v['nombre'] }}
+
+                                </strong>
+
+
+                            </div>
+
+
+                        </td>
+
+
+
+                        <td class="text-center">
+
+                            ${{ "{:,.0f}".format(v['meta'] or 0) }}
+
+                        </td>
+
+
+
+                        <td class="text-center fw-bold text-success">
+
+                            ${{ "{:,.0f}".format(v['venta'] or 0) }}
+
+                        </td>
+
+
+
+                        <td class="text-center">
+
+
+                            {% if v['porcentaje'] >= 100 %}
+
+                                <span class="badge ranking-success">
+
+                                    <i class="bi bi-check-circle-fill me-1"></i>
+
+                                    {{ v['porcentaje'] }}%
+
+                                </span>
+
+
+                            {% elif v['porcentaje'] >= 80 %}
+
+
+                                <span class="badge ranking-warning">
+
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i>
+
+                                    {{ v['porcentaje'] }}%
+
+                                </span>
+
+
+                            {% else %}
+
+
+                                <span class="badge ranking-danger">
+
+                                    <i class="bi bi-x-circle-fill me-1"></i>
+
+                                    {{ v['porcentaje'] }}%
+
+                                </span>
+
+
+                            {% endif %}
+
+
+                        </td>
+
+
+                    </tr>
+
+
+
+                {% else %}
+
+
+                    <tr>
+
+                        <td colspan="4" class="text-center py-5 text-muted">
+
+                            <i class="bi bi-person-x fs-1 d-block mb-3"></i>
+
+                            No hay vendedores registrados.
+
+                        </td>
+
+                    </tr>
+
+
+                {% endfor %}
+
+
+                </tbody>
+
+
+            </table>
+
+
+        </div>
+
+
+    </div>
+
+
 </div>
+
 {% endif %}
 <!-- PROXIMAS VISITAS SOLO VENDEDORES -->
 {% if not admin %}
