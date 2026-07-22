@@ -80,7 +80,6 @@ Historial de Visitas
 
 <thead class="table-primary">
 
-
 <tr>
 
 <th>Fecha</th>
@@ -89,15 +88,18 @@ Historial de Visitas
 
 <th>Vendedor</th>
 
+<th>Observaciones</th>
+
 <th>Venta</th>
 
 <th>Monto</th>
+
+<th>Evidencia</th>
 
 <th>Acciones</th>
 
 
 </tr>
-
 
 </thead>
 
@@ -122,17 +124,13 @@ Historial de Visitas
 
 <td>
 
-
 <strong>
-
 {{ visita.cliente.num_cliente }}
-
 </strong>
 
 <br>
 
 {{ visita.cliente.nombre }}
-
 
 </td>
 
@@ -146,24 +144,34 @@ Historial de Visitas
 
 
 
+<td>
+
+{{ visita.observaciones or '-' }}
+
+</td>
+
+
+
 
 <td>
 
 
 {% if visita.venta_realizada %}
 
+
 <span class="badge bg-success">
 
-Venta
+Sí
 
 </span>
 
 
 {% else %}
 
+
 <span class="badge bg-secondary">
 
-Sin venta
+No
 
 </span>
 
@@ -176,13 +184,135 @@ Sin venta
 
 
 
-<td>
 
+<td>
 
 $ {{ "%.2f"|format(visita.monto_venta or 0) }}
 
+</td>
+
+
+
+
+
+<td>
+
+
+{% if visita.foto %}
+
+
+<button
+
+type="button"
+
+class="btn btn-sm btn-primary"
+
+data-bs-toggle="modal"
+
+data-bs-target="#modalFoto{{ visita.id }}">
+
+
+<i class="bi bi-image"></i>
+
+Ver
+
+
+</button>
+
+
+
+
+
+<!-- MODAL FOTO -->
+
+
+<div class="modal fade"
+
+id="modalFoto{{ visita.id }}"
+
+tabindex="-1">
+
+
+<div class="modal-dialog modal-lg modal-dialog-centered">
+
+
+<div class="modal-content">
+
+
+
+<div class="modal-header">
+
+
+<h5 class="modal-title">
+
+Evidencia de visita
+
+</h5>
+
+
+
+<button
+
+type="button"
+
+class="btn-close"
+
+data-bs-dismiss="modal">
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="modal-body text-center">
+
+
+<img
+
+src="{{ visita.foto }}"
+
+class="img-fluid rounded shadow"
+
+style="max-height:600px;">
+
+
+
+</div>
+
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+{% else %}
+
+
+<span class="text-muted">
+
+Sin evidencia
+
+</span>
+
+
+{% endif %}
+
+
 
 </td>
+
+
+
 
 
 
@@ -190,6 +320,7 @@ $ {{ "%.2f"|format(visita.monto_venta or 0) }}
 
 
 <a href="/visita/editar/{{ visita.id }}"
+
 class="btn btn-warning btn-sm">
 
 
@@ -199,6 +330,27 @@ class="btn btn-warning btn-sm">
 </a>
 
 
+
+{% if current_user.rol == 'admin' %}
+
+
+<a href="/visita/eliminar/{{ visita.id }}"
+
+class="btn btn-danger btn-sm"
+
+onclick="return confirm('¿Está seguro de eliminar esta visita?');">
+
+
+<i class="bi bi-trash"></i>
+
+
+</a>
+
+
+{% endif %}
+
+
+
 </td>
 
 
@@ -206,13 +358,17 @@ class="btn btn-warning btn-sm">
 </tr>
 
 
+
 {% else %}
+
 
 
 <tr>
 
-<td colspan="6"
-class="text-center py-4 text-muted">
+<td colspan="8"
+
+class="text-center text-muted py-4">
+
 
 No hay visitas registradas.
 
@@ -222,7 +378,9 @@ No hay visitas registradas.
 </tr>
 
 
+
 {% endfor %}
+
 
 
 </tbody>
