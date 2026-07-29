@@ -418,7 +418,7 @@ def clientes():
             <h3>
             El número de cliente ya existe.
             </h3>
-            /clientes
+            <a href="/clientes">
                 Regresar
             </a>
             '''

@@ -1,168 +1,94 @@
 {% extends 'base.html' %}
-
 {% block titulo %}
 Objetivos Mensuales
 {% endblock %}
-
 {% block contenido %}
-
 <div class="d-flex justify-content-between align-items-center mb-4">
-
     <div>
-
         <h2 class="fw-bold mb-1">
             <i class="bi bi-bullseye text-primary"></i>
             Objetivos Mensuales
         </h2>
-
         <p class="text-muted mb-0">
             Administra las metas de venta asignadas a cada usuario.
         </p>
-
     </div>
-
     <a href="{{ url_for('nuevo_objetivo') }}"
        class="btn btn-primary rounded-pill px-4">
-
         <i class="bi bi-plus-circle-fill"></i>
         Nuevo Objetivo
-
     </a>
-
 </div>
-
 <div class="card shadow-sm border-0 rounded-4">
-
     <div class="card-header bg-light py-3">
-
         <h5 class="mb-0">
             <i class="bi bi-table text-primary"></i>
             Lista de Objetivos
         </h5>
-
     </div>
-
     <div class="table-responsive">
-
         <table class="table table-hover align-middle mb-0">
-
             <thead class="table-primary">
-
                 <tr>
-
                     <th>Usuario</th>
                     <th class="text-center">Año</th>
                     <th class="text-center">Mes</th>
                     <th class="text-end">Objetivo</th>
                     <th class="text-center">Acciones</th>
-
                 </tr>
-
             </thead>
-
             <tbody>
-
             {% for o in objetivos %}
-
                 <tr>
-
                     <td>
-
                         <div class="d-flex align-items-center">
-
-                          
-
                             <strong>
-
                                 {{ o.usuario.nombre }}
-
                             </strong>
-
                         </div>
-
                     </td>
-
                     <td class="text-center">
-
                         {{ o.anio }}
-
                     </td>
-
                     <td class="text-center">
-
                         <span class="badge bg-info text-dark">
-
                             {{ o.mes }}
-
                         </span>
-
                     </td>
-
                     <td class="text-end fw-bold text-success">
-
                         ${{ "{:,.0f}".format(o.objetivo or 0) }}
-
                     </td>
-
                     <td class="text-center">
-
                         <a href="{{ url_for('editar_objetivo', id=o.id) }}"
                            class="btn btn-outline-warning btn-sm"
                            title="Editar">
-
                             <i class="bi bi-pencil-square"></i>
-
                         </a>
-
                         <a href="{{ url_for('eliminar_objetivo', id=o.id) }}"
                            class="btn btn-outline-danger btn-sm"
                            title="Eliminar"
                            onclick="return confirm('¿Deseas eliminar este objetivo?');">
-
                             <i class="bi bi-trash-fill"></i>
-
                         </a>
-
                     </td>
-
                 </tr>
-
             {% else %}
-
                 <tr>
-
                     <td colspan="5">
-
                         <div class="text-center py-5">
-
                             <i class="bi bi-bullseye display-1 text-secondary"></i>
-
                             <h5 class="mt-3">
-
                                 No hay objetivos registrados
-
                             </h5>
-
                             <p class="text-muted">
-
                                 Comienza agregando el primer objetivo mensual.
-
                             </p>
-
                         </div>
-
                     </td>
-
                 </tr>
-
             {% endfor %}
-
             </tbody>
-
         </table>
-
     </div>
-
 </div>
-
 {% endblock %}

@@ -1,33 +1,22 @@
 {% extends 'base.html' %}
-
 {% block contenido %}
-
 <div class="container py-4">
-
     <div class="row justify-content-center">
-
         <div class="col-lg-8">
-
             <div class="card shadow border-0">
-
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0">
                         <i class="bi bi-person-plus-fill"></i>
                         Nuevo Prospecto
                     </h3>
                 </div>
-
                 <div class="card-body">
-
                     <form method="POST">
-
                         <div class="row">
-
                             <div class="col-md-6 mb-3">
                                 <label for="nombre" class="form-label">
                                     Nombre
                                 </label>
-
                                 <input
                                     type="text"
                                     class="form-control"
@@ -36,12 +25,10 @@
                                     placeholder="Nombre del prospecto"
                                     required>
                             </div>
-
                             <div class="col-md-6 mb-3">
                                 <label for="contacto" class="form-label">
                                     Contacto
                                 </label>
-
                                 <input
                                     type="text"
                                     class="form-control"
@@ -49,16 +36,12 @@
                                     name="contacto"
                                     placeholder="Persona de contacto">
                             </div>
-
                         </div>
-
                         <div class="row">
-
                             <div class="col-md-6 mb-3">
                                 <label for="telefono" class="form-label">
                                     Teléfono
                                 </label>
-
                                 <input
                                     type="text"
                                     class="form-control"
@@ -66,92 +49,62 @@
                                     name="telefono"
                                     placeholder="(00) 0000-0000">
                             </div>
-
                             <div class="col-md-6 mb-3">
                                 <label for="estatus" class="form-label">
                                     Estatus
                                 </label>
-
                                 <select
                                     class="form-select"
                                     id="estatus"
                                     name="estatus">
-
                                     <option value="Nuevo" selected>Nuevo</option>
                                     <option value="Negociacion">Negociación</option>
                                     <option value="Convertido">Convertido</option>
                                     <option value="Perdido">Perdido</option>
-
                                 </select>
-
                             </div>
-
                         </div>
-
                         <div class="mb-3">
-
                             <label for="direccion" class="form-label">
                                 Dirección
                             </label>
-
                             <textarea
                                 class="form-control"
                                 id="direccion"
                                 name="direccion"
                                 rows="3"
                                 placeholder="Dirección completa"></textarea>
-
                         </div>
-
                         <div class="mb-4">
-
                             <label for="observaciones" class="form-label">
                                 Observaciones
                             </label>
-
                             <textarea
                                 class="form-control"
                                 id="observaciones"
                                 name="observaciones"
                                 rows="4"
                                 placeholder="Escribe observaciones relevantes..."></textarea>
-
                         </div>
-
                         <hr>
-
                         <div class="d-flex justify-content-end gap-2">
-
                             <a
                                 href="{{ url_for('prospectos') }}"
                                 class="btn btn-outline-secondary">
-
                                 <i class="bi bi-x-circle"></i>
                                 Cancelar
-
                             </a>
-
                             <button
                                 type="submit"
                                 class="btn btn-primary">
-
                                 <i class="bi bi-save"></i>
                                 Guardar Prospecto
-
                             </button>
-
                         </div>
-
                     </form>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
-
 {% endblock %}
