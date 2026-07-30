@@ -86,6 +86,17 @@
                                 rows="4"
                                 placeholder="Escribe observaciones relevantes..."></textarea>
                         </div>
+                        <input
+                            type="hidden"
+                            name="latitud"
+                            id="latitud"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="longitud"
+                            id="longitud"
+                        >
                         <hr>
                         <div class="d-flex justify-content-end gap-2">
                             <a
@@ -102,9 +113,34 @@
                             </button>
                         </div>
                     </form>
+                    <script>
+                    navigator.geolocation.getCurrentPosition(
+                        function(posicion){
+
+                            document.getElementById("latitud").value = posicion.coords.latitude;
+                            document.getElementById("longitud").value = posicion.coords.longitude;
+
+                            console.log("GPS obtenido");
+                            console.log(posicion.coords.latitude);
+                            console.log(posicion.coords.longitude);
+
+                        },
+                        function(error){
+                            console.log("Error GPS:", error);
+                        }
+                    );
+                    </script>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script>
+const form = document.querySelector("form");
+
+form.addEventListener("submit", function () {
+    console.log("Latitud:", document.getElementById("latitud").value);
+    console.log("Longitud:", document.getElementById("longitud").value);
+});
+</script>
 {% endblock %}
