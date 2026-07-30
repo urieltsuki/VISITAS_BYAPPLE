@@ -1329,7 +1329,17 @@ def nuevo_prospecto():
 
             estatus=request.form['estatus'],
 
+            latitud=request.form.get(
+                'latitud'
+            ),
+
+            longitud=request.form.get(
+                'longitud'
+            ),
+
             usuario_id=current_user.id
+
+            
         )
 
         db.session.add(

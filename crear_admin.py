@@ -5,18 +5,25 @@ from models import db, Usuario
 
 with app.app_context():
 
-    usuario = Usuario.query.filter_by(
-        correo="uriel.luna@applecosmetics.com.mx"
-    ).first()
+    admin = Usuario(
 
-    if usuario:
+        nombre="Uriel Luna",
 
-        usuario.password = generate_password_hash("Admin123")
-        usuario.rol = "admin"
+        correo="uriel.luna@applecosmetics.com.mx",
 
-        db.session.commit()
+        password=generate_password_hash(
+            "uri26"
+        ),
 
-        print("Password actualizada")
+        rol="admin",
 
-    else:
-        print("No existe el usuario")
+        activo=True
+    )
+
+    db.session.add(admin)
+
+    db.session.commit()
+
+    print(
+        "Administrador creado correctamente"
+    )

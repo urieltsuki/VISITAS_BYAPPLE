@@ -204,3 +204,10 @@ class Prospecto(db.Model):
         'Usuario',
         backref='prospectos'
     )
+    latitud = db.Column(
+    db.String(50)
+    )
+
+    longitud = db.Column(
+        db.String(50)
+    )
