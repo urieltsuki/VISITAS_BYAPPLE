@@ -1315,6 +1315,13 @@ def nuevo_prospecto():
 
     if request.method == 'POST':
 
+        # Verificar datos recibidos
+        print("========== FORM ==========")
+        print(request.form)
+        print("Latitud recibida:", request.form.get("latitud"))
+        print("Longitud recibida:", request.form.get("longitud"))
+        print("==========================")
+
         prospecto = Prospecto(
 
             nombre=request.form['nombre'],
@@ -1329,24 +1336,24 @@ def nuevo_prospecto():
 
             estatus=request.form['estatus'],
 
-            latitud=request.form.get(
-                'latitud'
-            ),
+            latitud=request.form.get('latitud'),
 
-            longitud=request.form.get(
-                'longitud'
-            ),
+            longitud=request.form.get('longitud'),
 
             usuario_id=current_user.id
 
-            
         )
 
-        db.session.add(
-            prospecto
-        )
+        # Verificar objeto antes de guardar
+        print("========== OBJETO ==========")
+        print("Latitud:", prospecto.latitud)
+        print("Longitud:", prospecto.longitud)
+        print("============================")
 
+        db.session.add(prospecto)
         db.session.commit()
+
+        print("Prospecto guardado correctamente.")
 
         return redirect('/prospectos')
 
