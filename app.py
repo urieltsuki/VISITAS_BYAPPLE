@@ -1315,13 +1315,6 @@ def nuevo_prospecto():
 
     if request.method == 'POST':
 
-        # Verificar datos recibidos
-        print("========== FORM ==========")
-        print(request.form)
-        print("Latitud recibida:", request.form.get("latitud"))
-        print("Longitud recibida:", request.form.get("longitud"))
-        print("==========================")
-
         prospecto = Prospecto(
 
             nombre=request.form['nombre'],
