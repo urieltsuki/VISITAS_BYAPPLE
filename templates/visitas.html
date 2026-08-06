@@ -37,7 +37,7 @@ Visitas
                         <th>Cliente</th>
                         <th>Vendedor</th>
                         <th>Observaciones</th>
-                        <th>Venta</th>
+                        
                         <th>Monto</th>
                         <th>Evidencia</th>
                         <th>Acciones</th>
@@ -63,14 +63,6 @@ Visitas
 
                         <td>
                             {{ visita.observaciones or '-' }}
-                        </td>
-
-                        <td>
-                            {% if visita.venta_realizada %}
-                                <span class="badge bg-success">Sí</span>
-                            {% else %}
-                                <span class="badge bg-secondary">No</span>
-                            {% endif %}
                         </td>
 
                         <td>
