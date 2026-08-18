@@ -211,3 +211,55 @@ class Prospecto(db.Model):
     longitud = db.Column(
         db.String(50)
     )
+
+
+class Llamada(db.Model):
+
+    __tablename__ = 'llamadas'
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    fecha = db.Column(
+        db.DateTime,
+        default=datetime.now
+    )
+
+    estatus = db.Column(
+        db.String(20),
+        nullable=False,
+        default='No contestó'
+    )
+
+    monto_venta = db.Column(
+        db.Float,
+        default=0
+    )
+
+    observaciones = db.Column(
+        db.Text
+    )
+
+    cliente_id = db.Column(
+        db.Integer,
+        db.ForeignKey('clientes.id'),
+        nullable=False
+    )
+
+    usuario_id = db.Column(
+        db.Integer,
+        db.ForeignKey('usuarios.id'),
+        nullable=False
+    )
+
+    cliente = db.relationship(
+        'Cliente',
+        backref='llamadas'
+    )
+
+    usuario = db.relationship(
+        'Usuario',
+        backref='llamadas'
+    )

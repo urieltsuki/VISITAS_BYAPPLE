@@ -14,7 +14,7 @@ from sqlalchemy import or_
 from werkzeug.security import check_password_hash
 
 from models import db
-from models import Usuario, Cliente, Visita, Objetivo, Prospecto
+from models import Usuario, Cliente, Visita, Objetivo, Prospecto, Llamada
 
 import os
 from werkzeug.utils import secure_filename
@@ -135,258 +135,443 @@ from sqlalchemy import func, extract
 @login_required
 def dashboard():
 
-    hoy = datetime.now()
+    from datetime import datetime
+
+    ahora = datetime.now()
+
+    inicio_mes = datetime(
+        ahora.year,
+        ahora.month,
+        1
+    )
+
+    # ==========================================
+    # VARIABLES GENERALES
+    # ==========================================
+
+    admin = current_user.rol in ['admin', 'supervisor']
 
 
-    # ==========================
-    # ADMINISTRADOR / SUPERVISOR
-    # ==========================
+    # ==========================================
+    # CLIENTES
+    # ==========================================
 
-    if current_user.rol in ['admin', 'supervisor']:
+    if current_user.rol == 'vendedor':
 
-        total_clientes = Cliente.query.count()
+        clientes_total = Cliente.query.filter(
+            Cliente.vendedor == current_user.id
+        ).count()
 
-        total_visitas = Visita.query.count()
+    else:
 
+        clientes_total = Cliente.query.count()
+
+
+    # ==========================================
+    # VISITAS
+    # ==========================================
+
+    if current_user.rol == 'vendedor':
+
+        visitas_total = Visita.query.filter(
+            Visita.usuario_id == current_user.id
+        ).count()
 
         visitas_mes = Visita.query.filter(
-            extract('year', Visita.fecha) == hoy.year,
-            extract('month', Visita.fecha) == hoy.month
+            Visita.usuario_id == current_user.id,
+            Visita.fecha >= inicio_mes
+        ).count()
+
+    else:
+
+        visitas_total = Visita.query.count()
+
+        visitas_mes = Visita.query.filter(
+            Visita.fecha >= inicio_mes
         ).count()
 
 
-        monto_mes = db.session.query(
-            func.sum(Visita.monto_venta)
+    # ==========================================
+    # PROSPECTOS
+    # ==========================================
+
+    if current_user.rol == 'vendedor':
+
+        prospectos_mes = Prospecto.query.filter(
+            Prospecto.usuario_id == current_user.id,
+            Prospecto.fecha_registro >= inicio_mes
+        ).count()
+
+    else:
+
+        prospectos_mes = Prospecto.query.filter(
+            Prospecto.fecha_registro >= inicio_mes
+        ).count()
+
+
+    # ==========================================
+    # LLAMADAS
+    # ==========================================
+
+    if current_user.rol == 'vendedor':
+
+        llamadas_mes = Llamada.query.filter(
+            Llamada.usuario_id == current_user.id,
+            Llamada.fecha >= inicio_mes
+        ).count()
+
+    else:
+
+        llamadas_mes = Llamada.query.filter(
+            Llamada.fecha >= inicio_mes
+        ).count()
+
+
+    # ==========================================
+    # VENTAS POR VISITAS
+    # ==========================================
+
+    if current_user.rol == 'vendedor':
+
+        ventas_visitas = db.session.query(
+            db.func.sum(Visita.monto_venta)
         ).filter(
-            extract('year', Visita.fecha) == hoy.year,
-            extract('month', Visita.fecha) == hoy.month
+            Visita.usuario_id == current_user.id,
+            Visita.fecha >= inicio_mes,
+            Visita.monto_venta > 0
+        ).scalar() or 0
+
+    else:
+
+        ventas_visitas = db.session.query(
+            db.func.sum(Visita.monto_venta)
+        ).filter(
+            Visita.fecha >= inicio_mes,
+            Visita.monto_venta > 0
         ).scalar() or 0
 
 
-        clientes_con_venta = db.session.query(
+    # ==========================================
+    # VENTAS POR LLAMADAS
+    # ==========================================
+
+    if current_user.rol == 'vendedor':
+
+        ventas_llamadas = db.session.query(
+            db.func.sum(Llamada.monto_venta)
+        ).filter(
+            Llamada.usuario_id == current_user.id,
+            Llamada.fecha >= inicio_mes,
+            Llamada.monto_venta > 0
+        ).scalar() or 0
+
+    else:
+
+        ventas_llamadas = db.session.query(
+            db.func.sum(Llamada.monto_venta)
+        ).filter(
+            Llamada.fecha >= inicio_mes,
+            Llamada.monto_venta > 0
+        ).scalar() or 0
+
+
+    # ==========================================
+    # VENTA TOTAL DEL MES
+    # VISITAS + LLAMADAS
+    # ==========================================
+
+    venta_mes = (
+        ventas_visitas +
+        ventas_llamadas
+    )
+
+
+    # ==========================================
+    # CLIENTES ÚNICOS CON VENTA
+    # ==========================================
+
+    if current_user.rol == 'vendedor':
+
+        clientes_venta_visitas = db.session.query(
             Visita.cliente_id
         ).filter(
-            Visita.venta_realizada.is_(True),
-            extract('year', Visita.fecha) == hoy.year,
-            extract('month', Visita.fecha) == hoy.month
-        ).distinct().count()
-
-
-        cumplimiento_vendedores = []
-
-        usuarios = Usuario.query.filter(
-            Usuario.activo == True,
-            Usuario.rol == 'vendedor'
+            Visita.usuario_id == current_user.id,
+            Visita.fecha >= inicio_mes,
+            Visita.monto_venta > 0
         ).all()
 
-        for usuario in usuarios:
 
-            objetivo_usuario = Objetivo.query.filter_by(
-                usuario_id=usuario.id,
-                anio=hoy.year,
-                mes=hoy.month
+        clientes_venta_llamadas = db.session.query(
+            Llamada.cliente_id
+        ).filter(
+            Llamada.usuario_id == current_user.id,
+            Llamada.fecha >= inicio_mes,
+            Llamada.monto_venta > 0
+        ).all()
+
+    else:
+
+        clientes_venta_visitas = db.session.query(
+            Visita.cliente_id
+        ).filter(
+            Visita.fecha >= inicio_mes,
+            Visita.monto_venta > 0
+        ).all()
+
+
+        clientes_venta_llamadas = db.session.query(
+            Llamada.cliente_id
+        ).filter(
+            Llamada.fecha >= inicio_mes,
+            Llamada.monto_venta > 0
+        ).all()
+
+
+    clientes_con_venta_ids = set()
+
+
+    for resultado in clientes_venta_visitas:
+
+        if resultado[0] is not None:
+
+            clientes_con_venta_ids.add(
+                resultado[0]
+            )
+
+
+    for resultado in clientes_venta_llamadas:
+
+        if resultado[0] is not None:
+
+            clientes_con_venta_ids.add(
+                resultado[0]
+            )
+
+
+    clientes_con_venta = len(
+        clientes_con_venta_ids
+    )
+
+
+    # ==========================================
+    # OBJETIVO Y RANKING
+    # ==========================================
+
+    meta_empresa = 0
+    venta_empresa = 0
+    cumplimiento_empresa = 0
+
+    cumplimiento_vendedores = []
+
+
+    # ==========================================
+    # ADMIN / SUPERVISOR
+    # ==========================================
+
+    if admin:
+
+        vendedores = Usuario.query.filter(
+            Usuario.rol == 'vendedor',
+            Usuario.activo == True
+        ).all()
+
+        for vendedor in vendedores:
+
+            # ------------------------------
+            # OBJETIVO DEL VENDEDOR
+            # ------------------------------
+
+            objetivo = Objetivo.query.filter(
+                Objetivo.usuario_id == vendedor.id,
+                Objetivo.anio == ahora.year,
+                Objetivo.mes == ahora.month
             ).first()
 
-            meta = objetivo_usuario.objetivo if objetivo_usuario else 0
+            meta = objetivo.objetivo if objetivo else 0
 
-            venta = db.session.query(
-                func.sum(Visita.monto_venta)
+
+            # ------------------------------
+            # VENTAS POR VISITAS
+            # ------------------------------
+
+            venta_visitas_vendedor = db.session.query(
+                db.func.sum(Visita.monto_venta)
             ).filter(
-                Visita.usuario_id == usuario.id,
-                extract('year', Visita.fecha) == hoy.year,
-                extract('month', Visita.fecha) == hoy.month
+                Visita.usuario_id == vendedor.id,
+                Visita.fecha >= inicio_mes,
+                Visita.monto_venta > 0
             ).scalar() or 0
 
-            porcentaje = 0
+
+            # ------------------------------
+            # VENTAS POR LLAMADAS
+            # ------------------------------
+
+            venta_llamadas_vendedor = db.session.query(
+                db.func.sum(Llamada.monto_venta)
+            ).filter(
+                Llamada.usuario_id == vendedor.id,
+                Llamada.fecha >= inicio_mes,
+                Llamada.monto_venta > 0
+            ).scalar() or 0
+
+
+            # ------------------------------
+            # VENTA TOTAL DEL VENDEDOR
+            # ------------------------------
+
+            venta = (
+                venta_visitas_vendedor +
+                venta_llamadas_vendedor
+            )
+
+
+            # ------------------------------
+            # CUMPLIMIENTO
+            # ------------------------------
 
             if meta > 0:
+
                 porcentaje = round(
                     (venta / meta) * 100,
-                    2
+                    1
                 )
 
+            else:
+
+                porcentaje = 0
+
+
             cumplimiento_vendedores.append({
-                'nombre': usuario.nombre,
+
+                'nombre': vendedor.nombre,
+
                 'meta': meta,
+
                 'venta': venta,
+
                 'porcentaje': porcentaje
+
             })
 
-        cumplimiento_vendedores.sort(
-            key=lambda x: x['porcentaje'],
-            reverse=True
-        )
 
-        meta_empresa = sum(
-            x['meta']
-            for x in cumplimiento_vendedores
-        )
+            # Acumular únicamente las metas
 
-        venta_empresa = sum(
-            x['venta']
-            for x in cumplimiento_vendedores
-        )
+            meta_empresa += meta
 
-        cumplimiento_empresa = 0
+
+        # ==========================================
+        # VENTA EMPRESA
+        # VISITAS + LLAMADAS
+        # ==========================================
+
+        venta_empresa = venta_mes
+
+
+        # ==========================================
+        # CUMPLIMIENTO EMPRESA
+        # ==========================================
 
         if meta_empresa > 0:
 
             cumplimiento_empresa = round(
                 (venta_empresa / meta_empresa) * 100,
-                2
+                1
             )
 
-        objetivo = Objetivo.query.filter_by(
-            anio=hoy.year,
-            mes=hoy.month
+        else:
+
+            cumplimiento_empresa = 0
+
+
+    # ==========================================
+    # VENDEDOR
+    # ==========================================
+
+    else:
+
+        objetivo = Objetivo.query.filter(
+            Objetivo.usuario_id == current_user.id,
+            Objetivo.anio == ahora.year,
+            Objetivo.mes == ahora.month
         ).first()
 
 
-        cumplimiento = 0
+        meta_empresa = (
+            objetivo.objetivo
+            if objetivo
+            else 0
+        )
 
-        if objetivo and objetivo.objetivo > 0:
-            cumplimiento = round(
-                (monto_mes / objetivo.objetivo) * 100,
-                2
+
+        venta_empresa = venta_mes
+
+
+        if meta_empresa > 0:
+
+            cumplimiento_empresa = round(
+                (venta_empresa / meta_empresa) * 100,
+                1
             )
 
-        prospectos_mes = Prospecto.query.filter(
-            extract(
-                'year',
-                Prospecto.fecha_registro
-            ) == hoy.year,
+        else:
 
-            extract(
-                'month',
-                Prospecto.fecha_registro
-            ) == hoy.month
-        ).count()
+            cumplimiento_empresa = 0
 
 
-        return render_template(
-            'dashboard.html',
-            total_clientes=total_clientes,
-            total_visitas=total_visitas,
-            visitas_mes=visitas_mes,
-            monto_mes=monto_mes,
-            clientes_con_venta=clientes_con_venta,
-            objetivo=objetivo.objetivo if objetivo else 0,
-            cumplimiento=cumplimiento,
-            meta_empresa=meta_empresa,
-            venta_empresa=venta_empresa,
-            cumplimiento_empresa=cumplimiento_empresa,
-            cumplimiento_vendedores=cumplimiento_vendedores,
-            prospectos_mes=prospectos_mes,
-            admin=True
-        )
-
-
-
-    # ==========================
-    # VENDEDOR
-    # ==========================
-
-    total_visitas = Visita.query.filter(
-        Visita.usuario_id == current_user.id
-    ).count()
-
-
-
-    visitas_mes = Visita.query.filter(
-        Visita.usuario_id == current_user.id,
-        extract('year', Visita.fecha) == hoy.year,
-        extract('month', Visita.fecha) == hoy.month
-    ).count()
-
-
-
-    ventas_mes = Visita.query.filter(
-        Visita.usuario_id == current_user.id,
-        Visita.venta_realizada.is_(True),
-        extract('year', Visita.fecha) == hoy.year,
-        extract('month', Visita.fecha) == hoy.month
-    ).count()
-
-
-
-    monto_mes = db.session.query(
-        func.sum(Visita.monto_venta)
-    ).filter(
-        Visita.usuario_id == current_user.id,
-        extract('year', Visita.fecha) == hoy.year,
-        extract('month', Visita.fecha) == hoy.month
-    ).scalar() or 0
-
-
-
-    clientes_con_venta = db.session.query(
-        Visita.cliente_id
-    ).filter(
-        Visita.usuario_id == current_user.id,
-        Visita.venta_realizada.is_(True),
-        extract('year', Visita.fecha) == hoy.year,
-        extract('month', Visita.fecha) == hoy.month
-    ).distinct().count()
-
-    from datetime import date
-
-    proximas_visitas = Visita.query.filter(
-        Visita.usuario_id == current_user.id,
-        Visita.proxima_visita.isnot(None),
-        Visita.proxima_visita >= date.today()
-    ).order_by(
-        Visita.proxima_visita.asc()
-    ).limit(5).all()
-
-
-
-    objetivo = Objetivo.query.filter_by(
-        usuario_id=current_user.id,
-        anio=hoy.year,
-        mes=hoy.month
-    ).first()
-
-
-
-    cumplimiento = 0
-
-    if objetivo and objetivo.objetivo > 0:
-
-        cumplimiento = round(
-            (monto_mes / objetivo.objetivo) * 100,
-            2
-        )
-
-    prospectos_mes = Prospecto.query.filter(
-        Prospecto.usuario_id == current_user.id,
-
-        extract(
-            'year',
-            Prospecto.fecha_registro
-        ) == hoy.year,
-
-        extract(
-            'month',
-            Prospecto.fecha_registro
-        ) == hoy.month
-    ).count()
-
-
+    # ==========================================
+    # ENVIAR DATOS AL DASHBOARD
+    # ==========================================
 
     return render_template(
         'dashboard.html',
-        total_visitas=total_visitas,
-        visitas_mes=visitas_mes,
-        ventas_mes=ventas_mes,
-        monto_mes=monto_mes,
-        clientes_con_venta=clientes_con_venta,
-        proximas_visitas=proximas_visitas,
-        objetivo=objetivo.objetivo if objetivo else 0,
-        cumplimiento=cumplimiento,
-        prospectos_mes=prospectos_mes,
-        admin=False
-    )
 
+        # ==========================================
+        # KPI GENERALES
+        # ==========================================
+
+        clientes_total=clientes_total,
+
+        clientes_con_venta=clientes_con_venta,
+
+        visitas_total=visitas_total,
+
+        visitas_mes=visitas_mes,
+
+        prospectos_mes=prospectos_mes,
+
+        llamadas_mes=llamadas_mes,
+
+        # Venta total = Visitas + Llamadas
+        venta_mes=venta_mes,
+
+        # ==========================================
+        # COMPATIBILIDAD CON EL HTML ACTUAL
+        # ==========================================
+
+        # Para la sección Objetivo Mensual del vendedor
+        objetivo=meta_empresa,
+
+        # Para "Venta Actual" y tarjeta Venta del Mes
+        monto_mes=venta_mes,
+
+        # Cumplimiento del vendedor o empresa
+        cumplimiento=cumplimiento_empresa,
+
+        # ==========================================
+        # ADMIN / SUPERVISOR
+        # ==========================================
+
+        admin=admin,
+
+        meta_empresa=meta_empresa,
+
+        venta_empresa=venta_empresa,
+
+        cumplimiento_empresa=cumplimiento_empresa,
+
+        cumplimiento_vendedores=cumplimiento_vendedores
+    )
 
 # Logout
 @app.route('/logout')
@@ -1432,9 +1617,123 @@ def eliminar_prospecto(id):
 
     return redirect('/prospectos')
 
+@app.route('/llamadas')
+@login_required
+def llamadas():
 
+    if current_user.rol in ['admin', 'supervisor']:
 
+        llamadas = Llamada.query.order_by(
+            Llamada.fecha.desc()
+        ).all()
 
+    else:
+
+        llamadas = Llamada.query.filter_by(
+            usuario_id=current_user.id
+        ).order_by(
+            Llamada.fecha.desc()
+        ).all()
+
+    return render_template(
+        'llamadas.html',
+        llamadas=llamadas
+    )
+
+@app.route(
+    '/llamada/nueva',
+    methods=['GET', 'POST']
+)
+@login_required
+def nueva_llamada():
+
+    clientes = Cliente.query.order_by(
+        Cliente.nombre
+    ).all()
+
+    if request.method == 'POST':
+
+        llamada = Llamada(
+
+            cliente_id=request.form['cliente_id'],
+
+            estatus=request.form['estatus'],
+
+            monto_venta=float(
+                request.form.get('monto_venta') or 0
+            ),
+
+            observaciones=request.form.get(
+                'observaciones'
+            ),
+
+            usuario_id=current_user.id
+
+        )
+
+        db.session.add(llamada)
+
+        db.session.commit()
+
+        return redirect('/llamadas')
+
+    return render_template(
+        'nueva_llamada.html',
+        clientes=clientes
+    )
+
+@app.route(
+    '/llamada/editar/<int:id>',
+    methods=['GET', 'POST']
+)
+@login_required
+def editar_llamada(id):
+
+    llamada = Llamada.query.get_or_404(id)
+
+    # Los vendedores solamente pueden editar
+    # sus propias llamadas
+    if (
+        current_user.rol == 'vendedor'
+        and llamada.usuario_id != current_user.id
+    ):
+        return "Acceso denegado"
+
+    if request.method == 'POST':
+
+        llamada.estatus = request.form['estatus']
+
+        llamada.monto_venta = float(
+            request.form.get('monto_venta') or 0
+        )
+
+        llamada.observaciones = request.form.get(
+            'observaciones'
+        )
+
+        db.session.commit()
+
+        return redirect('/llamadas')
+
+    return render_template(
+        'editar_llamada.html',
+        llamada=llamada
+    )
+
+@app.route('/llamada/eliminar/<int:id>')
+@login_required
+def eliminar_llamada(id):
+
+    if current_user.rol != 'admin':
+        return "Acceso denegado"
+
+    llamada = Llamada.query.get_or_404(id)
+
+    db.session.delete(llamada)
+
+    db.session.commit()
+
+    return redirect('/llamadas')
 
 
 

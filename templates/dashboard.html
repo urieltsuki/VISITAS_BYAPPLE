@@ -16,48 +16,7 @@ Dashboard
 </div>
 <!-- TARJETAS GENERALES -->
 <div class="row g-2">
-{% if admin %}
-<!-- CLIENTES TOTALES -->
-<div class="col-xl-3 col-md-6">
-    <div class="card kpi-card bg-primary text-white shadow">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <small>
-                        Clientes Totales
-                    </small>
-                    <h2 class="fw-bold mb-0">
-                        {{ total_clientes or 0 }}
-                    </h2>
-                </div>
-                <div class="kpi-icon">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- VISITAS TOTALES -->
-<div class="col-xl-3 col-md-6">
-    <div class="card kpi-card bg-success text-white shadow">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <small>
-                        Visitas Totales
-                    </small>
-                    <h2 class="fw-bold mb-0">
-                        {{ total_visitas or 0 }}
-                    </h2>
-                </div>
-                <div class="kpi-icon">
-                    <i class="bi bi-calendar-check-fill"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
+
 <!-- PROSPECTOS MES -->
 <div class="col-xl-3 col-md-6">
     <div class="card kpi-card prospectos-card text-white shadow">
@@ -98,6 +57,41 @@ Dashboard
         </div>
     </div>
 </div>
+<!-- LLAMADAS DEL MES -->
+
+<div class="col-xl-3 col-md-6">
+
+    <div class="card kpi-card bg-primary text-white shadow">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <small>
+                        Llamadas del Mes
+                    </small>
+
+                    <h2 class="fw-bold mb-0">
+                        {{ llamadas_mes or 0 }}
+                    </h2>
+
+                </div>
+
+                <div class="kpi-icon">
+
+                    <i class="bi bi-telephone-fill"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 <!-- CLIENTES CON VENTA -->
 <div class="col-xl-3 col-md-6">
     <div class="card kpi-card bg-info text-white shadow">
@@ -122,22 +116,29 @@ Dashboard
 <div class="col-xl-3 col-md-6">
     <div class="card kpi-card bg-dark text-white shadow">
         <div class="card-body">
+
             <div class="d-flex justify-content-between align-items-center">
+
                 <div>
+
                     <small>
                         Venta del Mes
                     </small>
+
                     <h3 class="fw-bold mb-0">
-                        ${{ "{:,.2f}".format(monto_mes or 0) }}
+                        ${{ "{:,.2f}".format(venta_mes or 0) }}
                     </h3>
+
                 </div>
+
                 <div class="kpi-icon">
                     <i class="bi bi-currency-dollar"></i>
                 </div>
+
             </div>
+
         </div>
     </div>
-</div>
 </div>
 <!-- OBJETIVO MENSUAL SOLO VENDEDORES -->
 {% if not admin %}
@@ -199,167 +200,302 @@ Dashboard
     </div>
 </div>
 {% endif %}
-<!-- INFORMACION ADMINISTRADOR -->
+
+<!-- ========================================== -->
+<!-- INFORMACION ADMINISTRADOR / SUPERVISOR -->
+<!-- ========================================== -->
+
 {% if admin %}
+
 <div class="card canal-card mt-4 shadow">
+
     <div class="card-body p-4">
+
         <div class="d-flex justify-content-between align-items-center mb-4">
+
             <div>
+
                 <h3 class="fw-bold text-white mb-1">
+
                     <i class="bi bi-shop me-2"></i>
+
                     Canal Tradicional
+
                 </h3>
+
                 <small class="text-white-50">
+
                     Cumplimiento general de ventas
+
                 </small>
+
             </div>
+
             <div class="canal-icon">
+
                 <i class="bi bi-bar-chart-fill"></i>
+
             </div>
+
         </div>
+
+
         <div class="row text-center">
+
+            <!-- META -->
+
             <div class="col-md-4">
+
                 <small class="text-white-50">
+
                     Meta
+
                 </small>
+
                 <h3 class="fw-bold text-white">
+
                     ${{ "{:,.0f}".format(meta_empresa or 0) }}
+
                 </h3>
+
             </div>
+
+
+            <!-- VENTA -->
+
             <div class="col-md-4">
+
                 <small class="text-white-50">
+
                     Venta
+
                 </small>
+
                 <h3 class="fw-bold text-white">
+
                     ${{ "{:,.0f}".format(venta_empresa or 0) }}
+
                 </h3>
+
             </div>
+
+
+            <!-- CUMPLIMIENTO -->
+
             <div class="col-md-4">
+
                 <small class="text-white-50">
+
                     Cumplimiento
+
                 </small>
+
                 <h1 class="fw-bold text-white">
+
                     {{ cumplimiento_empresa or 0 }}%
+
                 </h1>
+
             </div>
+
         </div>
+
+
+        <!-- PROGRESO -->
+
         <div class="progress mt-4" style="height:25px;">
-            <div 
+
+            <div
+
                 class="progress-bar bg-success progress-bar-striped progress-bar-animated"
+
                 role="progressbar"
+
                 style="width: {{ [cumplimiento_empresa or 0,100]|min }}%;">
+
                 {{ cumplimiento_empresa or 0 }}%
+
             </div>
+
         </div>
+
     </div>
+
 </div>
+
+
+<!-- ========================================== -->
+<!-- RANKING -->
+<!-- ========================================== -->
+
 <div class="card ranking-card mt-4 shadow">
+
     <div class="card-header ranking-header text-white">
+
         <h3 class="mb-0">
+
             <i class="bi bi-trophy-fill me-2"></i>
+
             Ranking de Cumplimiento
+
         </h3>
+
         <small class="text-white-50">
+
             Desempeño mensual por vendedor
+
         </small>
+
     </div>
+
+
     <div class="card-body p-0">
+
         <div class="table-responsive">
+
             <table class="table ranking-table mb-0">
+
                 <thead>
+
                     <tr>
+
                         <th>
+
                             Vendedor
+
                         </th>
+
                         <th class="text-center">
+
                             Meta
+
                         </th>
+
                         <th class="text-center">
+
                             Venta
+
                         </th>
+
                         <th class="text-center">
+
                             Cumplimiento
+
                         </th>
+
                     </tr>
+
                 </thead>
+
+
                 <tbody>
-                {% for v in cumplimiento_vendedores %}
+
+                    {% for v in cumplimiento_vendedores %}
+
                     <tr>
+
                         <td>
+
                             <div class="d-flex align-items-center">
+
                                 <div class="seller-icon me-3">
+
                                     <i class="bi bi-person-fill"></i>
+
                                 </div>
+
                                 <strong>
+
                                     {{ v['nombre'] }}
+
                                 </strong>
+
                             </div>
+
                         </td>
+
+
                         <td class="text-center">
+
                             ${{ "{:,.0f}".format(v['meta'] or 0) }}
+
                         </td>
+
+
                         <td class="text-center fw-bold text-success">
+
                             ${{ "{:,.0f}".format(v['venta'] or 0) }}
+
                         </td>
+
+
                         <td class="text-center">
+
                             {% if v['porcentaje'] >= 100 %}
+
                                 <span class="badge ranking-success">
+
                                     <i class="bi bi-check-circle-fill me-1"></i>
+
                                     {{ v['porcentaje'] }}%
+
                                 </span>
+
                             {% elif v['porcentaje'] >= 80 %}
+
                                 <span class="badge ranking-warning">
+
                                     <i class="bi bi-exclamation-circle-fill me-1"></i>
+
                                     {{ v['porcentaje'] }}%
+
                                 </span>
+
                             {% else %}
+
                                 <span class="badge ranking-danger">
+
                                     <i class="bi bi-x-circle-fill me-1"></i>
+
                                     {{ v['porcentaje'] }}%
+
                                 </span>
+
                             {% endif %}
+
                         </td>
+
                     </tr>
-                {% else %}
+
+                    {% else %}
+
                     <tr>
-                        <td colspan="4" class="text-center py-5 text-muted">
+
+                        <td colspan="4"
+
+                            class="text-center py-5 text-muted">
+
                             <i class="bi bi-person-x fs-1 d-block mb-3"></i>
+
                             No hay vendedores registrados.
+
                         </td>
+
                     </tr>
-                {% endfor %}
+
+                    {% endfor %}
+
                 </tbody>
+
             </table>
+
         </div>
+
     </div>
+
 </div>
+
 {% endif %}
-<!-- PROXIMAS VISITAS SOLO VENDEDORES -->
-{% if not admin %}
-<div class="card mt-4 shadow-sm">
-    <div class="card-header bg-primary text-white">
-        Próximas Visitas / Llamadas
-    </div>
-    <div class="card-body">
-        {% if proximas_visitas %}
-        <ul class="list-group">
-            {% for visita in proximas_visitas %}
-            <li class="list-group-item">
-                <strong>
-                    {{ visita.proxima_visita.strftime('%d/%m/%Y') }}
-                </strong>
-                <br>
-                {{ visita.cliente.num_cliente }} -
-                {{ visita.cliente.nombre }}
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <div class="alert alert-secondary mb-0">
-            No tienes visitas / llamadas programadas.
-        </div>
-        {% endif %}
-    </div>
-</div>
-{% endif %}
+
+
 {% endblock %}
