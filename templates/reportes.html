@@ -1,79 +1,382 @@
 {% extends 'base.html' %}
+
 {% block titulo %}
 Reportes
 {% endblock %}
+
 {% block contenido %}
+
+<!-- ===================================================== -->
+<!-- ENCABEZADO -->
+<!-- ===================================================== -->
+
 <div class="d-flex justify-content-between align-items-center mb-4">
+
     <div>
+
         <h2 class="fw-bold mb-1">
+
             <i class="bi bi-file-earmark-bar-graph-fill text-primary"></i>
+
             Centro de Reportes
+
         </h2>
+
         <p class="text-muted mb-0">
-            Consulta reportes y estadísticas del sistema.
+
+            Analiza la actividad comercial, ventas y agenda de tu equipo.
+
         </p>
+
     </div>
+
 </div>
+
+
+<!-- ===================================================== -->
+<!-- REPORTES -->
+<!-- ===================================================== -->
+
 <div class="row g-4">
+
+
+    <!-- ================================================= -->
+    <!-- ACTIVIDAD COMERCIAL -->
+    <!-- ================================================= -->
+
     <div class="col-lg-4 col-md-6">
-        <div class="card report-card h-100">
+
+        <div class="card report-card h-100 shadow-sm">
+
             <div class="card-body text-center">
+
                 <div class="report-icon bg-primary">
-                    <i class="bi bi-people-fill"></i>
+
+                    <i class="bi bi-bar-chart-fill"></i>
+
                 </div>
+
+
                 <h4 class="mt-3">
-                    Visitas por Vendedor
+
+                    Actividad Comercial
+
                 </h4>
+
+
                 <p class="text-muted">
-                    Consulta el número de visitas realizadas por cada vendedor.
+
+                    Consulta visitas, llamadas, prospectos y
+                    ventas generadas por cada vendedor.
+
                 </p>
-                <a href="/reporte_visitas_vendedor"
-                   class="btn btn-primary rounded-pill px-4">
+
+
+                <a
+                    href="{{ url_for('reporte_visitas_vendedor') }}"
+                    class="btn btn-primary rounded-pill px-4">
+
                     <i class="bi bi-bar-chart-line"></i>
+
                     Ver Reporte
+
                 </a>
+
             </div>
+
         </div>
+
     </div>
+
+
+    <!-- ================================================= -->
+    <!-- VENTAS -->
+    <!-- ================================================= -->
+
     <div class="col-lg-4 col-md-6">
-        <div class="card report-card h-100">
+
+        <div class="card report-card h-100 shadow-sm">
+
             <div class="card-body text-center">
+
                 <div class="report-icon bg-success">
+
                     <i class="bi bi-currency-dollar"></i>
+
                 </div>
+
+
                 <h4 class="mt-3">
+
                     Ventas por Vendedor
+
                 </h4>
+
+
                 <p class="text-muted">
-                    Revisa el desempeño comercial y las ventas registradas.
+
+                    Analiza las ventas realizadas por cada vendedor
+                    y el monto comercial generado.
+
                 </p>
-                <a href="/reporte_ventas_vendedor"
-                   class="btn btn-success rounded-pill px-4">
+
+
+                <a
+                    href="{{ url_for('reporte_ventas_vendedor') }}"
+                    class="btn btn-success rounded-pill px-4">
+
                     <i class="bi bi-graph-up-arrow"></i>
+
                     Ver Reporte
+
                 </a>
+
             </div>
+
         </div>
+
     </div>
+
+
+    <!-- ================================================= -->
+    <!-- AGENDA -->
+    <!-- ================================================= -->
+
     <div class="col-lg-4 col-md-6">
-        <div class="card report-card h-100">
+
+        <div class="card report-card h-100 shadow-sm">
+
             <div class="card-body text-center">
+
                 <div class="report-icon bg-warning">
+
                     <i class="bi bi-calendar-event-fill text-dark"></i>
+
                 </div>
+
+
                 <h4 class="mt-3">
-                    Próximas Visitas
+
+                    Agenda Comercial
+
                 </h4>
+
+
                 <p class="text-muted">
-                    Consulta las visitas o llamadas programadas para los próximos días.
+
+                    Consulta las próximas visitas y actividades
+                    programadas del equipo comercial.
+
                 </p>
-                <a href="/reporte_proximas_visitas"
-                   class="btn btn-warning rounded-pill px-4">
+
+
+                <a
+                    href="{{ url_for('reporte_proximas_visitas') }}"
+                    class="btn btn-warning rounded-pill px-4">
+
                     <i class="bi bi-calendar-check"></i>
+
                     Ver Reporte
+
                 </a>
+
             </div>
+
         </div>
+
     </div>
+
+
+    <!-- ================================================= -->
+    <!-- PROSPECTOS -->
+    <!-- ================================================= -->
+
+    <div class="col-lg-4 col-md-6">
+
+        <div class="card report-card h-100 shadow-sm">
+
+            <div class="card-body text-center">
+
+                <div class="report-icon bg-danger">
+
+                    <i class="bi bi-person-plus-fill"></i>
+
+                </div>
+
+
+                <h4 class="mt-3">
+
+                    Prospección
+
+                </h4>
+
+
+                <p class="text-muted">
+
+                    Analiza la cantidad de prospectos registrados
+                    y el avance de la prospección comercial.
+
+                </p>
+
+
+                <button
+                    type="button"
+                    class="btn btn-danger rounded-pill px-4"
+                    disabled>
+
+                    <i class="bi bi-hourglass-split"></i>
+
+                    Próximamente
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- OBJETIVOS -->
+    <!-- ================================================= -->
+
+    <div class="col-lg-4 col-md-6">
+
+        <div class="card report-card h-100 shadow-sm">
+
+            <div class="card-body text-center">
+
+                <div class="report-icon bg-info">
+
+                    <i class="bi bi-bullseye"></i>
+
+                </div>
+
+
+                <h4 class="mt-3">
+
+                    Objetivos Comerciales
+
+                </h4>
+
+
+                <p class="text-muted">
+
+                    Compara los objetivos establecidos contra
+                    las ventas realmente obtenidas.
+
+                </p>
+
+
+                <button
+                    type="button"
+                    class="btn btn-info rounded-pill px-4"
+                    disabled>
+
+                    <i class="bi bi-hourglass-split"></i>
+
+                    Próximamente
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- CONVERSIÓN -->
+    <!-- ================================================= -->
+
+    <div class="col-lg-4 col-md-6">
+
+        <div class="card report-card h-100 shadow-sm">
+
+            <div class="card-body text-center">
+
+                <div class="report-icon bg-dark">
+
+                    <i class="bi bi-funnel-fill"></i>
+
+                </div>
+
+
+                <h4 class="mt-3">
+
+                    Conversión Comercial
+
+                </h4>
+
+
+                <p class="text-muted">
+
+                    Analiza la evolución de prospectos hasta
+                    convertirse en clientes y ventas.
+
+                </p>
+
+
+                <button
+                    type="button"
+                    class="btn btn-dark rounded-pill px-4"
+                    disabled>
+
+                    <i class="bi bi-hourglass-split"></i>
+
+                    Próximamente
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
+
+<!-- ===================================================== -->
+<!-- INFORMACIÓN -->
+<!-- ===================================================== -->
+
+<div class="card shadow-sm mt-4 border-0">
+
+    <div class="card-body">
+
+        <div class="d-flex align-items-center">
+
+            <div class="fs-2 text-primary me-3">
+
+                <i class="bi bi-lightbulb-fill"></i>
+
+            </div>
+
+            <div>
+
+                <h5 class="fw-bold mb-1">
+
+                    Centro de análisis comercial
+
+                </h5>
+
+                <p class="text-muted mb-0">
+
+                    Utiliza los reportes para identificar oportunidades,
+                    medir la productividad de los vendedores y tomar
+                    decisiones comerciales basadas en datos.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
 {% endblock %}

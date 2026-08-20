@@ -1,98 +1,1064 @@
 {% extends 'base.html' %}
+
 {% block titulo %}
-Visitas por Vendedor
+Actividad Comercial
 {% endblock %}
+
 {% block contenido %}
-<h2>Visitas por Vendedor</h2>
-<form method="GET">
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <label>Fecha Inicio</label>
-            <input
-                type="date"
-                name="fecha_inicio"
-                class="form-control"
-                value="{{ request.args.get('fecha_inicio','') }}">
-        </div>
-        <div class="col-md-3">
-            <label>Fecha Fin</label>
-            <input
-                type="date"
-                name="fecha_fin"
-                class="form-control"
-                value="{{ request.args.get('fecha_fin','') }}">
-        </div>
-        <div class="col-md-3 d-flex align-items-end">
-            <button
-                type="submit"
-                class="btn btn-primary me-2">
-                Consultar
-            </button>
-            <a href="/reporte_visitas_vendedor"
-               class="btn btn-secondary">
-                Limpiar
-            </a>
-        </div>
+
+<!-- ===================================================== -->
+<!-- ENCABEZADO -->
+<!-- ===================================================== -->
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2 class="fw-bold mb-1">
+
+            <i class="bi bi-bar-chart-fill text-primary"></i>
+
+            Actividad Comercial por Vendedor
+
+        </h2>
+
+        <p class="text-muted mb-0">
+
+            Consulta visitas, llamadas, prospectos y ventas generadas
+            por cada vendedor.
+
+        </p>
+
     </div>
-</form>
-<div class="card mb-4">
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- FILTROS -->
+<!-- ===================================================== -->
+
+<div class="card shadow-sm mb-4">
+
     <div class="card-body">
-        <h5 class="mb-3">
-            Visitas por Vendedor
-        </h5>
-        <canvas id="graficaVisitas"></canvas>
+
+        <form method="GET">
+
+            <div class="row g-3">
+
+                <!-- FECHA INICIO -->
+
+                <div class="col-md-4">
+
+                    <label class="form-label fw-semibold">
+                        Fecha Inicio
+                    </label>
+
+                    <input
+                        type="date"
+                        name="fecha_inicio"
+                        class="form-control"
+                        value="{{ request.args.get('fecha_inicio', '') }}">
+
+                </div>
+
+
+                <!-- FECHA FIN -->
+
+                <div class="col-md-4">
+
+                    <label class="form-label fw-semibold">
+                        Fecha Fin
+                    </label>
+
+                    <input
+                        type="date"
+                        name="fecha_fin"
+                        class="form-control"
+                        value="{{ request.args.get('fecha_fin', '') }}">
+
+                </div>
+
+
+                <!-- BOTONES -->
+
+                <div class="col-md-4 d-flex align-items-end">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary me-2">
+
+                        <i class="bi bi-search"></i>
+
+                        Consultar
+
+                    </button>
+
+                    <a
+                        href="{{ url_for('reporte_visitas_vendedor') }}"
+                        class="btn btn-secondary">
+
+                        <i class="bi bi-x-circle"></i>
+
+                        Limpiar
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
     </div>
+
 </div>
-<div class="table-responsive">
-    <table class="table table-striped table-bordered">
-        <thead class="table-dark">
-            <tr>
-                <th>Vendedor</th>
-                <th>Visitas</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for fila in reporte %}
-            <tr>
-                <td>
-                    {{ fila.nombre }}
-                </td>
-                <td>
-                    {{ fila.visitas }}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+
+<!-- ===================================================== -->
+<!-- KPIs -->
+<!-- ===================================================== -->
+
+<div class="row g-4 mb-4">
+
+
+    <!-- VISITAS -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <small class="text-muted">
+                            Visitas
+                        </small>
+
+                        <h2 class="fw-bold mb-0">
+
+                            {{ total_visitas }}
+
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-1 text-primary">
+
+                        <i class="bi bi-geo-alt-fill"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- LLAMADAS -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <small class="text-muted">
+                            Llamadas
+                        </small>
+
+                        <h2 class="fw-bold mb-0">
+
+                            {{ total_llamadas }}
+
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-1 text-secondary">
+
+                        <i class="bi bi-telephone-fill"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- PROSPECTOS -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <small class="text-muted">
+                            Prospectos
+                        </small>
+
+                        <h2 class="fw-bold mb-0">
+
+                            {{ total_prospectos }}
+
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-1 text-danger">
+
+                        <i class="bi bi-person-plus-fill"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- VENTA TOTAL -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card shadow-sm border-0 h-100">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <small class="text-muted">
+                            Venta Total
+                        </small>
+
+                        <h2 class="fw-bold mb-0">
+
+                            $
+                            {{ "{:,.2f}".format(total_ventas or 0) }}
+
+                        </h2>
+
+                    </div>
+
+                    <div class="fs-1 text-success">
+
+                        <i class="bi bi-currency-dollar"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
-<div class="alert alert-primary mt-3">
-    <strong>
-        Total de Visitas:
-        {{ total_general }}
-    </strong>
+
+
+<!-- ===================================================== -->
+<!-- RESUMEN DE ACTIVIDADES -->
+<!-- ===================================================== -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <div>
+
+                <h5 class="fw-bold mb-1">
+
+                    <i class="bi bi-activity text-primary"></i>
+
+                    Resumen de Actividad
+
+                </h5>
+
+                <small class="text-muted">
+
+                    Visitas, llamadas y prospectos registrados
+                    durante el periodo seleccionado.
+
+                </small>
+
+            </div>
+
+            <span class="badge bg-primary fs-6">
+
+                {{ total_actividades }} actividades
+
+            </span>
+
+        </div>
+
+
+        {% if total_actividades > 0 %}
+
+            <!-- PORCENTAJES -->
+
+            {% set porcentaje_visitas =
+                (total_visitas / total_actividades * 100)
+            %}
+
+            {% set porcentaje_llamadas =
+                (total_llamadas / total_actividades * 100)
+            %}
+
+            {% set porcentaje_prospectos =
+                (total_prospectos / total_actividades * 100)
+            %}
+
+
+            <!-- BARRA -->
+
+            <div
+                class="progress"
+                style="height: 35px;">
+
+
+                <!-- VISITAS -->
+
+                {% if total_visitas > 0 %}
+
+                    <div
+                        class="progress-bar bg-primary"
+                        role="progressbar"
+                        style="width: {{ porcentaje_visitas }}%;"
+                        title="Visitas: {{ total_visitas }}">
+
+                        {{ total_visitas }} Visitas
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- LLAMADAS -->
+
+                {% if total_llamadas > 0 %}
+
+                    <div
+                        class="progress-bar bg-secondary"
+                        role="progressbar"
+                        style="width: {{ porcentaje_llamadas }}%;"
+                        title="Llamadas: {{ total_llamadas }}">
+
+                        {{ total_llamadas }} Llamadas
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- PROSPECTOS -->
+
+                {% if total_prospectos > 0 %}
+
+                    <div
+                        class="progress-bar bg-danger"
+                        role="progressbar"
+                        style="width: {{ porcentaje_prospectos }}%;"
+                        title="Prospectos: {{ total_prospectos }}">
+
+                        {{ total_prospectos }} Prospectos
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- LEYENDA -->
+            <!-- ================================================= -->
+
+            <div class="d-flex justify-content-center gap-4 mt-3 flex-wrap">
+
+
+                <div>
+
+                    <span class="badge bg-primary">
+
+                        {{ total_visitas }}
+
+                    </span>
+
+                    Visitas
+
+                </div>
+
+
+                <div>
+
+                    <span class="badge bg-secondary">
+
+                        {{ total_llamadas }}
+
+                    </span>
+
+                    Llamadas
+
+                </div>
+
+
+                <div>
+
+                    <span class="badge bg-danger">
+
+                        {{ total_prospectos }}
+
+                    </span>
+
+                    Prospectos
+
+                </div>
+
+            </div>
+
+
+        {% else %}
+
+
+            <!-- SIN ACTIVIDADES -->
+
+            <div
+                class="progress"
+                style="height: 35px;">
+
+                <div
+                    class="progress-bar bg-secondary"
+                    role="progressbar"
+                    style="width: 100%;">
+
+                    Sin actividades
+
+                </div>
+
+            </div>
+
+
+        {% endif %}
+
+    </div>
+
 </div>
-<!-- Cargar Chart.js -->
+
+
+<!-- ===================================================== -->
+<!-- GRÁFICA DE ACTIVIDAD -->
+<!-- ===================================================== -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-body">
+
+        <h5 class="fw-bold mb-3">
+
+            <i class="bi bi-bar-chart-fill text-primary"></i>
+
+            Actividad por Vendedor
+
+        </h5>
+
+        <canvas id="graficaActividad"></canvas>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- GRÁFICA DE VENTAS -->
+<!-- ===================================================== -->
+
+<div class="card shadow-sm mb-4">
+
+    <div class="card-body">
+
+        <h5 class="fw-bold mb-3">
+
+            <i class="bi bi-graph-up-arrow text-success"></i>
+
+            Venta Total por Vendedor
+
+        </h5>
+
+        <canvas id="graficaVentas"></canvas>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- TABLA DETALLADA -->
+<!-- ===================================================== -->
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <div>
+
+                <h5 class="fw-bold mb-1">
+
+                    <i class="bi bi-table"></i>
+
+                    Detalle por Vendedor
+
+                </h5>
+
+                <small class="text-muted">
+
+                    Resumen comercial del periodo seleccionado.
+
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>
+                            Vendedor
+                        </th>
+
+                        <th class="text-center">
+                            Visitas
+                        </th>
+
+                        <th class="text-center">
+                            Llamadas
+                        </th>
+
+                        <th class="text-center">
+                            Prospectos
+                        </th>
+
+                        <th class="text-center">
+                            Actividades
+                        </th>
+
+                        <th class="text-end">
+                            Venta Visitas
+                        </th>
+
+                        <th class="text-end">
+                            Venta Llamadas
+                        </th>
+
+                        <th class="text-end">
+                            Venta Total
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+
+                    {% for fila in reporte %}
+
+                    <tr>
+
+
+                        <!-- VENDEDOR -->
+
+                        <td>
+
+                            <div class="fw-semibold">
+
+                                <i class="bi bi-person-fill text-muted"></i>
+
+                                {{ fila.nombre }}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- VISITAS -->
+
+                        <td class="text-center">
+
+                            <span class="badge bg-primary">
+
+                                {{ fila.visitas }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- LLAMADAS -->
+
+                        <td class="text-center">
+
+                            <span class="badge bg-secondary">
+
+                                {{ fila.llamadas }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- PROSPECTOS -->
+
+                        <td class="text-center">
+
+                            <span class="badge bg-danger">
+
+                                {{ fila.prospectos }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- ACTIVIDADES -->
+
+                        <td class="text-center">
+
+                            <span class="badge bg-dark">
+
+                                {{ fila.actividades }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- VENTA VISITAS -->
+
+                        <td class="text-end">
+
+                            $
+
+                            {{ "{:,.2f}".format(
+                                fila.venta_visitas or 0
+                            ) }}
+
+                        </td>
+
+
+                        <!-- VENTA LLAMADAS -->
+
+                        <td class="text-end">
+
+                            $
+
+                            {{ "{:,.2f}".format(
+                                fila.venta_llamadas or 0
+                            ) }}
+
+                        </td>
+
+
+                        <!-- VENTA TOTAL -->
+
+                        <td class="text-end fw-bold text-success">
+
+                            $
+
+                            {{ "{:,.2f}".format(
+                                fila.venta_total or 0
+                            ) }}
+
+                        </td>
+
+
+                    </tr>
+
+
+                    {% else %}
+
+
+                    <!-- SIN RESULTADOS -->
+
+                    <tr>
+
+                        <td
+                            colspan="8"
+                            class="text-center text-muted py-5">
+
+                            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+
+                            No hay información para el periodo seleccionado.
+
+                        </td>
+
+                    </tr>
+
+
+                    {% endfor %}
+
+                </tbody>
+
+
+                <!-- ================================================= -->
+                <!-- TOTALES -->
+                <!-- ================================================= -->
+
+                <tfoot class="table-light">
+
+                    <tr>
+
+                        <th>
+                            TOTALES
+                        </th>
+
+
+                        <th class="text-center">
+
+                            {{ total_visitas }}
+
+                        </th>
+
+
+                        <th class="text-center">
+
+                            {{ total_llamadas }}
+
+                        </th>
+
+
+                        <th class="text-center">
+
+                            {{ total_prospectos }}
+
+                        </th>
+
+
+                        <th class="text-center">
+
+                            {{ total_actividades }}
+
+                        </th>
+
+
+                        <th class="text-end">
+
+                            $
+
+                            {{ "{:,.2f}".format(
+                                total_venta_visitas or 0
+                            ) }}
+
+                        </th>
+
+
+                        <th class="text-end">
+
+                            $
+
+                            {{ "{:,.2f}".format(
+                                total_venta_llamadas or 0
+                            ) }}
+
+                        </th>
+
+
+                        <th class="text-end text-success">
+
+                            $
+
+                            {{ "{:,.2f}".format(
+                                total_ventas or 0
+                            ) }}
+
+                        </th>
+
+                    </tr>
+
+                </tfoot>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- CHART.JS -->
+<!-- ===================================================== -->
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
 <script>
-const ctx = document.getElementById('graficaVisitas');
-new Chart(ctx, {
+
+
+// =====================================================
+// DATOS
+// =====================================================
+
+const labels =
+    {{ labels|tojson }};
+
+const visitas =
+    {{ visitas|tojson }};
+
+const llamadas =
+    {{ llamadas|tojson }};
+
+const prospectos =
+    {{ prospectos|tojson }};
+
+const ventas =
+    {{ ventas|tojson }};
+
+
+// =====================================================
+// GRÁFICA DE ACTIVIDAD
+// =====================================================
+
+const ctxActividad =
+    document.getElementById('graficaActividad');
+
+
+new Chart(ctxActividad, {
+
     type: 'bar',
+
     data: {
-        labels: {{ labels|tojson }},
-        datasets: [{
-            label: 'Visitas',
-            data: {{ visitas|tojson }},
-            backgroundColor: '#0d6efd'
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true
+
+        labels: labels,
+
+        datasets: [
+
+            // VISITAS
+
+            {
+
+                label: 'Visitas',
+
+                data: visitas,
+
+                backgroundColor: '#0d6efd'
+
+            },
+
+
+            // LLAMADAS
+
+            {
+
+                label: 'Llamadas',
+
+                data: llamadas,
+
+                backgroundColor: '#6c757d'
+
+            },
+
+
+            // PROSPECTOS
+
+            {
+
+                label: 'Prospectos',
+
+                data: prospectos,
+
+                backgroundColor: '#dc3545'
+
             }
+
+        ]
+
+    },
+
+
+    options: {
+
+        responsive: true,
+
+        interaction: {
+
+            mode: 'index',
+
+            intersect: false
+
+        },
+
+
+        plugins: {
+
+            legend: {
+
+                position: 'top'
+
+            }
+
+        },
+
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+
+                    precision: 0
+
+                }
+
+            }
+
         }
+
     }
+
 });
+
+
+// =====================================================
+// GRÁFICA DE VENTAS
+// =====================================================
+
+const ctxVentas =
+    document.getElementById('graficaVentas');
+
+
+new Chart(ctxVentas, {
+
+    type: 'bar',
+
+    data: {
+
+        labels: labels,
+
+        datasets: [
+
+            {
+
+                label: 'Venta Total',
+
+                data: ventas,
+
+                backgroundColor: '#198754'
+
+            }
+
+        ]
+
+    },
+
+
+    options: {
+
+        responsive: true,
+
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            },
+
+
+            tooltip: {
+
+                callbacks: {
+
+                    label: function(context) {
+
+                        return '$ ' +
+
+                            context.parsed.y.toLocaleString(
+                                'es-MX',
+                                {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }
+                            );
+
+                    }
+
+                }
+
+            }
+
+        },
+
+
+        scales: {
+
+            y: {
+
+                beginAtZero: true,
+
+                ticks: {
+
+                    callback: function(value) {
+
+                        return '$ ' +
+
+                            value.toLocaleString(
+                                'es-MX'
+                            );
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
 </script>
+
+
 {% endblock %}

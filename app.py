@@ -21,7 +21,7 @@ from werkzeug.utils import secure_filename
 
 from flask import send_from_directory
 
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from sqlalchemy import func
 
 from werkzeug.security import generate_password_hash
@@ -1091,6 +1091,7 @@ def reportes():
         'reportes.html'
     )
 
+
 @app.route('/reporte_ventas_vendedor')
 @login_required
 def reporte_ventas_vendedor():
@@ -1101,62 +1102,296 @@ def reporte_ventas_vendedor():
     fecha_inicio = request.args.get('fecha_inicio')
     fecha_fin = request.args.get('fecha_fin')
 
-    consulta = db.session.query(
+    # =====================================================
+    # VENTAS DE VISITAS
+    # =====================================================
 
-        Usuario.nombre,
+    consulta_visitas = db.session.query(
+        Usuario.id.label('usuario_id'),
+        Usuario.nombre.label('nombre'),
 
-        func.count(Visita.id).label('ventas'),
+        func.count(Visita.id).label('ventas_visitas'),
 
-        func.sum(Visita.monto_venta).label('monto')
+        func.coalesce(
+            func.sum(Visita.monto_venta),
+            0
+        ).label('monto_visitas')
 
-    ).join(
-
+    ).outerjoin(
         Visita,
         Usuario.id == Visita.usuario_id
-
     ).filter(
-
-        Visita.venta_realizada == True
-
+        Visita.monto_venta > 0
     )
 
     if fecha_inicio:
 
-        consulta = consulta.filter(
+        consulta_visitas = consulta_visitas.filter(
             db.func.date(Visita.fecha) >= fecha_inicio
         )
 
     if fecha_fin:
 
-        consulta = consulta.filter(
+        consulta_visitas = consulta_visitas.filter(
             db.func.date(Visita.fecha) <= fecha_fin
         )
 
-    reporte = consulta.group_by(
+    reporte_visitas = consulta_visitas.group_by(
+        Usuario.id,
         Usuario.nombre
     ).all()
 
-    total_general = sum(
-        fila.monto or 0
+
+    # =====================================================
+    # VENTAS DE LLAMADAS
+    # =====================================================
+
+    consulta_llamadas = db.session.query(
+        Usuario.id.label('usuario_id'),
+
+        func.count(Llamada.id).label('ventas_llamadas'),
+
+        func.coalesce(
+            func.sum(Llamada.monto_venta),
+            0
+        ).label('monto_llamadas')
+
+    ).outerjoin(
+        Llamada,
+        Usuario.id == Llamada.usuario_id
+    ).filter(
+        Llamada.monto_venta > 0
+    )
+
+    if fecha_inicio:
+
+        consulta_llamadas = consulta_llamadas.filter(
+            db.func.date(Llamada.fecha) >= fecha_inicio
+        )
+
+    if fecha_fin:
+
+        consulta_llamadas = consulta_llamadas.filter(
+            db.func.date(Llamada.fecha) <= fecha_fin
+        )
+
+    reporte_llamadas = consulta_llamadas.group_by(
+        Usuario.id
+    ).all()
+
+
+    # =====================================================
+    # CONVERTIR LLAMADAS A DICCIONARIO
+    # =====================================================
+
+    llamadas_dict = {
+
+        fila.usuario_id: {
+
+            'ventas_llamadas':
+                fila.ventas_llamadas or 0,
+
+            'monto_llamadas':
+                float(fila.monto_llamadas or 0)
+
+        }
+
+        for fila in reporte_llamadas
+
+    }
+
+
+    # =====================================================
+    # UNIFICAR VENTAS
+    # =====================================================
+
+    reporte = []
+
+    for fila in reporte_visitas:
+
+        datos_llamadas = llamadas_dict.get(
+            fila.usuario_id,
+            {
+                'ventas_llamadas': 0,
+                'monto_llamadas': 0
+            }
+        )
+
+
+        ventas_visitas = fila.ventas_visitas or 0
+
+        ventas_llamadas = datos_llamadas[
+            'ventas_llamadas'
+        ]
+
+
+        monto_visitas = float(
+            fila.monto_visitas or 0
+        )
+
+        monto_llamadas = datos_llamadas[
+            'monto_llamadas'
+        ]
+
+
+        ventas = (
+            ventas_visitas +
+            ventas_llamadas
+        )
+
+
+        monto_total = (
+            monto_visitas +
+            monto_llamadas
+        )
+
+
+        reporte.append({
+
+            'usuario_id':
+                fila.usuario_id,
+
+            'nombre':
+                fila.nombre,
+
+            'ventas_visitas':
+                ventas_visitas,
+
+            'ventas_llamadas':
+                ventas_llamadas,
+
+            'ventas':
+                ventas,
+
+            'monto_visitas':
+                monto_visitas,
+
+            'monto_llamadas':
+                monto_llamadas,
+
+            'monto':
+                monto_total
+
+        })
+
+
+    # =====================================================
+    # ORDENAR POR VENTA TOTAL
+    # =====================================================
+
+    reporte.sort(
+        key=lambda x: x['monto'],
+        reverse=True
+    )
+
+
+    # =====================================================
+    # TOTALES
+    # =====================================================
+
+    total_ventas_visitas = sum(
+        fila['ventas_visitas']
         for fila in reporte
     )
 
+    total_ventas_llamadas = sum(
+        fila['ventas_llamadas']
+        for fila in reporte
+    )
+
+    total_ventas = sum(
+        fila['ventas']
+        for fila in reporte
+    )
+
+
+    total_monto_visitas = sum(
+        fila['monto_visitas']
+        for fila in reporte
+    )
+
+    total_monto_llamadas = sum(
+        fila['monto_llamadas']
+        for fila in reporte
+    )
+
+    total_general = sum(
+        fila['monto']
+        for fila in reporte
+    )
+
+
+    # =====================================================
+    # MAYOR VENDEDOR
+    # =====================================================
+
+    mejor_vendedor = (
+        reporte[0]
+        if reporte
+        else None
+    )
+
+
+    # =====================================================
+    # DATOS PARA GRÁFICA
+    # =====================================================
+
     labels = [
-        fila.nombre
+        fila['nombre']
         for fila in reporte
     ]
 
     montos = [
-        float(fila.monto or 0)
+        fila['monto']
         for fila in reporte
     ]
 
+    montos_visitas = [
+        fila['monto_visitas']
+        for fila in reporte
+    ]
+
+    montos_llamadas = [
+        fila['monto_llamadas']
+        for fila in reporte
+    ]
+
+
     return render_template(
         'reporte_ventas_vendedor.html',
+
         reporte=reporte,
-        total_general=total_general,
+
+        total_ventas_visitas=
+            total_ventas_visitas,
+
+        total_ventas_llamadas=
+            total_ventas_llamadas,
+
+        total_ventas=
+            total_ventas,
+
+        total_monto_visitas=
+            total_monto_visitas,
+
+        total_monto_llamadas=
+            total_monto_llamadas,
+
+        total_general=
+            total_general,
+
+        mejor_vendedor=
+            mejor_vendedor,
+
         labels=labels,
-        montos=montos
+
+        montos=montos,
+
+        montos_visitas=
+            montos_visitas,
+
+        montos_llamadas=
+            montos_llamadas
     )
 
 @app.route('/reporte_visitas_vendedor')
@@ -1169,57 +1404,356 @@ def reporte_visitas_vendedor():
     fecha_inicio = request.args.get('fecha_inicio')
     fecha_fin = request.args.get('fecha_fin')
 
-    consulta = db.session.query(
 
-        Usuario.nombre,
+    # =====================================================
+    # VISITAS POR VENDEDOR
+    # =====================================================
 
-        func.count(Visita.id).label('visitas')
+    consulta_visitas = db.session.query(
+        Usuario.id.label('usuario_id'),
+        Usuario.nombre.label('nombre'),
 
-    ).join(
+        func.count(Visita.id).label('visitas'),
 
+        func.coalesce(
+            func.sum(Visita.monto_venta),
+            0
+        ).label('venta_visitas')
+
+    ).outerjoin(
         Visita,
         Usuario.id == Visita.usuario_id
-
     )
 
     if fecha_inicio:
-
-        consulta = consulta.filter(
+        consulta_visitas = consulta_visitas.filter(
             db.func.date(Visita.fecha) >= fecha_inicio
         )
 
     if fecha_fin:
-
-        consulta = consulta.filter(
+        consulta_visitas = consulta_visitas.filter(
             db.func.date(Visita.fecha) <= fecha_fin
         )
 
-    reporte = consulta.group_by(
+    reporte_visitas = consulta_visitas.group_by(
+        Usuario.id,
         Usuario.nombre
     ).all()
 
-    total_general = sum(
-        fila.visitas
+
+    # =====================================================
+    # LLAMADAS POR VENDEDOR
+    # =====================================================
+
+    consulta_llamadas = db.session.query(
+        Usuario.id.label('usuario_id'),
+
+        func.count(
+            Llamada.id
+        ).label('llamadas'),
+
+        func.coalesce(
+            func.sum(Llamada.monto_venta),
+            0
+        ).label('venta_llamadas')
+
+    ).outerjoin(
+        Llamada,
+        Usuario.id == Llamada.usuario_id
+    )
+
+    if fecha_inicio:
+        consulta_llamadas = consulta_llamadas.filter(
+            db.func.date(Llamada.fecha) >= fecha_inicio
+        )
+
+    if fecha_fin:
+        consulta_llamadas = consulta_llamadas.filter(
+            db.func.date(Llamada.fecha) <= fecha_fin
+        )
+
+    reporte_llamadas = consulta_llamadas.group_by(
+        Usuario.id
+    ).all()
+
+
+    # =====================================================
+    # PROSPECTOS POR VENDEDOR
+    # =====================================================
+
+    consulta_prospectos = db.session.query(
+
+        Usuario.id.label('usuario_id'),
+
+        func.count(
+            Prospecto.id
+        ).label('prospectos')
+
+    ).outerjoin(
+        Prospecto,
+        Usuario.id == Prospecto.usuario_id
+    )
+
+    if fecha_inicio:
+        consulta_prospectos = consulta_prospectos.filter(
+            db.func.date(
+                Prospecto.fecha_registro
+            ) >= fecha_inicio
+        )
+
+    if fecha_fin:
+        consulta_prospectos = consulta_prospectos.filter(
+            db.func.date(
+                Prospecto.fecha_registro
+            ) <= fecha_fin
+        )
+
+    reporte_prospectos = consulta_prospectos.group_by(
+        Usuario.id
+    ).all()
+
+
+    # =====================================================
+    # CONVERTIR LLAMADAS A DICCIONARIO
+    # =====================================================
+
+    llamadas_dict = {
+
+        fila.usuario_id: {
+
+            'llamadas': fila.llamadas or 0,
+
+            'venta_llamadas': float(
+                fila.venta_llamadas or 0
+            )
+
+        }
+
+        for fila in reporte_llamadas
+    }
+
+
+    # =====================================================
+    # CONVERTIR PROSPECTOS A DICCIONARIO
+    # =====================================================
+
+    prospectos_dict = {
+
+        fila.usuario_id: fila.prospectos or 0
+
+        for fila in reporte_prospectos
+
+    }
+
+
+    # =====================================================
+    # UNIR VISITAS + LLAMADAS + PROSPECTOS
+    # =====================================================
+
+    reporte = []
+
+    for fila in reporte_visitas:
+
+        # -----------------------------------------------
+        # LLAMADAS
+        # -----------------------------------------------
+
+        datos_llamadas = llamadas_dict.get(
+
+            fila.usuario_id,
+
+            {
+                'llamadas': 0,
+                'venta_llamadas': 0
+            }
+
+        )
+
+
+        # -----------------------------------------------
+        # PROSPECTOS
+        # -----------------------------------------------
+
+        prospectos = prospectos_dict.get(
+            fila.usuario_id,
+            0
+        )
+
+
+        # -----------------------------------------------
+        # VISITAS
+        # -----------------------------------------------
+
+        visitas = fila.visitas or 0
+
+
+        # -----------------------------------------------
+        # LLAMADAS
+        # -----------------------------------------------
+
+        llamadas = datos_llamadas['llamadas']
+
+
+        # -----------------------------------------------
+        # VENTAS
+        # -----------------------------------------------
+
+        venta_visitas = float(
+            fila.venta_visitas or 0
+        )
+
+        venta_llamadas = float(
+            datos_llamadas['venta_llamadas'] or 0
+        )
+
+
+        # -----------------------------------------------
+        # ACTIVIDADES
+        # -----------------------------------------------
+
+        actividades = (
+            visitas +
+            llamadas +
+            prospectos
+        )
+
+
+        # -----------------------------------------------
+        # VENTA TOTAL
+        # -----------------------------------------------
+
+        venta_total = (
+            venta_visitas +
+            venta_llamadas
+        )
+
+
+        # -----------------------------------------------
+        # AGREGAR AL REPORTE
+        # -----------------------------------------------
+
+        reporte.append({
+
+            'usuario_id': fila.usuario_id,
+
+            'nombre': fila.nombre,
+
+            'visitas': visitas,
+
+            'llamadas': llamadas,
+
+            'prospectos': prospectos,
+
+            'actividades': actividades,
+
+            'venta_visitas': venta_visitas,
+
+            'venta_llamadas': venta_llamadas,
+
+            'venta_total': venta_total
+
+        })
+
+
+    # =====================================================
+    # TOTALES GENERALES
+    # =====================================================
+
+    total_visitas = sum(
+        fila['visitas']
         for fila in reporte
     )
 
+    total_llamadas = sum(
+        fila['llamadas']
+        for fila in reporte
+    )
+
+    total_prospectos = sum(
+        fila['prospectos']
+        for fila in reporte
+    )
+
+    total_actividades = sum(
+        fila['actividades']
+        for fila in reporte
+    )
+
+    total_venta_visitas = sum(
+        fila['venta_visitas']
+        for fila in reporte
+    )
+
+    total_venta_llamadas = sum(
+        fila['venta_llamadas']
+        for fila in reporte
+    )
+
+    total_ventas = sum(
+        fila['venta_total']
+        for fila in reporte
+    )
+
+
+    # =====================================================
+    # DATOS PARA GRÁFICAS
+    # =====================================================
+
     labels = [
-        fila.nombre
+        fila['nombre']
         for fila in reporte
     ]
 
     visitas = [
-        fila.visitas
+        fila['visitas']
         for fila in reporte
     ]
 
+    llamadas = [
+        fila['llamadas']
+        for fila in reporte
+    ]
+
+    prospectos = [
+        fila['prospectos']
+        for fila in reporte
+    ]
+
+    ventas = [
+        fila['venta_total']
+        for fila in reporte
+    ]
+
+
+    # =====================================================
+    # RENDER
+    # =====================================================
+
     return render_template(
+
         'reporte_visitas_vendedor.html',
+
         reporte=reporte,
-        total_general=total_general,
+
+        # Totales
+        total_visitas=total_visitas,
+        total_llamadas=total_llamadas,
+        total_prospectos=total_prospectos,
+        total_actividades=total_actividades,
+
+        # Ventas
+        total_venta_visitas=total_venta_visitas,
+        total_venta_llamadas=total_venta_llamadas,
+        total_ventas=total_ventas,
+
+        # Gráficas
         labels=labels,
-        visitas=visitas
+        visitas=visitas,
+        llamadas=llamadas,
+        prospectos=prospectos,
+        ventas=ventas
     )
+
 
 from datetime import date
 @app.route('/reporte_proximas_visitas')
@@ -1232,10 +1766,24 @@ def reporte_proximas_visitas():
     fecha_inicio = request.args.get('fecha_inicio')
     fecha_fin = request.args.get('fecha_fin')
 
+    # =====================================================
+    # FECHA ACTUAL
+    # =====================================================
+
+    hoy = date.today()
+
+    # =====================================================
+    # CONSULTA BASE
+    # =====================================================
+
     consulta = Visita.query.filter(
         Visita.proxima_visita.isnot(None),
-        Visita.proxima_visita >= date.today()
+        Visita.proxima_visita >= hoy
     )
+
+    # =====================================================
+    # FILTRO FECHA INICIO
+    # =====================================================
 
     if fecha_inicio:
 
@@ -1243,19 +1791,58 @@ def reporte_proximas_visitas():
             Visita.proxima_visita >= fecha_inicio
         )
 
+    # =====================================================
+    # FILTRO FECHA FIN
+    # =====================================================
+
     if fecha_fin:
 
         consulta = consulta.filter(
             Visita.proxima_visita <= fecha_fin
         )
 
+    # =====================================================
+    # ORDENAR
+    # =====================================================
+
     visitas = consulta.order_by(
         Visita.proxima_visita.asc()
     ).all()
 
+    # =====================================================
+    # INDICADORES
+    # =====================================================
+
+    total_visitas = len(visitas)
+
+    visitas_hoy = sum(
+        1
+        for visita in visitas
+        if visita.proxima_visita == hoy
+    )
+
+    visitas_7_dias = sum(
+        1
+        for visita in visitas
+        if visita.proxima_visita <= hoy + timedelta(days=7)
+    )
+
+    # =====================================================
+    # RETORNAR
+    # =====================================================
+
     return render_template(
         'reporte_proximas_visitas.html',
-        visitas=visitas
+
+        visitas=visitas,
+
+        total_visitas=total_visitas,
+
+        visitas_hoy=visitas_hoy,
+
+        visitas_7_dias=visitas_7_dias,
+
+        hoy=hoy
     )
 
 from datetime import date
