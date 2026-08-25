@@ -1199,43 +1199,76 @@ def reporte_ventas_vendedor():
     fecha_inicio = request.args.get('fecha_inicio')
     fecha_fin = request.args.get('fecha_fin')
 
+
     # =====================================================
     # VENTAS DE VISITAS
     # =====================================================
 
     consulta_visitas = db.session.query(
+
         Usuario.id.label('usuario_id'),
+
         Usuario.nombre.label('nombre'),
 
+        # Cantidad de visitas que generaron venta
         func.count(Visita.id).label('ventas_visitas'),
 
+        # Monto vendido mediante visitas
         func.coalesce(
             func.sum(Visita.monto_venta),
             0
         ).label('monto_visitas')
 
     ).outerjoin(
+
         Visita,
         Usuario.id == Visita.usuario_id
+
     ).filter(
+
+        # SOLO VENDEDORES ACTIVOS
+        Usuario.activo == True,
+
+        Usuario.rol == 'vendedor',
+
+        # SOLO VISITAS CON VENTA
         Visita.monto_venta > 0
+
     )
+
+
+    # =====================================================
+    # FILTRO FECHA INICIO
+    # =====================================================
 
     if fecha_inicio:
 
         consulta_visitas = consulta_visitas.filter(
+
             db.func.date(Visita.fecha) >= fecha_inicio
+
         )
+
+
+    # =====================================================
+    # FILTRO FECHA FIN
+    # =====================================================
 
     if fecha_fin:
 
         consulta_visitas = consulta_visitas.filter(
+
             db.func.date(Visita.fecha) <= fecha_fin
+
         )
 
+
     reporte_visitas = consulta_visitas.group_by(
+
         Usuario.id,
+
         Usuario.nombre
+
     ).all()
 
 
@@ -1244,36 +1277,67 @@ def reporte_ventas_vendedor():
     # =====================================================
 
     consulta_llamadas = db.session.query(
+
         Usuario.id.label('usuario_id'),
 
+        # Cantidad de llamadas que generaron venta
         func.count(Llamada.id).label('ventas_llamadas'),
 
+        # Monto vendido mediante llamadas
         func.coalesce(
             func.sum(Llamada.monto_venta),
             0
         ).label('monto_llamadas')
 
     ).outerjoin(
+
         Llamada,
+
         Usuario.id == Llamada.usuario_id
+
     ).filter(
+
+        # SOLO VENDEDORES ACTIVOS
+        Usuario.activo == True,
+
+        Usuario.rol == 'vendedor',
+
+        # SOLO LLAMADAS CON VENTA
         Llamada.monto_venta > 0
+
     )
+
+
+    # =====================================================
+    # FILTRO FECHA INICIO
+    # =====================================================
 
     if fecha_inicio:
 
         consulta_llamadas = consulta_llamadas.filter(
+
             db.func.date(Llamada.fecha) >= fecha_inicio
+
         )
+
+
+    # =====================================================
+    # FILTRO FECHA FIN
+    # =====================================================
 
     if fecha_fin:
 
         consulta_llamadas = consulta_llamadas.filter(
+
             db.func.date(Llamada.fecha) <= fecha_fin
+
         )
 
+
     reporte_llamadas = consulta_llamadas.group_by(
+
         Usuario.id
+
     ).all()
 
 
@@ -1289,7 +1353,9 @@ def reporte_ventas_vendedor():
                 fila.ventas_llamadas or 0,
 
             'monto_llamadas':
-                float(fila.monto_llamadas or 0)
+                float(
+                    fila.monto_llamadas or 0
+                )
 
         }
 
@@ -1299,49 +1365,78 @@ def reporte_ventas_vendedor():
 
 
     # =====================================================
-    # UNIFICAR VENTAS
+    # UNIFICAR VISITAS + LLAMADAS
     # =====================================================
 
     reporte = []
 
+
     for fila in reporte_visitas:
 
         datos_llamadas = llamadas_dict.get(
+
             fila.usuario_id,
+
             {
                 'ventas_llamadas': 0,
                 'monto_llamadas': 0
             }
+
         )
 
 
-        ventas_visitas = fila.ventas_visitas or 0
+        # ---------------------------------------------
+        # VENTAS
+        # ---------------------------------------------
 
-        ventas_llamadas = datos_llamadas[
-            'ventas_llamadas'
-        ]
-
-
-        monto_visitas = float(
-            fila.monto_visitas or 0
+        ventas_visitas = (
+            fila.ventas_visitas or 0
         )
 
-        monto_llamadas = datos_llamadas[
-            'monto_llamadas'
-        ]
+        ventas_llamadas = (
+            datos_llamadas['ventas_llamadas']
+        )
 
 
         ventas = (
+
             ventas_visitas +
+
             ventas_llamadas
+
+        )
+
+
+        # ---------------------------------------------
+        # MONTOS
+        # ---------------------------------------------
+
+        monto_visitas = float(
+
+            fila.monto_visitas or 0
+
+        )
+
+
+        monto_llamadas = (
+
+            datos_llamadas['monto_llamadas']
+
         )
 
 
         monto_total = (
+
             monto_visitas +
+
             monto_llamadas
+
         )
 
+
+        # ---------------------------------------------
+        # AGREGAR AL REPORTE
+        # ---------------------------------------------
 
         reporte.append({
 
@@ -1373,12 +1468,68 @@ def reporte_ventas_vendedor():
 
 
     # =====================================================
+    # AGREGAR VENDEDORES QUE SOLO TIENEN VENTAS
+    # POR LLAMADAS
+    # =====================================================
+
+    usuarios_reporte = {
+
+        fila['usuario_id']
+
+        for fila in reporte
+
+    }
+
+
+    for fila in reporte_llamadas:
+
+        if fila.usuario_id not in usuarios_reporte:
+
+            reporte.append({
+
+                'usuario_id':
+                    fila.usuario_id,
+
+                'nombre':
+                    Usuario.query.get(
+                        fila.usuario_id
+                    ).nombre,
+
+                'ventas_visitas':
+                    0,
+
+                'ventas_llamadas':
+                    fila.ventas_llamadas or 0,
+
+                'ventas':
+                    fila.ventas_llamadas or 0,
+
+                'monto_visitas':
+                    0,
+
+                'monto_llamadas':
+                    float(
+                        fila.monto_llamadas or 0
+                    ),
+
+                'monto':
+                    float(
+                        fila.monto_llamadas or 0
+                    )
+
+            })
+
+
+    # =====================================================
     # ORDENAR POR VENTA TOTAL
     # =====================================================
 
     reporte.sort(
+
         key=lambda x: x['monto'],
+
         reverse=True
+
     )
 
 
@@ -1387,45 +1538,71 @@ def reporte_ventas_vendedor():
     # =====================================================
 
     total_ventas_visitas = sum(
+
         fila['ventas_visitas']
+
         for fila in reporte
+
     )
+
 
     total_ventas_llamadas = sum(
+
         fila['ventas_llamadas']
+
         for fila in reporte
+
     )
 
+
     total_ventas = sum(
+
         fila['ventas']
+
         for fila in reporte
+
     )
 
 
     total_monto_visitas = sum(
+
         fila['monto_visitas']
+
         for fila in reporte
+
     )
+
 
     total_monto_llamadas = sum(
+
         fila['monto_llamadas']
+
         for fila in reporte
+
     )
 
+
     total_general = sum(
+
         fila['monto']
+
         for fila in reporte
+
     )
 
 
     # =====================================================
-    # MAYOR VENDEDOR
+    # MEJOR VENDEDOR
     # =====================================================
 
     mejor_vendedor = (
+
         reporte[0]
+
         if reporte
+
         else None
+
     )
 
 
@@ -1434,27 +1611,47 @@ def reporte_ventas_vendedor():
     # =====================================================
 
     labels = [
+
         fila['nombre']
+
         for fila in reporte
+
     ]
+
 
     montos = [
+
         fila['monto']
+
         for fila in reporte
+
     ]
+
 
     montos_visitas = [
+
         fila['monto_visitas']
+
         for fila in reporte
+
     ]
+
 
     montos_llamadas = [
+
         fila['monto_llamadas']
+
         for fila in reporte
+
     ]
 
 
+    # =====================================================
+    # RENDER
+    # =====================================================
+
     return render_template(
+
         'reporte_ventas_vendedor.html',
 
         reporte=reporte,
@@ -1480,16 +1677,21 @@ def reporte_ventas_vendedor():
         mejor_vendedor=
             mejor_vendedor,
 
-        labels=labels,
+        labels=
+            labels,
 
-        montos=montos,
+        montos=
+            montos,
 
         montos_visitas=
             montos_visitas,
 
         montos_llamadas=
             montos_llamadas
+
     )
+
+
 
 @app.route('/reporte_visitas_vendedor')
 @login_required
@@ -1509,17 +1711,17 @@ def reporte_visitas_vendedor():
     consulta_visitas = db.session.query(
         Usuario.id.label('usuario_id'),
         Usuario.nombre.label('nombre'),
-
         func.count(Visita.id).label('visitas'),
-
         func.coalesce(
             func.sum(Visita.monto_venta),
             0
         ).label('venta_visitas')
-
     ).outerjoin(
         Visita,
         Usuario.id == Visita.usuario_id
+    ).filter(
+        Usuario.activo == True,
+        Usuario.rol == 'vendedor'
     )
 
     if fecha_inicio:
@@ -1579,16 +1781,14 @@ def reporte_visitas_vendedor():
     # =====================================================
 
     consulta_prospectos = db.session.query(
-
         Usuario.id.label('usuario_id'),
-
-        func.count(
-            Prospecto.id
-        ).label('prospectos')
-
+        func.count(Prospecto.id).label('prospectos')
     ).outerjoin(
         Prospecto,
         Usuario.id == Prospecto.usuario_id
+    ).filter(
+        Usuario.activo == True,
+        Usuario.rol == 'vendedor'
     )
 
     if fecha_inicio:
@@ -1871,11 +2071,27 @@ def reporte_proximas_visitas():
 
     # =====================================================
     # CONSULTA BASE
+    # SOLO VENDEDORES ACTIVOS
     # =====================================================
 
-    consulta = Visita.query.filter(
+    consulta = db.session.query(
+        Visita
+    ).join(
+        Usuario,
+        Usuario.id == Visita.usuario_id
+    ).filter(
+
+        # La visita debe tener fecha programada
         Visita.proxima_visita.isnot(None),
-        Visita.proxima_visita >= hoy
+
+        # No mostrar visitas que ya pasaron
+        Visita.proxima_visita >= hoy,
+
+        # SOLO VENDEDORES ACTIVOS
+        Usuario.activo == True,
+
+        Usuario.rol == 'vendedor'
+
     )
 
     # =====================================================
@@ -1912,16 +2128,32 @@ def reporte_proximas_visitas():
 
     total_visitas = len(visitas)
 
+    # ---------------------------------------------
+    # VISITAS PROGRAMADAS PARA HOY
+    # ---------------------------------------------
+
     visitas_hoy = sum(
+
         1
+
         for visita in visitas
+
         if visita.proxima_visita == hoy
+
     )
 
+    # ---------------------------------------------
+    # VISITAS EN LOS PRÓXIMOS 7 DÍAS
+    # ---------------------------------------------
+
     visitas_7_dias = sum(
+
         1
+
         for visita in visitas
+
         if visita.proxima_visita <= hoy + timedelta(days=7)
+
     )
 
     # =====================================================
@@ -1929,6 +2161,7 @@ def reporte_proximas_visitas():
     # =====================================================
 
     return render_template(
+
         'reporte_proximas_visitas.html',
 
         visitas=visitas,
@@ -1940,6 +2173,7 @@ def reporte_proximas_visitas():
         visitas_7_dias=visitas_7_dias,
 
         hoy=hoy
+
     )
 
 from datetime import date
