@@ -1,0 +1,874 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Prospección
+{% endblock %}
+
+{% block contenido %}
+
+<div class="container-fluid py-4">
+
+    <!-- ===================================================== -->
+    <!-- ENCABEZADO -->
+    <!-- ===================================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+
+                <i class="bi bi-person-plus-fill text-danger"></i>
+
+                Reporte de Prospección
+
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                Analiza la generación y distribución de prospectos
+                del equipo comercial.
+
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('reportes') }}"
+            class="btn btn-secondary rounded-pill">
+
+            <i class="bi bi-arrow-left"></i>
+
+            Centro de Reportes
+
+        </a>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- FILTROS -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+        <div class="card-body">
+
+            <form method="GET">
+
+                <div class="row g-3">
+
+                    <!-- FECHA INICIO -->
+
+                    <div class="col-md-3">
+
+                        <label class="form-label fw-semibold">
+
+                            <i class="bi bi-calendar-event"></i>
+
+                            Fecha Inicio
+
+                        </label>
+
+                        <input
+                            type="date"
+                            name="fecha_inicio"
+                            class="form-control"
+                            value="{{ request.args.get('fecha_inicio', '') }}">
+
+                    </div>
+
+
+                    <!-- FECHA FIN -->
+
+                    <div class="col-md-3">
+
+                        <label class="form-label fw-semibold">
+
+                            <i class="bi bi-calendar-event"></i>
+
+                            Fecha Fin
+
+                        </label>
+
+                        <input
+                            type="date"
+                            name="fecha_fin"
+                            class="form-control"
+                            value="{{ request.args.get('fecha_fin', '') }}">
+
+                    </div>
+
+
+                    <!-- BOTONES -->
+
+                    <div class="col-md-4 d-flex align-items-end">
+
+                        <button
+                            type="submit"
+                            class="btn btn-danger rounded-pill px-4 me-2">
+
+                            <i class="bi bi-search"></i>
+
+                            Consultar
+
+                        </button>
+
+
+                        <a
+                            href="{{ url_for('reporte_prospeccion') }}"
+                            class="btn btn-secondary rounded-pill px-4">
+
+                            <i class="bi bi-arrow-clockwise"></i>
+
+                            Limpiar
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- INDICADORES -->
+    <!-- ===================================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- TOTAL PROSPECTOS -->
+
+        <div class="col-xl-4 col-md-6">
+
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="text-muted fw-semibold">
+
+                                TOTAL PROSPECTOS
+
+                            </small>
+
+                            <h2 class="fw-bold mb-0">
+
+                                {{ total_prospectos }}
+
+                            </h2>
+
+                        </div>
+
+                        <div
+                            class="rounded-circle bg-danger bg-opacity-10
+                                   p-3">
+
+                            <i class="bi bi-people-fill text-danger fs-3"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PROSPECTOS NUEVOS -->
+
+        <div class="col-xl-4 col-md-6">
+
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="text-muted fw-semibold">
+
+                                PROSPECTOS NUEVOS
+
+                            </small>
+
+                            <h2 class="fw-bold mb-0">
+
+                                {{ prospectos_nuevos }}
+
+                            </h2>
+
+                        </div>
+
+                        <div
+                            class="rounded-circle bg-primary bg-opacity-10
+                                   p-3">
+
+                            <i class="bi bi-person-plus-fill text-primary fs-3"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PORCENTAJE NUEVOS -->
+
+        <div class="col-xl-4 col-md-6">
+
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="text-muted fw-semibold">
+
+                                PROSPECTOS NUEVOS %
+
+                            </small>
+
+                            <h2 class="fw-bold mb-0">
+
+                                {{ "%.1f"|format(porcentaje_nuevos) }}%
+
+                            </h2>
+
+                        </div>
+
+                        <div
+                            class="rounded-circle bg-success bg-opacity-10
+                                   p-3">
+
+                            <i class="bi bi-percent text-success fs-3"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- GRÁFICAS -->
+    <!-- ===================================================== -->
+
+    <div class="row g-4 mb-4">
+
+
+        <!-- ================================================= -->
+        <!-- PROSPECTOS POR VENDEDOR -->
+        <!-- ================================================= -->
+
+        <div class="col-lg-7">
+
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                        <div>
+
+                            <h5 class="fw-bold mb-1">
+
+                                <i class="bi bi-bar-chart-fill text-danger"></i>
+
+                                Prospectos por Vendedor
+
+                            </h5>
+
+                            <small class="text-muted">
+
+                                Cantidad de prospectos registrados por cada vendedor.
+
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div style="height: 350px;">
+
+                        <canvas id="graficaVendedores"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- PROSPECTOS POR ESTATUS -->
+        <!-- ================================================= -->
+
+        <div class="col-lg-5">
+
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                        <div>
+
+                            <h5 class="fw-bold mb-1">
+
+                                <i class="bi bi-pie-chart-fill text-primary"></i>
+
+                                Prospectos por Estatus
+
+                            </h5>
+
+                            <small class="text-muted">
+
+                                Distribución actual de los prospectos.
+
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div style="height: 350px;">
+
+                        <canvas id="graficaEstatus"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- TABLA POR VENDEDOR -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <div>
+
+                    <h5 class="fw-bold mb-1">
+
+                        <i class="bi bi-person-lines-fill text-danger"></i>
+
+                        Resumen por Vendedor
+
+                    </h5>
+
+                    <small class="text-muted">
+
+                        Participación de cada vendedor en la generación
+                        de prospectos.
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Vendedor
+                            </th>
+
+                            <th class="text-center">
+                                Prospectos
+                            </th>
+
+                            <th>
+                                Participación
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for fila in reporte_vendedores %}
+
+                        <tr>
+
+                            <td>
+
+                                {{ loop.index }}
+
+                            </td>
+
+                            <td>
+
+                                <i class="bi bi-person-circle text-danger"></i>
+
+                                {{ fila.nombre }}
+
+                            </td>
+
+                            <td class="text-center">
+
+                                <span class="badge bg-danger rounded-pill">
+
+                                    {{ fila.prospectos }}
+
+                                </span>
+
+                            </td>
+
+                            <td style="min-width: 220px;">
+
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <div
+                                        class="progress flex-grow-1"
+                                        style="height: 8px;">
+
+                                        <div
+                                            class="progress-bar bg-danger"
+                                            role="progressbar"
+                                            style="width: {{ fila.porcentaje }}%;">
+
+                                        </div>
+
+                                    </div>
+
+                                    <small class="fw-semibold">
+
+                                        {{ "%.1f"|format(fila.porcentaje) }}%
+
+                                    </small>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="text-center text-muted py-4">
+
+                                <i class="bi bi-info-circle fs-4"></i>
+
+                                <br>
+
+                                No hay prospectos registrados
+                                en el periodo seleccionado.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- DETALLE DE PROSPECTOS -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm border-0 rounded-4">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <div>
+
+                    <h5 class="fw-bold mb-1">
+
+                        <i class="bi bi-list-ul text-danger"></i>
+
+                        Detalle de Prospectos
+
+                    </h5>
+
+                    <small class="text-muted">
+
+                        Prospectos registrados durante el periodo seleccionado.
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-responsive">
+
+                <table class="table table-striped table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+
+                            <th>
+                                Fecha
+                            </th>
+
+                            <th>
+                                Prospecto
+                            </th>
+
+                            <th>
+                                Contacto
+                            </th>
+
+                            <th>
+                                Teléfono
+                            </th>
+
+                            <th>
+                                Vendedor
+                            </th>
+
+                            <th>
+                                Estatus
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for prospecto in prospectos %}
+
+                        <tr>
+
+                            <td>
+
+                                {% if prospecto.fecha_registro %}
+
+                                    {{ prospecto.fecha_registro.strftime('%d/%m/%Y') }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <strong>
+
+                                    {{ prospecto.nombre }}
+
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                                {{ prospecto.contacto or '-' }}
+
+                            </td>
+
+
+                            <td>
+
+                                {{ prospecto.telefono or '-' }}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if prospecto.usuario %}
+
+                                    <i class="bi bi-person-circle text-danger"></i>
+
+                                    {{ prospecto.usuario.nombre }}
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% set estatus = (prospecto.estatus or 'Sin estatus')|lower %}
+
+
+                                {% if estatus == 'nuevo' %}
+
+                                    <span class="badge bg-primary">
+
+                                        {{ prospecto.estatus }}
+
+                                    </span>
+
+                                {% elif estatus == 'interesado' %}
+
+                                    <span class="badge bg-success">
+
+                                        {{ prospecto.estatus }}
+
+                                    </span>
+
+                                {% elif estatus == 'no interesado' %}
+
+                                    <span class="badge bg-secondary">
+
+                                        {{ prospecto.estatus }}
+
+                                    </span>
+
+                                {% elif estatus == 'contactado' %}
+
+                                    <span class="badge bg-warning text-dark">
+
+                                        {{ prospecto.estatus }}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-dark">
+
+                                        {{ prospecto.estatus or 'Sin estatus' }}
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="text-center text-muted py-4">
+
+                                No hay prospectos para mostrar.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- CHART.JS -->
+<!-- ===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+    // =====================================================
+    // PROSPECTOS POR VENDEDOR
+    // =====================================================
+
+    const ctxVendedores =
+        document.getElementById('graficaVendedores');
+
+    new Chart(ctxVendedores, {
+
+        type: 'bar',
+
+        data: {
+
+            labels: {{ labels_vendedores|tojson }},
+
+            datasets: [{
+
+                label: 'Prospectos',
+
+                data: {{ prospectos_vendedores|tojson }},
+
+                backgroundColor: '#dc3545',
+
+                borderRadius: 6
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+
+                    display: false
+
+                }
+
+            },
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+
+                        precision: 0
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    });
+
+
+    // =====================================================
+    // PROSPECTOS POR ESTATUS
+    // =====================================================
+
+    const ctxEstatus =
+        document.getElementById('graficaEstatus');
+
+    new Chart(ctxEstatus, {
+
+        type: 'doughnut',
+
+        data: {
+
+            labels: {{ labels_estatus|tojson }},
+
+            datasets: [{
+
+                label: 'Prospectos',
+
+                data: {{ prospectos_estatus|tojson }},
+
+                backgroundColor: [
+
+                    '#0d6efd',
+                    '#198754',
+                    '#ffc107',
+                    '#dc3545',
+                    '#6f42c1',
+                    '#20c997',
+                    '#6c757d'
+
+                ],
+
+                borderWidth: 2
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+
+                    position: 'bottom'
+
+                }
+
+            }
+
+        }
+
+    });
+
+</script>
+
+{% endblock %}
