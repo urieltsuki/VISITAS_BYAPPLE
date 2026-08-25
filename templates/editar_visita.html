@@ -11,12 +11,18 @@ Editar Visita
     <div>
 
         <h2 class="fw-bold mb-1">
+
             <i class="bi bi-pencil-square text-primary"></i>
+
             Editar Visita
+
         </h2>
 
         <p class="text-muted mb-0">
-            Modifica la información de la visita y actualiza su fotografía.
+
+            Modifica la información de la visita y actualiza
+            su fotografía.
+
         </p>
 
     </div>
@@ -33,6 +39,7 @@ Editar Visita
             enctype="multipart/form-data"
         >
 
+
             <!-- ========================================= -->
             <!-- OBSERVACIONES -->
             <!-- ========================================= -->
@@ -42,6 +49,7 @@ Editar Visita
                 <label class="form-label fw-semibold">
 
                     <i class="bi bi-chat-left-text"></i>
+
                     Observaciones
 
                 </label>
@@ -91,7 +99,7 @@ Editar Visita
 
 
             <!-- ========================================= -->
-            <!-- MONTO DE VENTA -->
+            <!-- MONTO -->
             <!-- ========================================= -->
 
             <div class="mb-4">
@@ -139,32 +147,30 @@ Editar Visita
                 </label>
 
 
-                {% if visita.foto %}
+                <!-- ===================================== -->
+                <!-- FOTO ACTUAL -->
+                <!-- ===================================== -->
 
-                    <!-- FOTO EXISTENTE -->
+                {% if visita.foto %}
 
                     <div class="mb-3">
 
-                        <div class="mb-2 text-muted">
+                        <p class="text-muted mb-2">
 
                             Fotografía actual:
 
-                        </div>
+                        </p>
 
-                        <div>
-
-                            <img
-                                src="{{ url_for('static', filename=visita.foto) }}"
-                                alt="Fotografía de la visita"
-                                class="img-fluid rounded shadow-sm"
-                                style="
-                                    max-width: 400px;
-                                    max-height: 350px;
-                                    object-fit: cover;
-                                "
-                            >
-
-                        </div>
+                        <img
+                            src="{{ url_for('static', filename=visita.foto) }}"
+                            alt="Fotografía de la visita"
+                            class="img-fluid rounded shadow-sm"
+                            style="
+                                max-width: 400px;
+                                max-height: 350px;
+                                object-fit: cover;
+                            "
+                        >
 
                     </div>
 
@@ -175,53 +181,106 @@ Editar Visita
 
                         Esta visita ya tiene una fotografía.
 
-                        <strong>
-                            Si seleccionas una nueva fotografía,
-                            reemplazará la actual.
-                        </strong>
+                        <br>
+
+                        Puedes seleccionar una nueva para
+                        <strong>reemplazarla</strong>.
 
                     </div>
 
                 {% else %}
 
-                    <!-- SIN FOTO -->
-
                     <div class="alert alert-warning">
 
-                        <i class="bi bi-camera"></i>
+                        <i class="bi bi-camera-fill"></i>
 
-                        Esta visita todavía no tiene una fotografía.
-
-                        Puedes agregar una utilizando el campo
-                        de abajo.
+                        Esta visita todavía no tiene fotografía.
 
                     </div>
 
                 {% endif %}
 
 
-                <!-- CAMPO PARA FOTO -->
+                <!-- ===================================== -->
+                <!-- BOTONES FOTO -->
+                <!-- ===================================== -->
 
-                <input
-                    type="file"
-                    name="foto"
-                    class="form-control"
-                    accept="image/*"
-                >
+                <div class="row g-2">
 
-                <div class="form-text">
 
-                    {% if visita.foto %}
+                    <!-- CÁMARA -->
 
-                        Selecciona una fotografía únicamente
-                        si deseas reemplazar la actual.
+                    <div class="col-12 col-md-6">
 
-                    {% else %}
+                        <label
+                            for="foto_camara"
+                            class="btn btn-primary w-100 py-3"
+                        >
 
-                        Selecciona una fotografía para agregarla
-                        a esta visita.
+                            <i class="bi bi-camera-fill fs-4"></i>
 
-                    {% endif %}
+                            <br>
+
+                            Tomar fotografía
+
+                        </label>
+
+                        <input
+                            type="file"
+                            name="foto"
+                            id="foto_camara"
+                            accept="image/*"
+                            capture="environment"
+                            class="d-none"
+                        >
+
+                    </div>
+
+
+                    <!-- GALERÍA -->
+
+                    <div class="col-12 col-md-6">
+
+                        <label
+                            for="foto_galeria"
+                            class="btn btn-outline-primary w-100 py-3"
+                        >
+
+                            <i class="bi bi-images fs-4"></i>
+
+                            <br>
+
+                            Elegir de galería
+
+                        </label>
+
+                        <input
+                            type="file"
+                            name="foto_galeria"
+                            id="foto_galeria"
+                            accept="image/*"
+                            class="d-none"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- ===================================== -->
+                <!-- NOMBRE ARCHIVO -->
+                <!-- ===================================== -->
+
+                <div
+                    id="nombreFoto"
+                    class="small text-muted mt-2"
+                ></div>
+
+
+                <div class="form-text mt-2">
+
+                    Puedes tomar una fotografía nueva
+                    o seleccionar una existente.
 
                 </div>
 
@@ -264,5 +323,64 @@ Editar Visita
     </div>
 
 </div>
+
+
+<!-- ========================================= -->
+<!-- JAVASCRIPT -->
+<!-- ========================================= -->
+
+<script>
+
+const camara = document.getElementById('foto_camara');
+
+const galeria = document.getElementById('foto_galeria');
+
+const nombreFoto = document.getElementById('nombreFoto');
+
+
+// =========================================
+// CÁMARA
+// =========================================
+
+camara.addEventListener('change', function () {
+
+    if (this.files.length > 0) {
+
+        // Limpiar selección de galería
+
+        galeria.value = '';
+
+        nombreFoto.innerHTML =
+            '<i class="bi bi-check-circle-fill text-success"></i> ' +
+            'Fotografía seleccionada: ' +
+            this.files[0].name;
+
+    }
+
+});
+
+
+// =========================================
+// GALERÍA
+// =========================================
+
+galeria.addEventListener('change', function () {
+
+    if (this.files.length > 0) {
+
+        // Limpiar selección de cámara
+
+        camara.value = '';
+
+        nombreFoto.innerHTML =
+            '<i class="bi bi-check-circle-fill text-success"></i> ' +
+            'Fotografía seleccionada: ' +
+            this.files[0].name;
+
+    }
+
+});
+
+</script>
 
 {% endblock %}
