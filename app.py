@@ -945,11 +945,20 @@ def editar_visita(id):
 
     visita = Visita.query.get_or_404(id)
 
+    # =====================================================
+    # VALIDAR PERMISOS
+    # =====================================================
+
     if (
-    current_user.rol == 'vendedor'
-    and visita.usuario_id != current_user.id
+        current_user.rol == 'vendedor'
+        and visita.usuario_id != current_user.id
     ):
         return "Acceso denegado"
+
+
+    # =====================================================
+    # EDITAR VISITA
+    # =====================================================
 
     if request.method == 'POST':
 
@@ -965,9 +974,97 @@ def editar_visita(id):
             request.form['monto_venta'] or 0
         )
 
+
+        # =================================================
+        # FOTO
+        # =================================================
+
+        foto = request.files.get('foto')
+
+
+        if foto and foto.filename:
+
+            # Nombre seguro del archivo
+
+            nombre_archivo = secure_filename(
+                foto.filename
+            )
+
+
+            # Crear carpeta si no existe
+
+            carpeta_uploads = os.path.join(
+                app.root_path,
+                'static',
+                'uploads',
+                'visitas'
+            )
+
+            os.makedirs(
+                carpeta_uploads,
+                exist_ok=True
+            )
+
+
+            # =================================================
+            # ELIMINAR FOTO ANTERIOR
+            # =================================================
+
+            if visita.foto:
+
+                ruta_foto_anterior = os.path.join(
+                    app.root_path,
+                    'static',
+                    visita.foto
+                )
+
+                if os.path.exists(
+                    ruta_foto_anterior
+                ):
+
+                    os.remove(
+                        ruta_foto_anterior
+                    )
+
+
+            # =================================================
+            # GUARDAR NUEVA FOTO
+            # =================================================
+
+            ruta_completa = os.path.join(
+                carpeta_uploads,
+                nombre_archivo
+            )
+
+            foto.save(
+                ruta_completa
+            )
+
+
+            # Guardar ruta en BD
+
+            visita.foto = os.path.join(
+                'uploads',
+                'visitas',
+                nombre_archivo
+            ).replace('\\', '/')
+
+
+        # =================================================
+        # GUARDAR CAMBIOS
+        # =================================================
+
         db.session.commit()
 
-        return redirect('/historial_visitas')
+
+        return redirect(
+            '/historial_visitas'
+        )
+
+
+    # =====================================================
+    # MOSTRAR FORMULARIO
+    # =====================================================
 
     return render_template(
         'editar_visita.html',

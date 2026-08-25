@@ -1,39 +1,268 @@
 {% extends 'base.html' %}
+
 {% block titulo %}
 Editar Visita
 {% endblock %}
+
 {% block contenido %}
-<h2>Editar Visita</h2>
-<form method="POST">
-    <div class="mb-3">
-        <label>Observaciones</label>
-        <textarea
-            name="observaciones"
-            class="form-control"
-            rows="5">{{ visita.observaciones }}</textarea>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <div>
+
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-pencil-square text-primary"></i>
+            Editar Visita
+        </h2>
+
+        <p class="text-muted mb-0">
+            Modifica la información de la visita y actualiza su fotografía.
+        </p>
+
     </div>
-    <div class="mb-3">
-        <label>
-            <input
-                type="checkbox"
-                name="venta_realizada"
-                {% if visita.venta_realizada %}checked{% endif %}>
-            ¿Hubo venta?
-        </label>
+
+</div>
+
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <!-- ========================================= -->
+            <!-- OBSERVACIONES -->
+            <!-- ========================================= -->
+
+            <div class="mb-4">
+
+                <label class="form-label fw-semibold">
+
+                    <i class="bi bi-chat-left-text"></i>
+                    Observaciones
+
+                </label>
+
+                <textarea
+                    name="observaciones"
+                    class="form-control"
+                    rows="5"
+                    placeholder="Escribe las observaciones de la visita..."
+                >{{ visita.observaciones or '' }}</textarea>
+
+            </div>
+
+
+            <!-- ========================================= -->
+            <!-- VENTA -->
+            <!-- ========================================= -->
+
+            <div class="mb-4">
+
+                <div class="form-check">
+
+                    <input
+                        type="checkbox"
+                        name="venta_realizada"
+                        id="venta_realizada"
+                        class="form-check-input"
+                        {% if visita.venta_realizada %}
+                            checked
+                        {% endif %}
+                    >
+
+                    <label
+                        class="form-check-label fw-semibold"
+                        for="venta_realizada"
+                    >
+
+                        <i class="bi bi-cart-check"></i>
+
+                        ¿Hubo venta?
+
+                    </label>
+
+                </div>
+
+            </div>
+
+
+            <!-- ========================================= -->
+            <!-- MONTO DE VENTA -->
+            <!-- ========================================= -->
+
+            <div class="mb-4">
+
+                <label class="form-label fw-semibold">
+
+                    <i class="bi bi-currency-dollar"></i>
+
+                    Monto Venta
+
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">
+                        $
+                    </span>
+
+                    <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        name="monto_venta"
+                        class="form-control"
+                        value="{{ visita.monto_venta or 0 }}"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- ========================================= -->
+            <!-- FOTOGRAFÍA -->
+            <!-- ========================================= -->
+
+            <div class="mb-4">
+
+                <label class="form-label fw-semibold">
+
+                    <i class="bi bi-camera-fill"></i>
+
+                    Fotografía de la Visita
+
+                </label>
+
+
+                {% if visita.foto %}
+
+                    <!-- FOTO EXISTENTE -->
+
+                    <div class="mb-3">
+
+                        <div class="mb-2 text-muted">
+
+                            Fotografía actual:
+
+                        </div>
+
+                        <div>
+
+                            <img
+                                src="{{ url_for('static', filename=visita.foto) }}"
+                                alt="Fotografía de la visita"
+                                class="img-fluid rounded shadow-sm"
+                                style="
+                                    max-width: 400px;
+                                    max-height: 350px;
+                                    object-fit: cover;
+                                "
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="alert alert-info">
+
+                        <i class="bi bi-info-circle-fill"></i>
+
+                        Esta visita ya tiene una fotografía.
+
+                        <strong>
+                            Si seleccionas una nueva fotografía,
+                            reemplazará la actual.
+                        </strong>
+
+                    </div>
+
+                {% else %}
+
+                    <!-- SIN FOTO -->
+
+                    <div class="alert alert-warning">
+
+                        <i class="bi bi-camera"></i>
+
+                        Esta visita todavía no tiene una fotografía.
+
+                        Puedes agregar una utilizando el campo
+                        de abajo.
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- CAMPO PARA FOTO -->
+
+                <input
+                    type="file"
+                    name="foto"
+                    class="form-control"
+                    accept="image/*"
+                >
+
+                <div class="form-text">
+
+                    {% if visita.foto %}
+
+                        Selecciona una fotografía únicamente
+                        si deseas reemplazar la actual.
+
+                    {% else %}
+
+                        Selecciona una fotografía para agregarla
+                        a esta visita.
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- ========================================= -->
+            <!-- BOTONES -->
+            <!-- ========================================= -->
+
+            <div class="d-flex gap-2">
+
+                <button
+                    type="submit"
+                    class="btn btn-success"
+                >
+
+                    <i class="bi bi-save"></i>
+
+                    Guardar Cambios
+
+                </button>
+
+
+                <a
+                    href="/historial_visitas"
+                    class="btn btn-secondary"
+                >
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Cancelar
+
+                </a>
+
+            </div>
+
+        </form>
+
     </div>
-    <div class="mb-3">
-        <label>Monto Venta</label>
-        <input
-            type="number"
-            step="0.01"
-            name="monto_venta"
-            class="form-control"
-            value="{{ visita.monto_venta }}">
-    </div>
-    <button
-        type="submit"
-        class="btn btn-success">
-        Guardar Cambios
-    </button>
-</form>
+
+</div>
+
 {% endblock %}
