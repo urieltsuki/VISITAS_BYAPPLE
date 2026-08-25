@@ -2653,6 +2653,200 @@ def eliminar_llamada(id):
 
     return redirect('/llamadas')
 
+@app.route('/reporte_prospeccion')
+@login_required
+def reporte_prospeccion():
+
+    if current_user.rol not in ['admin', 'supervisor']:
+        return "Acceso denegado"
+
+    fecha_inicio = request.args.get('fecha_inicio')
+    fecha_fin = request.args.get('fecha_fin')
+
+    # =====================================================
+    # CONSULTA BASE
+    # SOLO VENDEDORES ACTIVOS
+    # =====================================================
+
+    consulta = db.session.query(
+        Prospecto
+    ).join(
+        Usuario,
+        Usuario.id == Prospecto.usuario_id
+    ).filter(
+        Usuario.activo == True,
+        Usuario.rol == 'vendedor'
+    )
+
+    # =====================================================
+    # FILTRO FECHA INICIO
+    # =====================================================
+
+    if fecha_inicio:
+
+        consulta = consulta.filter(
+            db.func.date(
+                Prospecto.fecha_registro
+            ) >= fecha_inicio
+        )
+
+    # =====================================================
+    # FILTRO FECHA FIN
+    # =====================================================
+
+    if fecha_fin:
+
+        consulta = consulta.filter(
+            db.func.date(
+                Prospecto.fecha_registro
+            ) <= fecha_fin
+        )
+
+    prospectos = consulta.order_by(
+        Prospecto.fecha_registro.desc()
+    ).all()
+
+    # =====================================================
+    # TOTAL DE PROSPECTOS
+    # =====================================================
+
+    total_prospectos = len(prospectos)
+
+    # =====================================================
+    # PROSPECTOS POR ESTATUS
+    # =====================================================
+
+    estatus_dict = {}
+
+    for prospecto in prospectos:
+
+        estatus = prospecto.estatus or 'Sin estatus'
+
+        estatus_dict[estatus] = (
+            estatus_dict.get(estatus, 0) + 1
+        )
+
+    labels_estatus = list(
+        estatus_dict.keys()
+    )
+
+    prospectos_estatus = list(
+        estatus_dict.values()
+    )
+
+    # =====================================================
+    # PROSPECTOS POR VENDEDOR
+    # =====================================================
+
+    vendedores_dict = {}
+
+    for prospecto in prospectos:
+
+        if prospecto.usuario:
+
+            nombre = prospecto.usuario.nombre
+
+            vendedores_dict[nombre] = (
+                vendedores_dict.get(nombre, 0) + 1
+            )
+
+    # Ordenar de mayor a menor
+    vendedores_ordenados = sorted(
+        vendedores_dict.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    labels_vendedores = [
+        fila[0]
+        for fila in vendedores_ordenados
+    ]
+
+    prospectos_vendedores = [
+        fila[1]
+        for fila in vendedores_ordenados
+    ]
+
+    # =====================================================
+    # PROSPECTOS NUEVOS
+    # =====================================================
+
+    prospectos_nuevos = sum(
+        1
+        for prospecto in prospectos
+        if (prospecto.estatus or '').lower() == 'nuevo'
+    )
+
+    # =====================================================
+    # PORCENTAJE DE PROSPECTOS NUEVOS
+    # =====================================================
+
+    porcentaje_nuevos = (
+
+        (prospectos_nuevos / total_prospectos) * 100
+
+        if total_prospectos > 0
+
+        else 0
+
+    )
+
+    # =====================================================
+    # TABLA POR VENDEDOR
+    # =====================================================
+
+    reporte_vendedores = []
+
+    for nombre, cantidad in vendedores_ordenados:
+
+        porcentaje = (
+
+            (cantidad / total_prospectos) * 100
+
+            if total_prospectos > 0
+
+            else 0
+
+        )
+
+        reporte_vendedores.append({
+
+            'nombre': nombre,
+
+            'prospectos': cantidad,
+
+            'porcentaje': porcentaje
+
+        })
+
+    # =====================================================
+    # RETORNAR
+    # =====================================================
+
+    return render_template(
+
+        'reporte_prospeccion.html',
+
+        prospectos=prospectos,
+
+        total_prospectos=total_prospectos,
+
+        prospectos_nuevos=prospectos_nuevos,
+
+        porcentaje_nuevos=porcentaje_nuevos,
+
+        labels_estatus=labels_estatus,
+
+        prospectos_estatus=prospectos_estatus,
+
+        labels_vendedores=labels_vendedores,
+
+        prospectos_vendedores=prospectos_vendedores,
+
+        reporte_vendedores=reporte_vendedores
+
+    )
+
 
 
 

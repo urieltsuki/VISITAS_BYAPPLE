@@ -17,26 +17,6 @@ Dashboard
 <!-- TARJETAS GENERALES -->
 <div class="row g-2">
 
-<!-- PROSPECTOS MES -->
-<div class="col-xl-3 col-md-6">
-    <div class="card kpi-card prospectos-card text-white shadow">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <small>
-                        Prospectos del Mes
-                    </small>
-                    <h2 class="fw-bold mb-0">
-                        {{ prospectos_mes or 0 }}
-                    </h2>
-                </div>
-                <div class="kpi-icon">
-                    <i class="bi bi-person-plus-fill"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <!-- VISITAS MES -->
 <div class="col-xl-3 col-md-6">
     <div class="card kpi-card bg-warning shadow">
@@ -92,6 +72,28 @@ Dashboard
     </div>
 
 </div>
+
+<!-- PROSPECTOS MES -->
+<div class="col-xl-3 col-md-6">
+    <div class="card kpi-card prospectos-card text-white shadow">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <small>
+                        Prospectos del Mes
+                    </small>
+                    <h2 class="fw-bold mb-0">
+                        {{ prospectos_mes or 0 }}
+                    </h2>
+                </div>
+                <div class="kpi-icon">
+                    <i class="bi bi-person-plus-fill"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- CLIENTES CON VENTA -->
 <div class="col-xl-3 col-md-6">
     <div class="card kpi-card bg-success text-white shadow">
