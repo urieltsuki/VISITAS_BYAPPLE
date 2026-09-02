@@ -915,6 +915,7 @@ def uploaded_file(filename):
     )
 
 
+```python
 @app.route('/visita/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
 def editar_visita(id):
@@ -925,7 +926,8 @@ def editar_visita(id):
     # VALIDAR PERMISOS
     # =====================================================
 
-    # Los vendedores solamente pueden editar sus propias visitas
+    # Los vendedores solamente pueden editar
+    # sus propias visitas
     if (
         current_user.rol == 'vendedor'
         and visita.usuario_id != current_user.id
@@ -939,9 +941,9 @@ def editar_visita(id):
 
     if request.method == 'POST':
 
-        # -------------------------------------------------
+        # =================================================
         # OBSERVACIONES
-        # -------------------------------------------------
+        # =================================================
 
         visita.observaciones = request.form.get(
             'observaciones',
@@ -949,202 +951,178 @@ def editar_visita(id):
         )
 
 
-        # -------------------------------------------------
+        # =================================================
         # VENTA REALIZADA
-        # -------------------------------------------------
+        # =================================================
 
         visita.venta_realizada = (
             'venta_realizada' in request.form
         )
 
 
-        # -------------------------------------------------
+        # =================================================
         # MONTO DE VENTA
-        # -------------------------------------------------
+        # =================================================
 
         try:
+
             visita.monto_venta = float(
                 request.form.get(
                     'monto_venta',
                     '0'
                 ) or 0
             )
+
         except ValueError:
+
             visita.monto_venta = 0
 
 
         # =================================================
-        # CARPETA DE UPLOADS
-        # =================================================
-
-        carpeta_uploads = os.path.join(
-            app.root_path,
-            'static',
-            'uploads',
-            'visitas'
-        )
-
-        os.makedirs(
-            carpeta_uploads,
-            exist_ok=True
-        )
-
-
-        # =================================================
         # FOTO FUERA
+        #
+        # Aceptamos:
+        # foto_fuera_camara
+        # foto_fuera_galeria
+        # foto_fuera
         # =================================================
 
-        foto_fuera = request.files.get(
-            'foto_fuera'
+        foto_fuera = (
+
+            request.files.get(
+                'foto_fuera_camara'
+            )
+
+            or
+
+            request.files.get(
+                'foto_fuera_galeria'
+            )
+
+            or
+
+            request.files.get(
+                'foto_fuera'
+            )
+
         )
+
 
         if foto_fuera and foto_fuera.filename:
 
-            # ---------------------------------------------
-            # Generar nombre único
-            # ---------------------------------------------
+            try:
 
-            extension = os.path.splitext(
-                secure_filename(
-                    foto_fuera.filename
-                )
-            )[1]
+                resultado = cloudinary.uploader.upload(
 
-            nombre_archivo = (
-                f"visita_{visita.id}_fuera_"
-                f"{uuid.uuid4().hex}"
-                f"{extension}"
-            )
+                    foto_fuera,
 
+                    folder="bitacora_visitas/fuera"
 
-            # ---------------------------------------------
-            # Eliminar foto anterior
-            # ---------------------------------------------
-
-            if visita.foto_fuera:
-
-                ruta_foto_anterior = os.path.join(
-                    app.root_path,
-                    'static',
-                    visita.foto_fuera
                 )
 
-                if os.path.exists(
-                    ruta_foto_anterior
-                ):
-                    try:
-                        os.remove(
-                            ruta_foto_anterior
-                        )
-                    except OSError:
-                        pass
+                # Guardar URL de Cloudinary
+                visita.foto_fuera = (
+                    resultado["secure_url"]
+                )
 
+            except Exception as e:
 
-            # ---------------------------------------------
-            # Guardar nueva foto
-            # ---------------------------------------------
+                print(
+                    "ERROR AL SUBIR FOTO FUERA:",
+                    e
+                )
 
-            ruta_completa = os.path.join(
-                carpeta_uploads,
-                nombre_archivo
-            )
+                db.session.rollback()
 
-            foto_fuera.save(
-                ruta_completa
-            )
-
-
-            # ---------------------------------------------
-            # Guardar ruta en BD
-            # ---------------------------------------------
-
-            visita.foto_fuera = os.path.join(
-                'uploads',
-                'visitas',
-                nombre_archivo
-            ).replace('\\', '/')
+                return (
+                    "Error al subir la fotografía "
+                    "de fuera del establecimiento."
+                ), 500
 
 
         # =================================================
         # FOTO EXHIBIDOR
+        #
+        # Aceptamos:
+        # foto_exhibidor_camara
+        # foto_exhibidor_galeria
+        # foto_exhibidor
         # =================================================
 
-        foto_exhibidor = request.files.get(
-            'foto_exhibidor'
+        foto_exhibidor = (
+
+            request.files.get(
+                'foto_exhibidor_camara'
+            )
+
+            or
+
+            request.files.get(
+                'foto_exhibidor_galeria'
+            )
+
+            or
+
+            request.files.get(
+                'foto_exhibidor'
+            )
+
         )
+
 
         if foto_exhibidor and foto_exhibidor.filename:
 
-            # ---------------------------------------------
-            # Generar nombre único
-            # ---------------------------------------------
+            try:
 
-            extension = os.path.splitext(
-                secure_filename(
-                    foto_exhibidor.filename
-                )
-            )[1]
+                resultado = cloudinary.uploader.upload(
 
-            nombre_archivo = (
-                f"visita_{visita.id}_exhibidor_"
-                f"{uuid.uuid4().hex}"
-                f"{extension}"
-            )
+                    foto_exhibidor,
 
+                    folder="bitacora_visitas/exhibidor"
 
-            # ---------------------------------------------
-            # Eliminar foto anterior
-            # ---------------------------------------------
-
-            if visita.foto_exhibidor:
-
-                ruta_foto_anterior = os.path.join(
-                    app.root_path,
-                    'static',
-                    visita.foto_exhibidor
                 )
 
-                if os.path.exists(
-                    ruta_foto_anterior
-                ):
-                    try:
-                        os.remove(
-                            ruta_foto_anterior
-                        )
-                    except OSError:
-                        pass
+                # Guardar URL de Cloudinary
+                visita.foto_exhibidor = (
+                    resultado["secure_url"]
+                )
 
+            except Exception as e:
 
-            # ---------------------------------------------
-            # Guardar nueva foto
-            # ---------------------------------------------
+                print(
+                    "ERROR AL SUBIR FOTO EXHIBIDOR:",
+                    e
+                )
 
-            ruta_completa = os.path.join(
-                carpeta_uploads,
-                nombre_archivo
-            )
+                db.session.rollback()
 
-            foto_exhibidor.save(
-                ruta_completa
-            )
-
-
-            # ---------------------------------------------
-            # Guardar ruta en BD
-            # ---------------------------------------------
-
-            visita.foto_exhibidor = os.path.join(
-                'uploads',
-                'visitas',
-                nombre_archivo
-            ).replace('\\', '/')
+                return (
+                    "Error al subir la fotografía "
+                    "del exhibidor."
+                ), 500
 
 
         # =================================================
-        # GUARDAR CAMBIOS
+        # GUARDAR CAMBIOS EN POSTGRESQL
         # =================================================
 
-        db.session.commit()
+        try:
+
+            db.session.commit()
+
+        except Exception as e:
+
+            db.session.rollback()
+
+            print(
+                "ERROR AL GUARDAR VISITA:",
+                e
+            )
+
+            return (
+                "Error al guardar los cambios "
+                "de la visita."
+            ), 500
 
 
         # =================================================
@@ -1164,6 +1142,7 @@ def editar_visita(id):
         'editar_visita.html',
         visita=visita
     )
+
 
 
 
