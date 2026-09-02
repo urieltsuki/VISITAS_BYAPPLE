@@ -976,74 +976,122 @@ def editar_visita(id):
 
 
         # =================================================
-        # FOTO
+        # CREAR CARPETA DE UPLOADS
         # =================================================
 
-        foto = request.files.get('foto')
+        carpeta_uploads = os.path.join(
+            app.root_path,
+            'static',
+            'uploads',
+            'visitas'
+        )
+
+        os.makedirs(
+            carpeta_uploads,
+            exist_ok=True
+        )
 
 
-        if foto and foto.filename:
+        # =================================================
+        # FOTO POR FUERA
+        # =================================================
 
-            # Nombre seguro del archivo
+        foto_fuera = request.files.get(
+            'foto_fuera'
+        )
+
+        if foto_fuera and foto_fuera.filename:
 
             nombre_archivo = secure_filename(
-                foto.filename
+                foto_fuera.filename
             )
 
+            # Eliminar foto anterior
 
-            # Crear carpeta si no existe
-
-            carpeta_uploads = os.path.join(
-                app.root_path,
-                'static',
-                'uploads',
-                'visitas'
-            )
-
-            os.makedirs(
-                carpeta_uploads,
-                exist_ok=True
-            )
-
-
-            # =================================================
-            # ELIMINAR FOTO ANTERIOR
-            # =================================================
-
-            if visita.foto:
+            if visita.foto_fuera:
 
                 ruta_foto_anterior = os.path.join(
                     app.root_path,
                     'static',
-                    visita.foto
+                    visita.foto_fuera
                 )
 
                 if os.path.exists(
                     ruta_foto_anterior
                 ):
-
                     os.remove(
                         ruta_foto_anterior
                     )
 
 
-            # =================================================
-            # GUARDAR NUEVA FOTO
-            # =================================================
+            # Guardar nueva foto
 
             ruta_completa = os.path.join(
                 carpeta_uploads,
                 nombre_archivo
             )
 
-            foto.save(
+            foto_fuera.save(
                 ruta_completa
             )
 
 
             # Guardar ruta en BD
 
-            visita.foto = os.path.join(
+            visita.foto_fuera = os.path.join(
+                'uploads',
+                'visitas',
+                nombre_archivo
+            ).replace('\\', '/')
+
+
+        # =================================================
+        # FOTO EXHIBIDOR
+        # =================================================
+
+        foto_exhibidor = request.files.get(
+            'foto_exhibidor'
+        )
+
+        if foto_exhibidor and foto_exhibidor.filename:
+
+            nombre_archivo = secure_filename(
+                foto_exhibidor.filename
+            )
+
+            # Eliminar foto anterior
+
+            if visita.foto_exhibidor:
+
+                ruta_foto_anterior = os.path.join(
+                    app.root_path,
+                    'static',
+                    visita.foto_exhibidor
+                )
+
+                if os.path.exists(
+                    ruta_foto_anterior
+                ):
+                    os.remove(
+                        ruta_foto_anterior
+                    )
+
+
+            # Guardar nueva foto
+
+            ruta_completa = os.path.join(
+                carpeta_uploads,
+                nombre_archivo
+            )
+
+            foto_exhibidor.save(
+                ruta_completa
+            )
+
+
+            # Guardar ruta en BD
+
+            visita.foto_exhibidor = os.path.join(
                 'uploads',
                 'visitas',
                 nombre_archivo

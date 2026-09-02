@@ -1,155 +1,411 @@
 {% extends 'base.html' %}
+
 {% block titulo %}
 Visitas
 {% endblock %}
+
 {% block contenido %}
+
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2 class="fw-bold mb-1">
-            <i class="bi bi-geo-alt-fill text-primary"></i>
-            Visitas
-        </h2>
-        <p class="text-muted">
-            Gestiona visitas nuevas y consulta el historial.
-        </p>
-    </div>
-    <a href="{{ url_for('nueva_visita') }}"
-       class="btn btn-primary rounded-pill px-4">
-        <i class="bi bi-plus-circle-fill"></i>
-        Nueva Visita
-    </a>
+
+
+<div>
+
+    <h2 class="fw-bold mb-1">
+
+        <i class="bi bi-geo-alt-fill text-primary"></i>
+
+        Visitas
+
+    </h2>
+
+    <p class="text-muted">
+
+        Gestiona visitas nuevas y consulta el historial.
+
+    </p>
+
+</div>
+
+
+<a
+    href="{{ url_for('nueva_visita') }}"
+    class="btn btn-primary rounded-pill px-4"
+>
+
+    <i class="bi bi-plus-circle-fill"></i>
+
+    Nueva Visita
+
+</a>
+
+
 </div>
 
 <div class="card shadow-sm border-0 rounded-4">
-    <div class="card-header bg-light">
-        <h5 class="mb-0">
-            <i class="bi bi-clock-history text-primary"></i>
-            Historial de Visitas
-        </h5>
-    </div>
 
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-primary">
-                    <tr>
-                        <th>Fecha</th>
-                        <th>Cliente</th>
-                        <th>Vendedor</th>
-                        <th>Observaciones</th>
-                        
-                        <th>Monto</th>
-                        <th>Evidencia</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
 
-                <tbody>
-                    {% for visita in visitas %}
-                    <tr>
-                        <td>
-                            {{ visita.fecha.strftime('%d/%m/%Y %H:%M') }}
-                        </td>
+<div class="card-header bg-light">
 
-                        <td>
-                            <strong>{{ visita.cliente.num_cliente }}</strong>
-                            <br>
-                            {{ visita.cliente.nombre }}
-                        </td>
+    <h5 class="mb-0">
 
-                        <td>
-                            {{ visita.usuario.nombre }}
-                        </td>
+        <i class="bi bi-clock-history text-primary"></i>
 
-                        <td>
-                            {{ visita.observaciones or '-' }}
-                        </td>
+        Historial de Visitas
 
-                        <td>
-                            $ {{ "%.2f"|format(visita.monto_venta or 0) }}
-                        </td>
+    </h5>
 
-                        <td>
-                            {% if visita.foto %}
-                                <button
-                                    type="button"
-                                    class="btn btn-sm btn-primary"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modalFoto{{ visita.id }}">
-                                    <i class="bi bi-image"></i>
-                                    Ver
-                                </button>
-
-                                <!-- MODAL FOTO -->
-                                <div class="modal fade"
-                                     id="modalFoto{{ visita.id }}"
-                                     tabindex="-1">
-                                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">
-                                                    Evidencia de visita
-                                                </h5>
-                                                <button
-                                                    type="button"
-                                                    class="btn-close"
-                                                    data-bs-dismiss="modal">
-                                                </button>
-                                            </div>
-                                            <div class="modal-body text-center">
-                                                <img
-                                                    src="{{ visita.foto }}"
-                                                    class="img-fluid rounded shadow"
-                                                    style="max-height:600px;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% else %}
-                                <span class="text-muted">Sin evidencia</span>
-                            {% endif %}
-                        </td>
-
-                        <td>
-                            <!-- BOTÓN UBICACIÓN -->
-                            {% if visita.latitud and visita.longitud %}
-                            <a href="https://www.google.com/maps?q={{ visita.latitud }},{{ visita.longitud }}"
-                               target="_blank"
-                               class="btn btn-info btn-sm"
-                               title="Ver ubicación">
-                                <i class="bi bi-geo-alt-fill"></i>
-                            </a>
-                            {% endif %}
-
-                            <!-- EDITAR -->
-                            <a href="/visita/editar/{{ visita.id }}"
-                               class="btn btn-warning btn-sm">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-
-                            <!-- ELIMINAR -->
-                            {% if current_user.rol == 'admin' %}
-                            <a href="/visita/eliminar/{{ visita.id }}"
-                               class="btn btn-danger btn-sm"
-                               onclick="return confirm('¿Está seguro de eliminar esta visita?');">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                            {% endif %}
-                        </td>
-                    </tr>
-
-                    {% else %}
-                    <tr>
-                        <td colspan="8"
-                            class="text-center text-muted py-4">
-                            No hay visitas registradas.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-
-            </table>
-        </div>
-    </div>
 </div>
+
+
+<div class="card-body">
+
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle">
+
+            <thead class="table-primary">
+
+                <tr>
+
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Vendedor</th>
+                    <th>Observaciones</th>
+                    <th>Monto</th>
+                    <th>Evidencia</th>
+                    <th>Acciones</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for visita in visitas %}
+
+                <tr>
+
+                    <!-- ================================= -->
+                    <!-- FECHA -->
+                    <!-- ================================= -->
+
+                    <td>
+
+                        {{ visita.fecha.strftime('%d/%m/%Y %H:%M') }}
+
+                    </td>
+
+
+                    <!-- ================================= -->
+                    <!-- CLIENTE -->
+                    <!-- ================================= -->
+
+                    <td>
+
+                        <strong>
+                            {{ visita.cliente.num_cliente }}
+                        </strong>
+
+                        <br>
+
+                        {{ visita.cliente.nombre }}
+
+                    </td>
+
+
+                    <!-- ================================= -->
+                    <!-- VENDEDOR -->
+                    <!-- ================================= -->
+
+                    <td>
+
+                        {{ visita.usuario.nombre }}
+
+                    </td>
+
+
+                    <!-- ================================= -->
+                    <!-- OBSERVACIONES -->
+                    <!-- ================================= -->
+
+                    <td>
+
+                        {{ visita.observaciones or '-' }}
+
+                    </td>
+
+
+                    <!-- ================================= -->
+                    <!-- MONTO -->
+                    <!-- ================================= -->
+
+                    <td>
+
+                        $ {{ "%.2f"|format(visita.monto_venta or 0) }}
+
+                    </td>
+
+
+                    <!-- ================================= -->
+                    <!-- EVIDENCIAS -->
+                    <!-- ================================= -->
+
+                    <td>
+
+                        {% if visita.foto_fuera or visita.foto_exhibidor %}
+
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalFoto{{ visita.id }}"
+                            >
+
+                                <i class="bi bi-images"></i>
+
+                                Ver fotos
+
+                            </button>
+
+
+                            <!-- ================================= -->
+                            <!-- MODAL FOTOS -->
+                            <!-- ================================= -->
+
+                            <div
+                                class="modal fade"
+                                id="modalFoto{{ visita.id }}"
+                                tabindex="-1"
+                                aria-hidden="true"
+                            >
+
+                                <div class="modal-dialog modal-lg modal-dialog-centered">
+
+                                    <div class="modal-content">
+
+
+                                        <!-- HEADER -->
+
+                                        <div class="modal-header">
+
+                                            <h5 class="modal-title">
+
+                                                <i class="bi bi-images"></i>
+
+                                                Evidencias de la visita
+
+                                            </h5>
+
+
+                                            <button
+                                                type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal"
+                                            ></button>
+
+                                        </div>
+
+
+                                        <!-- BODY -->
+
+                                        <div class="modal-body">
+
+
+                                            <!-- ================================= -->
+                                            <!-- FOTO POR FUERA -->
+                                            <!-- ================================= -->
+
+                                            {% if visita.foto_fuera %}
+
+                                                <div class="mb-4">
+
+                                                    <h6 class="fw-bold">
+
+                                                        <i class="bi bi-building text-primary"></i>
+
+                                                        Foto por fuera
+
+                                                    </h6>
+
+
+                                                    <div class="text-center">
+
+                                                        <img
+                                                            src="{{ url_for('static', filename=visita.foto_fuera) }}"
+                                                            alt="Foto por fuera"
+                                                            class="img-fluid rounded shadow"
+                                                            style="max-height: 500px;"
+                                                        >
+
+                                                    </div>
+
+                                                </div>
+
+                                            {% endif %}
+
+
+                                            <!-- ================================= -->
+                                            <!-- FOTO EXHIBIDOR -->
+                                            <!-- ================================= -->
+
+                                            {% if visita.foto_exhibidor %}
+
+                                                <div class="mb-2">
+
+                                                    <h6 class="fw-bold">
+
+                                                        <i class="bi bi-shop-window text-success"></i>
+
+                                                        Foto exhibidor
+
+                                                    </h6>
+
+
+                                                    <div class="text-center">
+
+                                                        <img
+                                                            src="{{ url_for('static', filename=visita.foto_exhibidor) }}"
+                                                            alt="Foto del exhibidor"
+                                                            class="img-fluid rounded shadow"
+                                                            style="max-height: 500px;"
+                                                        >
+
+                                                    </div>
+
+                                                </div>
+
+                                            {% endif %}
+
+
+                                        </div>
+
+
+                                        <!-- FOOTER -->
+
+                                        <div class="modal-footer">
+
+                                            <button
+                                                type="button"
+                                                class="btn btn-secondary"
+                                                data-bs-dismiss="modal"
+                                            >
+
+                                                Cerrar
+
+                                            </button>
+
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        {% else %}
+
+                            <span class="text-muted">
+
+                                Sin evidencia
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- ================================= -->
+                    <!-- ACCIONES -->
+                    <!-- ================================= -->
+
+                    <td>
+
+
+                        <!-- UBICACIÓN -->
+
+                        {% if visita.latitud and visita.longitud %}
+
+                            <a
+                                href="https://www.google.com/maps?q={{ visita.latitud }},{{ visita.longitud }}"
+                                target="_blank"
+                                class="btn btn-info btn-sm"
+                                title="Ver ubicación"
+                            >
+
+                                <i class="bi bi-geo-alt-fill"></i>
+
+                            </a>
+
+                        {% endif %}
+
+
+                        <!-- EDITAR -->
+
+                        <a
+                            href="/visita/editar/{{ visita.id }}"
+                            class="btn btn-warning btn-sm"
+                            title="Editar visita"
+                        >
+
+                            <i class="bi bi-pencil"></i>
+
+                        </a>
+
+
+                        <!-- ELIMINAR -->
+
+                        {% if current_user.rol == 'admin' %}
+
+                            <a
+                                href="/visita/eliminar/{{ visita.id }}"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('¿Está seguro de eliminar esta visita?');"
+                                title="Eliminar visita"
+                            >
+
+                                <i class="bi bi-trash"></i>
+
+                            </a>
+
+                        {% endif %}
+
+
+                    </td>
+
+                </tr>
+
+
+                {% else %}
+
+                <tr>
+
+                    <td
+                        colspan="7"
+                        class="text-center text-muted py-4"
+                    >
+
+                        No hay visitas registradas.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+</div>
+
 {% endblock %}

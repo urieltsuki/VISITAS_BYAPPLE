@@ -174,115 +174,218 @@ Nueva Visita
 
 
                 <!-- ================================= -->
-                <!-- FOTO -->
-                <!-- ================================= -->
 
-                <div class="mb-4">
+<!-- FOTOGRAFÍAS -->
 
-                    <label class="form-label fw-semibold">
+<!-- ================================= -->
 
-                        <i class="bi bi-camera-fill text-primary"></i>
+<div class="mb-4">
 
-                        Foto Evidencia
+```
+<h5 class="fw-bold mb-3">
 
-                    </label>
+    <i class="bi bi-camera-fill text-primary"></i>
 
+    Fotografías de la Visita
 
-                    <div class="alert alert-info">
-
-                        <i class="bi bi-info-circle-fill"></i>
-
-                        Puedes tomar una fotografía en el momento
-                        o seleccionar una imagen de tu galería.
-
-                    </div>
+</h5>
 
 
-                    <!-- ============================= -->
-                    <!-- BOTONES -->
-                    <!-- ============================= -->
+<!-- ========================================= -->
+<!-- FOTO POR FUERA -->
+<!-- ========================================= -->
 
-                    <div class="row g-2">
+<div class="card border mb-4">
 
+    <div class="card-body">
 
-                        <!-- CÁMARA -->
+        <h6 class="fw-bold">
 
-                        <div class="col-12 col-md-6">
+            <i class="bi bi-building text-primary"></i>
 
-                            <label
-                                for="foto_camara"
-                                class="btn btn-primary w-100 py-3"
-                            >
+            Foto por fuera
 
-                                <i class="bi bi-camera-fill fs-4"></i>
+        </h6>
 
-                                <br>
+        <p class="text-muted small">
 
-                                Tomar fotografía
+            Toma una fotografía de la parte exterior
+            del establecimiento o selecciónala desde
+            la galería.
 
-                            </label>
-
-
-                            <input
-                                type="file"
-                                name="foto"
-                                id="foto_camara"
-                                accept="image/*"
-                                capture="environment"
-                                class="d-none"
-                            >
-
-                        </div>
+        </p>
 
 
-                        <!-- GALERÍA -->
-
-                        <div class="col-12 col-md-6">
-
-                            <label
-                                for="foto_galeria"
-                                class="btn btn-outline-primary w-100 py-3"
-                            >
-
-                                <i class="bi bi-images fs-4"></i>
-
-                                <br>
-
-                                Elegir de galería
-
-                            </label>
+        <div class="row g-2">
 
 
-                            <input
-                                type="file"
-                                name="foto_galeria"
-                                id="foto_galeria"
-                                accept="image/*"
-                                class="d-none"
-                            >
+            <!-- CÁMARA -->
 
-                        </div>
+            <div class="col-12 col-md-6">
 
-                    </div>
+                <label
+                    for="foto_fuera_camara"
+                    class="btn btn-primary w-100 py-3"
+                >
+
+                    <i class="bi bi-camera-fill fs-4"></i>
+
+                    <br>
+
+                    Tomar fotografía
+
+                </label>
+
+                <input
+                    type="file"
+                    name="foto_fuera_camara"
+                    id="foto_fuera_camara"
+                    accept="image/*"
+                    capture="environment"
+                    class="d-none"
+                >
+
+            </div>
 
 
-                    <!-- ============================= -->
-                    <!-- ARCHIVO SELECCIONADO -->
-                    <!-- ============================= -->
+            <!-- GALERÍA -->
 
-                    <div
-                        id="nombreFoto"
-                        class="small text-muted mt-2"
-                    ></div>
+            <div class="col-12 col-md-6">
+
+                <label
+                    for="foto_fuera_galeria"
+                    class="btn btn-outline-primary w-100 py-3"
+                >
+
+                    <i class="bi bi-images fs-4"></i>
+
+                    <br>
+
+                    Elegir de galería
+
+                </label>
+
+                <input
+                    type="file"
+                    name="foto_fuera_galeria"
+                    id="foto_fuera_galeria"
+                    accept="image/*"
+                    class="d-none"
+                >
+
+            </div>
+
+        </div>
 
 
-                    <div class="form-text mt-2">
+        <div
+            id="nombreFotoFuera"
+            class="small text-muted mt-3"
+        ></div>
 
-                        La fotografía es opcional.
+    </div>
 
-                    </div>
+</div>
 
-                </div>
+
+<!-- ========================================= -->
+<!-- FOTO EXHIBIDOR -->
+<!-- ========================================= -->
+
+<div class="card border">
+
+    <div class="card-body">
+
+        <h6 class="fw-bold">
+
+            <i class="bi bi-shop-window text-success"></i>
+
+            Foto exhibidor
+
+        </h6>
+
+        <p class="text-muted small">
+
+            Toma una fotografía del exhibidor o
+            selecciónala desde la galería.
+
+        </p>
+
+
+        <div class="row g-2">
+
+
+            <!-- CÁMARA -->
+
+            <div class="col-12 col-md-6">
+
+                <label
+                    for="foto_exhibidor_camara"
+                    class="btn btn-success w-100 py-3"
+                >
+
+                    <i class="bi bi-camera-fill fs-4"></i>
+
+                    <br>
+
+                    Tomar fotografía
+
+                </label>
+
+                <input
+                    type="file"
+                    name="foto_exhibidor_camara"
+                    id="foto_exhibidor_camara"
+                    accept="image/*"
+                    capture="environment"
+                    class="d-none"
+                >
+
+            </div>
+
+
+            <!-- GALERÍA -->
+
+            <div class="col-12 col-md-6">
+
+                <label
+                    for="foto_exhibidor_galeria"
+                    class="btn btn-outline-success w-100 py-3"
+                >
+
+                    <i class="bi bi-images fs-4"></i>
+
+                    <br>
+
+                    Elegir de galería
+
+                </label>
+
+                <input
+                    type="file"
+                    name="foto_exhibidor_galeria"
+                    id="foto_exhibidor_galeria"
+                    accept="image/*"
+                    class="d-none"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="nombreFotoExhibidor"
+            class="small text-muted mt-3"
+        ></div>
+
+    </div>
+
+</div>
+```
+
+</div>
+
 
 
                 <!-- ================================= -->

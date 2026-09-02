@@ -8,378 +8,602 @@ Editar Visita
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <div>
+```
+<div>
 
-        <h2 class="fw-bold mb-1">
+    <h2 class="fw-bold mb-1">
 
-            <i class="bi bi-pencil-square text-primary"></i>
+        <i class="bi bi-pencil-square text-primary"></i>
 
-            Editar Visita
+        Editar Visita
 
-        </h2>
+    </h2>
 
-        <p class="text-muted mb-0">
+    <p class="text-muted mb-0">
 
-            Modifica la información de la visita y actualiza
-            su fotografía.
+        Modifica la información de la visita y actualiza
+        sus fotografías.
 
-        </p>
-
-    </div>
+    </p>
 
 </div>
+```
 
+</div>
 
 <div class="card shadow-sm">
 
-    <div class="card-body">
+```
+<div class="card-body">
 
-        <form
-            method="POST"
-            enctype="multipart/form-data"
-        >
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+    >
 
 
-            <!-- ========================================= -->
-            <!-- OBSERVACIONES -->
-            <!-- ========================================= -->
+        <!-- ========================================= -->
+        <!-- OBSERVACIONES -->
+        <!-- ========================================= -->
 
-            <div class="mb-4">
+        <div class="mb-4">
 
-                <label class="form-label fw-semibold">
+            <label class="form-label fw-semibold">
 
-                    <i class="bi bi-chat-left-text"></i>
+                <i class="bi bi-chat-left-text"></i>
 
-                    Observaciones
+                Observaciones
+
+            </label>
+
+            <textarea
+                name="observaciones"
+                class="form-control"
+                rows="5"
+                placeholder="Escribe las observaciones de la visita..."
+            >{{ visita.observaciones or '' }}</textarea>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- VENTA -->
+        <!-- ========================================= -->
+
+        <div class="mb-4">
+
+            <div class="form-check">
+
+                <input
+                    type="checkbox"
+                    name="venta_realizada"
+                    id="venta_realizada"
+                    class="form-check-input"
+                    {% if visita.venta_realizada %}
+                        checked
+                    {% endif %}
+                >
+
+                <label
+                    class="form-check-label fw-semibold"
+                    for="venta_realizada"
+                >
+
+                    <i class="bi bi-cart-check"></i>
+
+                    ¿Hubo venta?
 
                 </label>
 
-                <textarea
-                    name="observaciones"
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- MONTO -->
+        <!-- ========================================= -->
+
+        <div class="mb-4">
+
+            <label class="form-label fw-semibold">
+
+                <i class="bi bi-currency-dollar"></i>
+
+                Monto Venta
+
+            </label>
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+                    $
+                </span>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    name="monto_venta"
                     class="form-control"
-                    rows="5"
-                    placeholder="Escribe las observaciones de la visita..."
-                >{{ visita.observaciones or '' }}</textarea>
+                    value="{{ visita.monto_venta or 0 }}"
+                >
 
             </div>
 
-
-            <!-- ========================================= -->
-            <!-- VENTA -->
-            <!-- ========================================= -->
-
-            <div class="mb-4">
-
-                <div class="form-check">
-
-                    <input
-                        type="checkbox"
-                        name="venta_realizada"
-                        id="venta_realizada"
-                        class="form-check-input"
-                        {% if visita.venta_realizada %}
-                            checked
-                        {% endif %}
-                    >
-
-                    <label
-                        class="form-check-label fw-semibold"
-                        for="venta_realizada"
-                    >
-
-                        <i class="bi bi-cart-check"></i>
-
-                        ¿Hubo venta?
-
-                    </label>
-
-                </div>
-
-            </div>
+        </div>
 
 
-            <!-- ========================================= -->
-            <!-- MONTO -->
-            <!-- ========================================= -->
+        <!-- ========================================= -->
+        <!-- FOTO POR FUERA -->
+        <!-- ========================================= -->
 
-            <div class="mb-4">
+        <div class="mb-5 border rounded p-3">
 
-                <label class="form-label fw-semibold">
+            <h5 class="fw-bold mb-3">
 
-                    <i class="bi bi-currency-dollar"></i>
+                <i class="bi bi-building text-primary"></i>
 
-                    Monto Venta
+                Foto por fuera
 
-                </label>
+            </h5>
 
-                <div class="input-group">
 
-                    <span class="input-group-text">
-                        $
-                    </span>
+            <!-- ===================================== -->
+            <!-- FOTO ACTUAL -->
+            <!-- ===================================== -->
 
-                    <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        name="monto_venta"
-                        class="form-control"
-                        value="{{ visita.monto_venta or 0 }}"
+            {% if visita.foto_fuera %}
+
+                <div class="mb-3">
+
+                    <p class="text-muted mb-2">
+
+                        Foto actual:
+
+                    </p>
+
+                    <img
+                        src="{{ url_for('static', filename=visita.foto_fuera) }}"
+                        alt="Foto por fuera del establecimiento"
+                        class="img-fluid rounded shadow-sm"
+                        style="
+                            max-width: 400px;
+                            max-height: 350px;
+                            object-fit: cover;
+                        "
                     >
 
                 </div>
 
-            </div>
 
+                <div class="alert alert-info">
 
-            <!-- ========================================= -->
-            <!-- FOTOGRAFÍA -->
-            <!-- ========================================= -->
+                    <i class="bi bi-info-circle-fill"></i>
 
-            <div class="mb-4">
+                    Esta visita ya tiene una fotografía por fuera.
 
-                <label class="form-label fw-semibold">
+                    <br>
+
+                    Puedes seleccionar una nueva para
+                    <strong>reemplazarla</strong>.
+
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-warning">
 
                     <i class="bi bi-camera-fill"></i>
 
-                    Fotografía de la Visita
+                    Esta visita todavía no tiene fotografía por fuera.
 
-                </label>
+                </div>
 
-
-                <!-- ===================================== -->
-                <!-- FOTO ACTUAL -->
-                <!-- ===================================== -->
-
-                {% if visita.foto %}
-
-                    <div class="mb-3">
-
-                        <p class="text-muted mb-2">
-
-                            Fotografía actual:
-
-                        </p>
-
-                        <img
-                            src="{{ url_for('static', filename=visita.foto) }}"
-                            alt="Fotografía de la visita"
-                            class="img-fluid rounded shadow-sm"
-                            style="
-                                max-width: 400px;
-                                max-height: 350px;
-                                object-fit: cover;
-                            "
-                        >
-
-                    </div>
+            {% endif %}
 
 
-                    <div class="alert alert-info">
+            <!-- ===================================== -->
+            <!-- BOTONES FOTO POR FUERA -->
+            <!-- ===================================== -->
 
-                        <i class="bi bi-info-circle-fill"></i>
+            <div class="row g-2">
 
-                        Esta visita ya tiene una fotografía.
+
+                <!-- CÁMARA -->
+
+                <div class="col-12 col-md-6">
+
+                    <label
+                        for="foto_fuera_camara"
+                        class="btn btn-primary w-100 py-3"
+                    >
+
+                        <i class="bi bi-camera-fill fs-4"></i>
 
                         <br>
 
-                        Puedes seleccionar una nueva para
-                        <strong>reemplazarla</strong>.
+                        Tomar fotografía
 
-                    </div>
+                    </label>
 
-                {% else %}
-
-                    <div class="alert alert-warning">
-
-                        <i class="bi bi-camera-fill"></i>
-
-                        Esta visita todavía no tiene fotografía.
-
-                    </div>
-
-                {% endif %}
-
-
-                <!-- ===================================== -->
-                <!-- BOTONES FOTO -->
-                <!-- ===================================== -->
-
-                <div class="row g-2">
-
-
-                    <!-- CÁMARA -->
-
-                    <div class="col-12 col-md-6">
-
-                        <label
-                            for="foto_camara"
-                            class="btn btn-primary w-100 py-3"
-                        >
-
-                            <i class="bi bi-camera-fill fs-4"></i>
-
-                            <br>
-
-                            Tomar fotografía
-
-                        </label>
-
-                        <input
-                            type="file"
-                            name="foto"
-                            id="foto_camara"
-                            accept="image/*"
-                            capture="environment"
-                            class="d-none"
-                        >
-
-                    </div>
-
-
-                    <!-- GALERÍA -->
-
-                    <div class="col-12 col-md-6">
-
-                        <label
-                            for="foto_galeria"
-                            class="btn btn-outline-primary w-100 py-3"
-                        >
-
-                            <i class="bi bi-images fs-4"></i>
-
-                            <br>
-
-                            Elegir de galería
-
-                        </label>
-
-                        <input
-                            type="file"
-                            name="foto_galeria"
-                            id="foto_galeria"
-                            accept="image/*"
-                            class="d-none"
-                        >
-
-                    </div>
+                    <input
+                        type="file"
+                        name="foto_fuera_camara"
+                        id="foto_fuera_camara"
+                        accept="image/*"
+                        capture="environment"
+                        class="d-none"
+                    >
 
                 </div>
 
 
-                <!-- ===================================== -->
-                <!-- NOMBRE ARCHIVO -->
-                <!-- ===================================== -->
+                <!-- GALERÍA -->
 
-                <div
-                    id="nombreFoto"
-                    class="small text-muted mt-2"
-                ></div>
+                <div class="col-12 col-md-6">
 
+                    <label
+                        for="foto_fuera_galeria"
+                        class="btn btn-outline-primary w-100 py-3"
+                    >
 
-                <div class="form-text mt-2">
+                        <i class="bi bi-images fs-4"></i>
 
-                    Puedes tomar una fotografía nueva
-                    o seleccionar una existente.
+                        <br>
+
+                        Elegir de galería
+
+                    </label>
+
+                    <input
+                        type="file"
+                        name="foto_fuera_galeria"
+                        id="foto_fuera_galeria"
+                        accept="image/*"
+                        class="d-none"
+                    >
 
                 </div>
 
             </div>
 
 
-            <!-- ========================================= -->
-            <!-- BOTONES -->
-            <!-- ========================================= -->
-
-            <div class="d-flex gap-2">
-
-                <button
-                    type="submit"
-                    class="btn btn-success"
-                >
-
-                    <i class="bi bi-save"></i>
-
-                    Guardar Cambios
-
-                </button>
+            <div
+                id="nombreFotoFuera"
+                class="small text-muted mt-2"
+            ></div>
 
 
-                <a
-                    href="/historial_visitas"
-                    class="btn btn-secondary"
-                >
+            <div class="form-text mt-2">
 
-                    <i class="bi bi-arrow-left"></i>
-
-                    Cancelar
-
-                </a>
+                Puedes tomar una fotografía nueva o seleccionar
+                una existente para la foto por fuera.
 
             </div>
 
-        </form>
+        </div>
 
-    </div>
+
+        <!-- ========================================= -->
+        <!-- FOTO EXHIBIDOR -->
+        <!-- ========================================= -->
+
+        <div class="mb-4 border rounded p-3">
+
+            <h5 class="fw-bold mb-3">
+
+                <i class="bi bi-shop-window text-success"></i>
+
+                Foto exhibidor
+
+            </h5>
+
+
+            <!-- ===================================== -->
+            <!-- FOTO ACTUAL -->
+            <!-- ===================================== -->
+
+            {% if visita.foto_exhibidor %}
+
+                <div class="mb-3">
+
+                    <p class="text-muted mb-2">
+
+                        Foto actual:
+
+                    </p>
+
+                    <img
+                        src="{{ url_for('static', filename=visita.foto_exhibidor) }}"
+                        alt="Foto del exhibidor"
+                        class="img-fluid rounded shadow-sm"
+                        style="
+                            max-width: 400px;
+                            max-height: 350px;
+                            object-fit: cover;
+                        "
+                    >
+
+                </div>
+
+
+                <div class="alert alert-info">
+
+                    <i class="bi bi-info-circle-fill"></i>
+
+                    Esta visita ya tiene una fotografía del exhibidor.
+
+                    <br>
+
+                    Puedes seleccionar una nueva para
+                    <strong>reemplazarla</strong>.
+
+                </div>
+
+            {% else %}
+
+                <div class="alert alert-warning">
+
+                    <i class="bi bi-camera-fill"></i>
+
+                    Esta visita todavía no tiene fotografía del exhibidor.
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- ===================================== -->
+            <!-- BOTONES FOTO EXHIBIDOR -->
+            <!-- ===================================== -->
+
+            <div class="row g-2">
+
+
+                <!-- CÁMARA -->
+
+                <div class="col-12 col-md-6">
+
+                    <label
+                        for="foto_exhibidor_camara"
+                        class="btn btn-success w-100 py-3"
+                    >
+
+                        <i class="bi bi-camera-fill fs-4"></i>
+
+                        <br>
+
+                        Tomar fotografía
+
+                    </label>
+
+                    <input
+                        type="file"
+                        name="foto_exhibidor_camara"
+                        id="foto_exhibidor_camara"
+                        accept="image/*"
+                        capture="environment"
+                        class="d-none"
+                    >
+
+                </div>
+
+
+                <!-- GALERÍA -->
+
+                <div class="col-12 col-md-6">
+
+                    <label
+                        for="foto_exhibidor_galeria"
+                        class="btn btn-outline-success w-100 py-3"
+                    >
+
+                        <i class="bi bi-images fs-4"></i>
+
+                        <br>
+
+                        Elegir de galería
+
+                    </label>
+
+                    <input
+                        type="file"
+                        name="foto_exhibidor_galeria"
+                        id="foto_exhibidor_galeria"
+                        accept="image/*"
+                        class="d-none"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="nombreFotoExhibidor"
+                class="small text-muted mt-2"
+            ></div>
+
+
+            <div class="form-text mt-2">
+
+                Puedes tomar una fotografía nueva o seleccionar
+                una existente para la foto del exhibidor.
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================================= -->
+        <!-- BOTONES -->
+        <!-- ========================================= -->
+
+        <div class="d-flex gap-2">
+
+            <button
+                type="submit"
+                class="btn btn-success"
+            >
+
+                <i class="bi bi-save"></i>
+
+                Guardar Cambios
+
+            </button>
+
+
+            <a
+                href="/historial_visitas"
+                class="btn btn-secondary"
+            >
+
+                <i class="bi bi-arrow-left"></i>
+
+                Cancelar
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+```
 
 </div>
 
-
 <!-- ========================================= -->
+
 <!-- JAVASCRIPT -->
+
 <!-- ========================================= -->
 
 <script>
 
-const camara = document.getElementById('foto_camara');
-
-const galeria = document.getElementById('foto_galeria');
-
-const nombreFoto = document.getElementById('nombreFoto');
-
 
 // =========================================
-// CÁMARA
+// FOTO POR FUERA
 // =========================================
 
-camara.addEventListener('change', function () {
+const fotoFueraCamara = document.getElementById(
+    'foto_fuera_camara'
+);
 
-    if (this.files.length > 0) {
+const fotoFueraGaleria = document.getElementById(
+    'foto_fuera_galeria'
+);
 
-        // Limpiar selección de galería
+const nombreFotoFuera = document.getElementById(
+    'nombreFotoFuera'
+);
 
-        galeria.value = '';
 
-        nombreFoto.innerHTML =
-            '<i class="bi bi-check-circle-fill text-success"></i> ' +
-            'Fotografía seleccionada: ' +
-            this.files[0].name;
+fotoFueraCamara.addEventListener(
+    'change',
+    function () {
+
+        if (this.files.length > 0) {
+
+            // Limpiar galería
+
+            fotoFueraGaleria.value = '';
+
+
+            nombreFotoFuera.innerHTML =
+                '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                'Foto seleccionada: ' +
+                this.files[0].name;
+
+        }
 
     }
+);
 
-});
+
+fotoFueraGaleria.addEventListener(
+    'change',
+    function () {
+
+        if (this.files.length > 0) {
+
+            // Limpiar cámara
+
+            fotoFueraCamara.value = '';
 
 
-// =========================================
-// GALERÍA
-// =========================================
+            nombreFotoFuera.innerHTML =
+                '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                'Foto seleccionada: ' +
+                this.files[0].name;
 
-galeria.addEventListener('change', function () {
-
-    if (this.files.length > 0) {
-
-        // Limpiar selección de cámara
-
-        camara.value = '';
-
-        nombreFoto.innerHTML =
-            '<i class="bi bi-check-circle-fill text-success"></i> ' +
-            'Fotografía seleccionada: ' +
-            this.files[0].name;
+        }
 
     }
+);
 
-});
+
+// =========================================
+// FOTO EXHIBIDOR
+// =========================================
+
+const fotoExhibidorCamara = document.getElementById(
+    'foto_exhibidor_camara'
+);
+
+const fotoExhibidorGaleria = document.getElementById(
+    'foto_exhibidor_galeria'
+);
+
+const nombreFotoExhibidor = document.getElementById(
+    'nombreFotoExhibidor'
+);
+
+
+fotoExhibidorCamara.addEventListener(
+    'change',
+    function () {
+
+        if (this.files.length > 0) {
+
+            // Limpiar galería
+
+            fotoExhibidorGaleria.value = '';
+
+
+            nombreFotoExhibidor.innerHTML =
+                '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                'Foto seleccionada: ' +
+                this.files[0].name;
+
+        }
+
+    }
+);
+
+
+fotoExhibidorGaleria.addEventListener(
+    'change',
+    function () {
+
+        if (this.files.length > 0) {
+
+            // Limpiar cámara
+
+            fotoExhibidorCamara.value = '';
+
+
+            nombreFotoExhibidor.innerHTML =
+                '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                'Foto seleccionada: ' +
+                this.files[0].name;
+
+        }
+
+    }
+);
+
 
 </script>
 
