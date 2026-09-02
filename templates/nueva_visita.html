@@ -8,668 +8,715 @@ Nueva Visita
 
 <div class="container py-4">
 
-    <!-- ========================================= -->
-    <!-- ENCABEZADO -->
-    <!-- ========================================= -->
+```
+<!-- ========================================= -->
+<!-- ENCABEZADO -->
+<!-- ========================================= -->
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4">
 
-        <div>
+    <div>
+        <h2 class="fw-bold mb-1">
+            <i class="bi bi-geo-alt-fill text-primary"></i>
+            Nueva Visita
+        </h2>
 
-            <h2 class="fw-bold mb-1">
-
-                <i class="bi bi-geo-alt-fill text-primary"></i>
-
-                Nueva Visita
-
-            </h2>
-
-            <p class="text-muted mb-0">
-
-                Registra la actividad realizada con el cliente.
-
-            </p>
-
-        </div>
-
-
-        <a
-            href="{{ url_for('visitas') }}"
-            class="btn btn-secondary rounded-pill"
-        >
-
-            <i class="bi bi-arrow-left"></i>
-
-            Regresar
-
-        </a>
-
+        <p class="text-muted mb-0">
+            Registra la actividad realizada con el cliente.
+        </p>
     </div>
 
+    <a
+        href="{{ url_for('visitas') }}"
+        class="btn btn-secondary rounded-pill"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Regresar
+    </a>
 
-    <!-- ========================================= -->
-    <!-- FORMULARIO -->
-    <!-- ========================================= -->
-
-    <div class="card shadow-sm border-0 rounded-4">
-
-        <div class="card-body p-4">
-
-            <form
-                method="POST"
-                enctype="multipart/form-data"
-            >
+</div>
 
 
-                <!-- ================================= -->
-                <!-- CLIENTE -->
-                <!-- ================================= -->
+<!-- ========================================= -->
+<!-- FORMULARIO -->
+<!-- ========================================= -->
 
-                <div class="mb-4">
+<div class="card shadow-sm border-0 rounded-4">
 
-                    <label class="form-label fw-semibold">
+    <div class="card-body p-4">
 
-                        <i class="bi bi-person-fill text-primary"></i>
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            id="formVisita"
+        >
 
-                        Cliente
+            <!-- ================================= -->
+            <!-- CLIENTE -->
+            <!-- ================================= -->
 
+            <div class="mb-4">
+
+                <label
+                    for="cliente_busqueda"
+                    class="form-label fw-semibold"
+                >
+                    <i class="bi bi-person-fill text-primary"></i>
+                    Cliente
+                </label>
+
+                <input
+                    type="text"
+                    id="cliente_busqueda"
+                    class="form-control"
+                    list="clientesList"
+                    placeholder="Buscar por número o nombre"
+                    autocomplete="off"
+                    required
+                >
+
+                <datalist id="clientesList">
+
+                    {% for cliente in clientes %}
+
+                    <option
+                        value="{{ cliente.num_cliente }} - {{ cliente.nombre }}"
+                    ></option>
+
+                    {% endfor %}
+
+                </datalist>
+
+                <input
+                    type="hidden"
+                    name="cliente_id"
+                    id="cliente_id"
+                >
+
+                <div
+                    id="clienteMensaje"
+                    class="small mt-2"
+                ></div>
+
+            </div>
+
+
+            <!-- ================================= -->
+            <!-- OBSERVACIONES -->
+            <!-- ================================= -->
+
+            <div class="mb-4">
+
+                <label
+                    for="observaciones"
+                    class="form-label fw-semibold"
+                >
+                    <i class="bi bi-chat-left-text text-primary"></i>
+                    Observaciones
+                </label>
+
+                <textarea
+                    name="observaciones"
+                    id="observaciones"
+                    class="form-control"
+                    rows="4"
+                    placeholder="Describe la visita realizada..."
+                ></textarea>
+
+            </div>
+
+
+            <!-- ================================= -->
+            <!-- MONTO -->
+            <!-- ================================= -->
+
+            <div class="row">
+
+                <div class="col-md-6 mb-4">
+
+                    <label
+                        for="monto_venta"
+                        class="form-label fw-semibold"
+                    >
+                        <i class="bi bi-cash text-success"></i>
+                        Monto Venta
                     </label>
 
+                    <div class="input-group">
 
-                    <input
-                        type="text"
-                        id="cliente_busqueda"
-                        class="form-control"
-                        list="clientesList"
-                        placeholder="Buscar por número o nombre"
-                        autocomplete="off"
-                        required
-                    >
+                        <span class="input-group-text">
+                            $
+                        </span>
 
-
-                    <datalist id="clientesList">
-
-                        {% for cliente in clientes %}
-
-                        <option
-                            value="{{ cliente.num_cliente }} - {{ cliente.nombre }}"
+                        <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            name="monto_venta"
+                            id="monto_venta"
+                            class="form-control"
+                            placeholder="0.00"
+                            value="0"
                         >
 
-                        {% endfor %}
-
-                    </datalist>
-
-
-                    <input
-                        type="hidden"
-                        name="cliente_id"
-                        id="cliente_id"
-                    >
+                    </div>
 
                 </div>
 
-
-                <!-- ================================= -->
-                <!-- OBSERVACIONES -->
-                <!-- ================================= -->
-
-                <div class="mb-4">
-
-                    <label class="form-label fw-semibold">
-
-                        <i class="bi bi-chat-left-text text-primary"></i>
-
-                        Observaciones
-
-                    </label>
+            </div>
 
 
-                    <textarea
-                        name="observaciones"
-                        class="form-control"
-                        rows="4"
-                        placeholder="Describe la visita realizada..."
-                    ></textarea>
+            <!-- ========================================= -->
+            <!-- FOTOGRAFÍAS -->
+            <!-- ========================================= -->
 
-                </div>
+            <div class="mb-4">
 
+                <h5 class="fw-bold mb-3">
 
-                <!-- ================================= -->
-                <!-- MONTO -->
-                <!-- ================================= -->
+                    <i class="bi bi-camera-fill text-primary"></i>
 
-                <div class="row">
+                    Fotografías de la Visita
 
-                    <div class="col-md-6 mb-4">
-
-                        <label class="form-label fw-semibold">
-
-                            <i class="bi bi-cash text-success"></i>
-
-                            Monto Venta
-
-                        </label>
+                </h5>
 
 
-                        <div class="input-group">
+                <!-- ========================================= -->
+                <!-- FOTO POR FUERA -->
+                <!-- ========================================= -->
 
-                            <span class="input-group-text">
-                                $
-                            </span>
+                <div class="card border mb-4">
 
-                            <input
-                                type="number"
-                                step="0.01"
-                                min="0"
-                                name="monto_venta"
-                                class="form-control"
-                                placeholder="0.00"
-                            >
+                    <div class="card-body">
+
+                        <h6 class="fw-bold">
+
+                            <i class="bi bi-building text-primary"></i>
+
+                            Foto por fuera
+
+                        </h6>
+
+                        <p class="text-muted small">
+
+                            Toma una fotografía de la parte exterior
+                            del establecimiento o selecciónala desde
+                            la galería.
+
+                        </p>
+
+
+                        <div class="row g-2">
+
+                            <!-- CÁMARA -->
+
+                            <div class="col-12 col-md-6">
+
+                                <label
+                                    for="foto_fuera_camara"
+                                    class="btn btn-primary w-100 py-3"
+                                >
+
+                                    <i class="bi bi-camera-fill fs-4"></i>
+
+                                    <br>
+
+                                    Tomar fotografía
+
+                                </label>
+
+                                <input
+                                    type="file"
+                                    name="foto_fuera_camara"
+                                    id="foto_fuera_camara"
+                                    accept="image/*"
+                                    capture="environment"
+                                    class="d-none"
+                                >
+
+                            </div>
+
+
+                            <!-- GALERÍA -->
+
+                            <div class="col-12 col-md-6">
+
+                                <label
+                                    for="foto_fuera_galeria"
+                                    class="btn btn-outline-primary w-100 py-3"
+                                >
+
+                                    <i class="bi bi-images fs-4"></i>
+
+                                    <br>
+
+                                    Elegir de galería
+
+                                </label>
+
+                                <input
+                                    type="file"
+                                    name="foto_fuera_galeria"
+                                    id="foto_fuera_galeria"
+                                    accept="image/*"
+                                    class="d-none"
+                                >
+
+                            </div>
 
                         </div>
+
+
+                        <div
+                            id="nombreFotoFuera"
+                            class="small text-muted mt-3"
+                        ></div>
 
                     </div>
 
                 </div>
 
 
-                <!-- ================================= -->
+                <!-- ========================================= -->
+                <!-- FOTO EXHIBIDOR -->
+                <!-- ========================================= -->
 
-<!-- FOTOGRAFÍAS -->
+                <div class="card border">
 
-<!-- ================================= -->
+                    <div class="card-body">
 
-<div class="mb-4">
+                        <h6 class="fw-bold">
 
-<h5 class="fw-bold mb-3">
+                            <i class="bi bi-shop-window text-success"></i>
 
-    <i class="bi bi-camera-fill text-primary"></i>
+                            Foto exhibidor
 
-    Fotografías de la Visita
+                        </h6>
 
-</h5>
+                        <p class="text-muted small">
 
+                            Toma una fotografía del exhibidor o
+                            selecciónala desde la galería.
 
-<!-- ========================================= -->
-<!-- FOTO POR FUERA -->
-<!-- ========================================= -->
+                        </p>
 
-<div class="card border mb-4">
 
-    <div class="card-body">
+                        <div class="row g-2">
 
-        <h6 class="fw-bold">
+                            <!-- CÁMARA -->
 
-            <i class="bi bi-building text-primary"></i>
+                            <div class="col-12 col-md-6">
 
-            Foto por fuera
+                                <label
+                                    for="foto_exhibidor_camara"
+                                    class="btn btn-success w-100 py-3"
+                                >
 
-        </h6>
+                                    <i class="bi bi-camera-fill fs-4"></i>
 
-        <p class="text-muted small">
+                                    <br>
 
-            Toma una fotografía de la parte exterior
-            del establecimiento o selecciónala desde
-            la galería.
+                                    Tomar fotografía
 
-        </p>
+                                </label>
 
+                                <input
+                                    type="file"
+                                    name="foto_exhibidor_camara"
+                                    id="foto_exhibidor_camara"
+                                    accept="image/*"
+                                    capture="environment"
+                                    class="d-none"
+                                >
 
-        <div class="row g-2">
+                            </div>
 
 
-            <!-- CÁMARA -->
+                            <!-- GALERÍA -->
 
-            <div class="col-12 col-md-6">
+                            <div class="col-12 col-md-6">
 
-                <label
-                    for="foto_fuera_camara"
-                    class="btn btn-primary w-100 py-3"
-                >
+                                <label
+                                    for="foto_exhibidor_galeria"
+                                    class="btn btn-outline-success w-100 py-3"
+                                >
 
-                    <i class="bi bi-camera-fill fs-4"></i>
+                                    <i class="bi bi-images fs-4"></i>
 
-                    <br>
+                                    <br>
 
-                    Tomar fotografía
+                                    Elegir de galería
 
-                </label>
+                                </label>
 
-                <input
-                    type="file"
-                    name="foto_fuera_camara"
-                    id="foto_fuera_camara"
-                    accept="image/*"
-                    capture="environment"
-                    class="d-none"
-                >
+                                <input
+                                    type="file"
+                                    name="foto_exhibidor_galeria"
+                                    id="foto_exhibidor_galeria"
+                                    accept="image/*"
+                                    class="d-none"
+                                >
 
-            </div>
+                            </div>
 
+                        </div>
 
-            <!-- GALERÍA -->
 
-            <div class="col-12 col-md-6">
+                        <div
+                            id="nombreFotoExhibidor"
+                            class="small text-muted mt-3"
+                        ></div>
 
-                <label
-                    for="foto_fuera_galeria"
-                    class="btn btn-outline-primary w-100 py-3"
-                >
-
-                    <i class="bi bi-images fs-4"></i>
-
-                    <br>
-
-                    Elegir de galería
-
-                </label>
-
-                <input
-                    type="file"
-                    name="foto_fuera_galeria"
-                    id="foto_fuera_galeria"
-                    accept="image/*"
-                    class="d-none"
-                >
-
-            </div>
-
-        </div>
-
-
-        <div
-            id="nombreFotoFuera"
-            class="small text-muted mt-3"
-        ></div>
-
-    </div>
-
-</div>
-
-
-<!-- ========================================= -->
-<!-- FOTO EXHIBIDOR -->
-<!-- ========================================= -->
-
-<div class="card border">
-
-    <div class="card-body">
-
-        <h6 class="fw-bold">
-
-            <i class="bi bi-shop-window text-success"></i>
-
-            Foto exhibidor
-
-        </h6>
-
-        <p class="text-muted small">
-
-            Toma una fotografía del exhibidor o
-            selecciónala desde la galería.
-
-        </p>
-
-
-        <div class="row g-2">
-
-
-            <!-- CÁMARA -->
-
-            <div class="col-12 col-md-6">
-
-                <label
-                    for="foto_exhibidor_camara"
-                    class="btn btn-success w-100 py-3"
-                >
-
-                    <i class="bi bi-camera-fill fs-4"></i>
-
-                    <br>
-
-                    Tomar fotografía
-
-                </label>
-
-                <input
-                    type="file"
-                    name="foto_exhibidor_camara"
-                    id="foto_exhibidor_camara"
-                    accept="image/*"
-                    capture="environment"
-                    class="d-none"
-                >
-
-            </div>
-
-
-            <!-- GALERÍA -->
-
-            <div class="col-12 col-md-6">
-
-                <label
-                    for="foto_exhibidor_galeria"
-                    class="btn btn-outline-success w-100 py-3"
-                >
-
-                    <i class="bi bi-images fs-4"></i>
-
-                    <br>
-
-                    Elegir de galería
-
-                </label>
-
-                <input
-                    type="file"
-                    name="foto_exhibidor_galeria"
-                    id="foto_exhibidor_galeria"
-                    accept="image/*"
-                    class="d-none"
-                >
-
-            </div>
-
-        </div>
-
-
-        <div
-            id="nombreFotoExhibidor"
-            class="small text-muted mt-3"
-        ></div>
-
-    </div>
-
-</div>
-
-
-</div>
-
-
-
-                <!-- ================================= -->
-                <!-- PRÓXIMA VISITA -->
-                <!-- ================================= -->
-
-                <div class="mb-4">
-
-                    <label class="form-label fw-semibold">
-
-                        <i class="bi bi-calendar-event text-primary"></i>
-
-                        Próxima Visita / Llamada
-
-                    </label>
-
-
-                    <input
-                        type="date"
-                        name="proxima_visita"
-                        class="form-control"
-                        required
-                    >
+                    </div>
 
                 </div>
 
+            </div>
 
-                <!-- ================================= -->
-                <!-- GPS -->
-                <!-- ================================= -->
+
+            <!-- ================================= -->
+            <!-- PRÓXIMA VISITA -->
+            <!-- ================================= -->
+
+            <div class="mb-4">
+
+                <label
+                    for="proxima_visita"
+                    class="form-label fw-semibold"
+                >
+
+                    <i class="bi bi-calendar-event text-primary"></i>
+
+                    Próxima Visita / Llamada
+
+                </label>
 
                 <input
-                    type="hidden"
-                    name="latitud"
-                    id="latitud"
+                    type="date"
+                    name="proxima_visita"
+                    id="proxima_visita"
+                    class="form-control"
+                    required
                 >
 
-                <input
-                    type="hidden"
-                    name="longitud"
-                    id="longitud"
-                >
+            </div>
 
 
-                <!-- ================================= -->
-                <!-- GUARDAR -->
-                <!-- ================================= -->
+            <!-- ================================= -->
+            <!-- GPS -->
+            <!-- ================================= -->
 
-                <button
-                    type="submit"
-                    class="btn btn-success px-4 rounded-pill"
-                >
+            <input
+                type="hidden"
+                name="latitud"
+                id="latitud"
+            >
 
-                    <i class="bi bi-check-circle"></i>
+            <input
+                type="hidden"
+                name="longitud"
+                id="longitud"
+            >
 
-                    Guardar Visita
 
-                </button>
+            <!-- ================================= -->
+            <!-- GUARDAR -->
+            <!-- ================================= -->
 
-            </form>
+            <button
+                type="submit"
+                class="btn btn-success px-4 rounded-pill"
+            >
 
-        </div>
+                <i class="bi bi-check-circle"></i>
+
+                Guardar Visita
+
+            </button>
+
+        </form>
 
     </div>
 
 </div>
+```
 
+</div>
 
 <!-- ========================================= -->
+
 <!-- JAVASCRIPT -->
+
 <!-- ========================================= -->
 
 <script>
 
+document.addEventListener("DOMContentLoaded", function () {
 
-// =============================================
-// OBTENER UBICACIÓN GPS
-// =============================================
+    // =============================================
+    // OBTENER UBICACIÓN GPS
+    // =============================================
 
-navigator.geolocation.getCurrentPosition(
+    if (navigator.geolocation) {
 
-    function(posicion){
+        navigator.geolocation.getCurrentPosition(
 
-        document.getElementById("latitud").value =
-            posicion.coords.latitude;
+            function (posicion) {
 
-        document.getElementById("longitud").value =
-            posicion.coords.longitude;
+                document.getElementById("latitud").value =
+                    posicion.coords.latitude;
 
-    },
+                document.getElementById("longitud").value =
+                    posicion.coords.longitude;
 
-    function(error){
+                console.log(
+                    "Ubicación obtenida:",
+                    posicion.coords.latitude,
+                    posicion.coords.longitude
+                );
+
+            },
+
+            function (error) {
+
+                console.log(
+                    "No fue posible obtener ubicación GPS:",
+                    error.message
+                );
+
+            }
+
+        );
+
+    } else {
 
         console.log(
-            "No fue posible obtener ubicación GPS"
+            "El navegador no soporta geolocalización."
         );
 
     }
 
-);
+
+    // =============================================
+    // CLIENTES
+    // =============================================
+
+    const clientes = [
+
+        {% for cliente in clientes %}
+
+        {
+            id: {{ cliente.id | tojson }},
+            texto: {{ (cliente.num_cliente ~ " - " ~ cliente.nombre) | tojson }}
+        },
+
+        {% endfor %}
+
+    ];
 
 
-// =============================================
-// CLIENTES
-// =============================================
+    const buscador =
+        document.getElementById("cliente_busqueda");
 
-const clientes = [
+    const clienteId =
+        document.getElementById("cliente_id");
 
-    {% for cliente in clientes %}
-
-    {
-        id: "{{ cliente.id }}",
-
-        texto:
-            "{{ cliente.num_cliente }} - {{ cliente.nombre }}"
-    },
-
-    {% endfor %}
-
-];
+    const clienteMensaje =
+        document.getElementById("clienteMensaje");
 
 
-const buscador =
-    document.getElementById("cliente_busqueda");
+    // =============================================
+    // BUSCAR CLIENTE
+    // =============================================
 
+    buscador.addEventListener(
+        "input",
+        function () {
 
-const clienteId =
-    document.getElementById("cliente_id");
+            const valor = this.value.trim();
 
-
-buscador.addEventListener(
-
-    "input",
-
-    function(){
-
-        const valor =
-            this.value.trim();
-
-
-        const cliente =
-            clientes.find(
-                c => c.texto === valor
+            const cliente = clientes.find(
+                function (c) {
+                    return c.texto === valor;
+                }
             );
 
 
-        if(cliente){
+            if (cliente) {
 
-            clienteId.value =
-                cliente.id;
+                clienteId.value = cliente.id;
 
-        }else{
+                clienteMensaje.innerHTML =
+                    '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                    'Cliente seleccionado correctamente.';
 
-            clienteId.value =
-                "";
+                clienteMensaje.className =
+                    "small mt-2 text-success";
 
-        }
+            } else {
 
-    }
+                clienteId.value = "";
 
-);
+                if (valor !== "") {
 
+                    clienteMensaje.innerHTML =
+                        '<i class="bi bi-exclamation-circle text-warning"></i> ' +
+                        'Selecciona un cliente válido de la lista.';
 
-// =============================================
-// VALIDAR CLIENTE
-// =============================================
+                    clienteMensaje.className =
+                        "small mt-2 text-warning";
 
-document.querySelector("form")
-.addEventListener(
+                } else {
 
-    "submit",
+                    clienteMensaje.innerHTML = "";
 
-    function(e){
+                }
 
-        if(clienteId.value === ""){
-
-            alert(
-                "Debe seleccionar un cliente válido de la lista."
-            );
-
-            e.preventDefault();
+            }
 
         }
-
-    }
-
-);
+    );
 
 
-// =============================================
-// FOTO FUERA - CÁMARA
-// =============================================
+    // =============================================
+    // VALIDAR FORMULARIO
+    // =============================================
 
-const fotoFueraCamara =
-    document.getElementById("foto_fuera_camara");
+    document.getElementById("formVisita")
+    .addEventListener(
+        "submit",
+        function (e) {
 
-const fotoFueraGaleria =
-    document.getElementById("foto_fuera_galeria");
+            if (clienteId.value === "") {
 
-const nombreFotoFuera =
-    document.getElementById("nombreFotoFuera");
+                e.preventDefault();
 
-fotoFueraCamara.addEventListener(
-    "change",
-    function () {
+                alert(
+                    "Debe seleccionar un cliente válido de la lista."
+                );
 
-        if (this.files.length > 0) {
+                buscador.focus();
 
-            fotoFueraGaleria.value = "";
+                return;
+            }
 
-            nombreFotoFuera.innerHTML =
-                '<i class="bi bi-check-circle-fill text-success"></i> ' +
-                'Fotografía seleccionada: ' +
-                this.files[0].name;
         }
-    }
-);
+    );
 
-// =============================================
-// FOTO FUERA - GALERÍA
-// =============================================
 
-fotoFueraGaleria.addEventListener(
-    "change",
-    function () {
+    // =============================================
+    // FOTO FUERA - CÁMARA
+    // =============================================
 
-        if (this.files.length > 0) {
+    const fotoFueraCamara =
+        document.getElementById("foto_fuera_camara");
 
-            fotoFueraCamara.value = "";
+    const fotoFueraGaleria =
+        document.getElementById("foto_fuera_galeria");
 
-            nombreFotoFuera.innerHTML =
-                '<i class="bi bi-check-circle-fill text-success"></i> ' +
-                'Fotografía seleccionada: ' +
-                this.files[0].name;
+    const nombreFotoFuera =
+        document.getElementById("nombreFotoFuera");
+
+
+    fotoFueraCamara.addEventListener(
+        "change",
+        function () {
+
+            if (this.files.length > 0) {
+
+                fotoFueraGaleria.value = "";
+
+                nombreFotoFuera.innerHTML =
+                    '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                    'Fotografía seleccionada: ' +
+                    this.files[0].name;
+
+            }
+
         }
-    }
-);
+    );
 
-// =============================================
-// FOTO EXHIBIDOR - CÁMARA
-// =============================================
 
-const fotoExhibidorCamara =
-    document.getElementById("foto_exhibidor_camara");
+    // =============================================
+    // FOTO FUERA - GALERÍA
+    // =============================================
 
-const fotoExhibidorGaleria =
-    document.getElementById("foto_exhibidor_galeria");
+    fotoFueraGaleria.addEventListener(
+        "change",
+        function () {
 
-const nombreFotoExhibidor =
-    document.getElementById("nombreFotoExhibidor");
+            if (this.files.length > 0) {
 
-fotoExhibidorCamara.addEventListener(
-    "change",
-    function () {
+                fotoFueraCamara.value = "";
 
-        if (this.files.length > 0) {
+                nombreFotoFuera.innerHTML =
+                    '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                    'Fotografía seleccionada: ' +
+                    this.files[0].name;
 
-            fotoExhibidorGaleria.value = "";
+            }
 
-            nombreFotoExhibidor.innerHTML =
-                '<i class="bi bi-check-circle-fill text-success"></i> ' +
-                'Fotografía seleccionada: ' +
-                this.files[0].name;
         }
-    }
-);
+    );
 
-// =============================================
-// FOTO EXHIBIDOR - GALERÍA
-// =============================================
 
-fotoExhibidorGaleria.addEventListener(
-    "change",
-    function () {
+    // =============================================
+    // FOTO EXHIBIDOR - CÁMARA
+    // =============================================
 
-        if (this.files.length > 0) {
+    const fotoExhibidorCamara =
+        document.getElementById("foto_exhibidor_camara");
 
-            fotoExhibidorCamara.value = "";
+    const fotoExhibidorGaleria =
+        document.getElementById("foto_exhibidor_galeria");
 
-            nombreFotoExhibidor.innerHTML =
-                '<i class="bi bi-check-circle-fill text-success"></i> ' +
-                'Fotografía seleccionada: ' +
-                this.files[0].name;
+    const nombreFotoExhibidor =
+        document.getElementById("nombreFotoExhibidor");
+
+
+    fotoExhibidorCamara.addEventListener(
+        "change",
+        function () {
+
+            if (this.files.length > 0) {
+
+                fotoExhibidorGaleria.value = "";
+
+                nombreFotoExhibidor.innerHTML =
+                    '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                    'Fotografía seleccionada: ' +
+                    this.files[0].name;
+
+            }
+
         }
-    }
-);
+    );
+
+
+    // =============================================
+    // FOTO EXHIBIDOR - GALERÍA
+    // =============================================
+
+    fotoExhibidorGaleria.addEventListener(
+        "change",
+        function () {
+
+            if (this.files.length > 0) {
+
+                fotoExhibidorCamara.value = "";
+
+                nombreFotoExhibidor.innerHTML =
+                    '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                    'Fotografía seleccionada: ' +
+                    this.files[0].name;
+
+            }
+
+        }
+    );
+
+});
+
+</script>
 
 {% endblock %}
