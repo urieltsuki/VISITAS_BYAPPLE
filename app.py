@@ -1130,7 +1130,7 @@ def editar_visita(id):
         # =================================================
 
         return redirect(
-            url_for('historial_visitas')
+            url_for('visitas')
         )
 
 
