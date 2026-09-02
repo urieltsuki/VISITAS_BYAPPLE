@@ -917,6 +917,7 @@ def uploaded_file(filename):
         filename
     )
 
+
 @app.route('/visita/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
 def editar_visita(id):
@@ -927,11 +928,12 @@ def editar_visita(id):
     # VALIDAR PERMISOS
     # =====================================================
 
+    # Los vendedores solamente pueden editar sus propias visitas
     if (
         current_user.rol == 'vendedor'
         and visita.usuario_id != current_user.id
     ):
-        return "Acceso denegado"
+        return "Acceso denegado", 403
 
 
     # =====================================================
@@ -940,21 +942,42 @@ def editar_visita(id):
 
     if request.method == 'POST':
 
-        visita.observaciones = request.form[
-            'observaciones'
-        ]
+        # -------------------------------------------------
+        # OBSERVACIONES
+        # -------------------------------------------------
+
+        visita.observaciones = request.form.get(
+            'observaciones',
+            ''
+        )
+
+
+        # -------------------------------------------------
+        # VENTA REALIZADA
+        # -------------------------------------------------
 
         visita.venta_realizada = (
             'venta_realizada' in request.form
         )
 
-        visita.monto_venta = float(
-            request.form['monto_venta'] or 0
-        )
+
+        # -------------------------------------------------
+        # MONTO DE VENTA
+        # -------------------------------------------------
+
+        try:
+            visita.monto_venta = float(
+                request.form.get(
+                    'monto_venta',
+                    '0'
+                ) or 0
+            )
+        except ValueError:
+            visita.monto_venta = 0
 
 
         # =================================================
-        # CREAR CARPETA DE UPLOADS
+        # CARPETA DE UPLOADS
         # =================================================
 
         carpeta_uploads = os.path.join(
@@ -971,7 +994,7 @@ def editar_visita(id):
 
 
         # =================================================
-        # FOTO POR FUERA
+        # FOTO FUERA
         # =================================================
 
         foto_fuera = request.files.get(
@@ -980,11 +1003,26 @@ def editar_visita(id):
 
         if foto_fuera and foto_fuera.filename:
 
-            nombre_archivo = secure_filename(
-                foto_fuera.filename
+            # ---------------------------------------------
+            # Generar nombre único
+            # ---------------------------------------------
+
+            extension = os.path.splitext(
+                secure_filename(
+                    foto_fuera.filename
+                )
+            )[1]
+
+            nombre_archivo = (
+                f"visita_{visita.id}_fuera_"
+                f"{uuid.uuid4().hex}"
+                f"{extension}"
             )
 
+
+            # ---------------------------------------------
             # Eliminar foto anterior
+            # ---------------------------------------------
 
             if visita.foto_fuera:
 
@@ -997,12 +1035,17 @@ def editar_visita(id):
                 if os.path.exists(
                     ruta_foto_anterior
                 ):
-                    os.remove(
-                        ruta_foto_anterior
-                    )
+                    try:
+                        os.remove(
+                            ruta_foto_anterior
+                        )
+                    except OSError:
+                        pass
 
 
+            # ---------------------------------------------
             # Guardar nueva foto
+            # ---------------------------------------------
 
             ruta_completa = os.path.join(
                 carpeta_uploads,
@@ -1014,7 +1057,9 @@ def editar_visita(id):
             )
 
 
+            # ---------------------------------------------
             # Guardar ruta en BD
+            # ---------------------------------------------
 
             visita.foto_fuera = os.path.join(
                 'uploads',
@@ -1033,11 +1078,26 @@ def editar_visita(id):
 
         if foto_exhibidor and foto_exhibidor.filename:
 
-            nombre_archivo = secure_filename(
-                foto_exhibidor.filename
+            # ---------------------------------------------
+            # Generar nombre único
+            # ---------------------------------------------
+
+            extension = os.path.splitext(
+                secure_filename(
+                    foto_exhibidor.filename
+                )
+            )[1]
+
+            nombre_archivo = (
+                f"visita_{visita.id}_exhibidor_"
+                f"{uuid.uuid4().hex}"
+                f"{extension}"
             )
 
+
+            # ---------------------------------------------
             # Eliminar foto anterior
+            # ---------------------------------------------
 
             if visita.foto_exhibidor:
 
@@ -1050,12 +1110,17 @@ def editar_visita(id):
                 if os.path.exists(
                     ruta_foto_anterior
                 ):
-                    os.remove(
-                        ruta_foto_anterior
-                    )
+                    try:
+                        os.remove(
+                            ruta_foto_anterior
+                        )
+                    except OSError:
+                        pass
 
 
+            # ---------------------------------------------
             # Guardar nueva foto
+            # ---------------------------------------------
 
             ruta_completa = os.path.join(
                 carpeta_uploads,
@@ -1067,7 +1132,9 @@ def editar_visita(id):
             )
 
 
+            # ---------------------------------------------
             # Guardar ruta en BD
+            # ---------------------------------------------
 
             visita.foto_exhibidor = os.path.join(
                 'uploads',
@@ -1083,8 +1150,12 @@ def editar_visita(id):
         db.session.commit()
 
 
+        # =================================================
+        # REGRESAR AL HISTORIAL
+        # =================================================
+
         return redirect(
-            '/historial_visitas'
+            url_for('historial_visitas')
         )
 
 
@@ -1096,6 +1167,7 @@ def editar_visita(id):
         'editar_visita.html',
         visita=visita
     )
+
 
 
 @app.route('/usuarios', methods=['GET', 'POST'])
