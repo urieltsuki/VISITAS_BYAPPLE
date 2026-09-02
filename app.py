@@ -915,7 +915,7 @@ def uploaded_file(filename):
     )
 
 
-```python
+
 @app.route('/visita/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
 def editar_visita(id):
