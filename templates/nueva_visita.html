@@ -575,74 +575,101 @@ document.querySelector("form")
 
 
 // =============================================
-// FOTOGRAFÍA - CÁMARA
+// FOTO FUERA - CÁMARA
 // =============================================
 
-const camara =
-    document.getElementById("foto_camara");
+const fotoFueraCamara =
+    document.getElementById("foto_fuera_camara");
 
+const fotoFueraGaleria =
+    document.getElementById("foto_fuera_galeria");
 
-const galeria =
-    document.getElementById("foto_galeria");
+const nombreFotoFuera =
+    document.getElementById("nombreFotoFuera");
 
-
-const nombreFoto =
-    document.getElementById("nombreFoto");
-
-
-camara.addEventListener(
-
+fotoFueraCamara.addEventListener(
     "change",
+    function () {
 
-    function(){
+        if (this.files.length > 0) {
 
-        if(this.files.length > 0){
+            fotoFueraGaleria.value = "";
 
-            // Limpiar galería
-
-            galeria.value = "";
-
-
-            nombreFoto.innerHTML =
+            nombreFotoFuera.innerHTML =
                 '<i class="bi bi-check-circle-fill text-success"></i> ' +
                 'Fotografía seleccionada: ' +
                 this.files[0].name;
-
         }
-
     }
-
 );
 
-
 // =============================================
-// FOTOGRAFÍA - GALERÍA
+// FOTO FUERA - GALERÍA
 // =============================================
 
-galeria.addEventListener(
-
+fotoFueraGaleria.addEventListener(
     "change",
+    function () {
 
-    function(){
+        if (this.files.length > 0) {
 
-        if(this.files.length > 0){
+            fotoFueraCamara.value = "";
 
-            // Limpiar cámara
-
-            camara.value = "";
-
-
-            nombreFoto.innerHTML =
+            nombreFotoFuera.innerHTML =
                 '<i class="bi bi-check-circle-fill text-success"></i> ' +
                 'Fotografía seleccionada: ' +
                 this.files[0].name;
-
         }
-
     }
-
 );
 
-</script>
+// =============================================
+// FOTO EXHIBIDOR - CÁMARA
+// =============================================
+
+const fotoExhibidorCamara =
+    document.getElementById("foto_exhibidor_camara");
+
+const fotoExhibidorGaleria =
+    document.getElementById("foto_exhibidor_galeria");
+
+const nombreFotoExhibidor =
+    document.getElementById("nombreFotoExhibidor");
+
+fotoExhibidorCamara.addEventListener(
+    "change",
+    function () {
+
+        if (this.files.length > 0) {
+
+            fotoExhibidorGaleria.value = "";
+
+            nombreFotoExhibidor.innerHTML =
+                '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                'Fotografía seleccionada: ' +
+                this.files[0].name;
+        }
+    }
+);
+
+// =============================================
+// FOTO EXHIBIDOR - GALERÍA
+// =============================================
+
+fotoExhibidorGaleria.addEventListener(
+    "change",
+    function () {
+
+        if (this.files.length > 0) {
+
+            fotoExhibidorCamara.value = "";
+
+            nombreFotoExhibidor.innerHTML =
+                '<i class="bi bi-check-circle-fill text-success"></i> ' +
+                'Fotografía seleccionada: ' +
+                this.files[0].name;
+        }
+    }
+);
 
 {% endblock %}

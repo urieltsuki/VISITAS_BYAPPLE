@@ -105,9 +105,8 @@ class Visita(db.Model):
     db.String(50)
     )
 
-    foto = db.Column(
-    db.String(255)
-    )
+    foto_fuera = db.Column(db.String(200))
+    foto_exhibidor = db.Column(db.String(200))
 
     cliente = db.relationship(
         'Cliente',

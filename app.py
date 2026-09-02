@@ -750,51 +750,46 @@ def nueva_visita():
 
     if request.method == 'POST':
 
-        archivo = request.files.get('foto')
+        foto_fuera = (
+            request.files.get('foto_fuera_camara')
+            or
+            request.files.get('foto_fuera_galeria')
+        )
 
-        nombre_archivo = None
+        foto_exhibidor = (
+            request.files.get('foto_exhibidor_camara')
+            or
+            request.files.get('foto_exhibidor_galeria')
+        )
 
+        url_foto_fuera = None
+        url_foto_exhibidor = None
 
-        # FOTO CLOUDINARY
+        # =====================================
+        # FOTO FUERA
+        # =====================================
 
-        if archivo and archivo.filename:
-
-            imagen = Image.open(archivo)
-
-
-            # Corregir orientación del celular (EXIF)
-            imagen = ImageOps.exif_transpose(imagen)
-
-
-            # Convertir a RGB para JPEG
-            if imagen.mode != "RGB":
-                imagen = imagen.convert("RGB")
-
-
-            imagen.thumbnail(
-                (1200, 1200)
-            )
-
-
-            buffer = io.BytesIO()
-
-            imagen.save(
-                buffer,
-                format="JPEG",
-                quality=85,
-                optimize=True
-            )
-
-            buffer.seek(0)
-
+        if foto_fuera and foto_fuera.filename:
 
             resultado = cloudinary.uploader.upload(
-                buffer,
-                folder="bitacora_visitas"
+                foto_fuera,
+                folder="bitacora_visitas/fuera"
             )
 
+            url_foto_fuera = resultado["secure_url"]
 
-            nombre_archivo = resultado["secure_url"]
+        # =====================================
+        # FOTO EXHIBIDOR
+        # =====================================
+
+        if foto_exhibidor and foto_exhibidor.filename:
+
+            resultado = cloudinary.uploader.upload(
+                foto_exhibidor,
+                folder="bitacora_visitas/exhibidor"
+            )
+
+            url_foto_exhibidor = resultado["secure_url"]
 
 
 
@@ -811,33 +806,16 @@ def nueva_visita():
 
 
         visita = Visita(
-
             cliente_id=request.form['cliente_id'],
-
             observaciones=request.form.get('observaciones'),
-
-            venta_realizada=
-                'venta_realizada' in request.form,
-
-
-            monto_venta=float(
-                request.form.get('monto_venta') or 0
-            ),
-
-
+            venta_realizada='venta_realizada' in request.form,
+            monto_venta=float(request.form.get('monto_venta') or 0),
             proxima_visita=proxima_visita,
-
-
-            foto=nombre_archivo,
-
-
+            foto_fuera=url_foto_fuera,
+            foto_exhibidor=url_foto_exhibidor,
             latitud=request.form.get('latitud'),
-
             longitud=request.form.get('longitud'),
-
-
             usuario_id=current_user.id
-
         )
 
 
