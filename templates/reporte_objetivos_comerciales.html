@@ -1,0 +1,1006 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+Objetivos Comerciales
+{% endblock %}
+
+
+{% block contenido %}
+
+<div class="container-fluid py-3">
+
+
+    <!-- ===================================================== -->
+    <!-- ENCABEZADO -->
+    <!-- ===================================================== -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 class="fw-bold mb-1">
+
+                <i class="bi bi-bullseye text-info"></i>
+
+                Objetivos Comerciales
+
+            </h2>
+
+            <p class="text-muted mb-0">
+
+                Analiza el cumplimiento de los objetivos comerciales
+                de cada vendedor.
+
+            </p>
+
+        </div>
+
+
+        <!-- VOLVER -->
+
+        <a
+            href="{{ url_for('reportes') }}"
+            class="btn btn-outline-secondary">
+
+            <i class="bi bi-arrow-left"></i>
+
+            Volver a Reportes
+
+        </a>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- FILTROS -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <form
+                method="GET"
+                action="{{ url_for('reporte_objetivos_comerciales') }}">
+
+                <div class="row g-3 align-items-end">
+
+
+                    <!-- AÑO -->
+
+                    <div class="col-md-4">
+
+                        <label class="form-label fw-semibold">
+
+                            <i class="bi bi-calendar3"></i>
+
+                            Año
+
+                        </label>
+
+                        <select
+                            name="anio"
+                            class="form-select">
+
+                            {% for a in range(anio - 3, anio + 4) %}
+
+                            <option
+                                value="{{ a }}"
+                                {% if a == anio %}
+                                selected
+                                {% endif %}>
+
+                                {{ a }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- MES -->
+
+                    <div class="col-md-5">
+
+                        <label class="form-label fw-semibold">
+
+                            <i class="bi bi-calendar-month"></i>
+
+                            Mes
+
+                        </label>
+
+                        <select
+                            name="mes"
+                            class="form-select">
+
+                            {% set meses = [
+                                'Enero',
+                                'Febrero',
+                                'Marzo',
+                                'Abril',
+                                'Mayo',
+                                'Junio',
+                                'Julio',
+                                'Agosto',
+                                'Septiembre',
+                                'Octubre',
+                                'Noviembre',
+                                'Diciembre'
+                            ] %}
+
+                            {% for nombre_mes in meses %}
+
+                            <option
+                                value="{{ loop.index }}"
+                                {% if loop.index == mes %}
+                                selected
+                                {% endif %}>
+
+                                {{ nombre_mes }}
+
+                            </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- BOTÓN -->
+
+                    <div class="col-md-3">
+
+                        <button
+                            type="submit"
+                            class="btn btn-info w-100">
+
+                            <i class="bi bi-funnel-fill"></i>
+
+                            Consultar
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- KPI -->
+    <!-- ===================================================== -->
+
+    <div class="row g-4 mb-4">
+
+
+        <!-- OBJETIVO TOTAL -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card bg-primary text-white shadow border-0 h-100">
+
+                <div class="card-body">
+
+                    <div
+                        class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="opacity-75">
+
+                                Objetivo Total
+
+                            </small>
+
+                            <h3 class="fw-bold mb-0 mt-2">
+
+                                ${{ "{:,.2f}".format(objetivo_total) }}
+
+                            </h3>
+
+                        </div>
+
+                        <div class="fs-1 opacity-75">
+
+                            <i class="bi bi-bullseye"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- VENTA TOTAL -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card bg-success text-white shadow border-0 h-100">
+
+                <div class="card-body">
+
+                    <div
+                        class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="opacity-75">
+
+                                Venta Acumulada
+
+                            </small>
+
+                            <h3 class="fw-bold mb-0 mt-2">
+
+                                ${{ "{:,.2f}".format(venta_total_general) }}
+
+                            </h3>
+
+                        </div>
+
+                        <div class="fs-1 opacity-75">
+
+                            <i class="bi bi-cash-stack"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CUMPLIMIENTO -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div class="card bg-info text-white shadow border-0 h-100">
+
+                <div class="card-body">
+
+                    <div
+                        class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="opacity-75">
+
+                                Cumplimiento General
+
+                            </small>
+
+                            <h3 class="fw-bold mb-0 mt-2">
+
+                                {{ cumplimiento_general }}%
+
+                            </h3>
+
+                        </div>
+
+                        <div class="fs-1 opacity-75">
+
+                            <i class="bi bi-graph-up-arrow"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PENDIENTE / EXCEDENTE -->
+
+        <div class="col-xl-3 col-md-6">
+
+            <div
+                class="card
+                {% if diferencia_general > 0 %}
+                    bg-warning text-dark
+                {% elif diferencia_general < 0 %}
+                    bg-success text-white
+                {% else %}
+                    bg-primary text-white
+                {% endif %}
+                shadow border-0 h-100">
+
+                <div class="card-body">
+
+                    <div
+                        class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <small class="opacity-75">
+
+                                {% if diferencia_general > 0 %}
+
+                                    Pendiente por Cumplir
+
+                                {% elif diferencia_general < 0 %}
+
+                                    Objetivo Superado
+
+                                {% else %}
+
+                                    Objetivo Cumplido
+
+                                {% endif %}
+
+                            </small>
+
+                            <h3 class="fw-bold mb-0 mt-2">
+
+                                ${{ "{:,.2f}".format(diferencia_general|abs) }}
+
+                            </h3>
+
+                        </div>
+
+                        <div class="fs-1 opacity-75">
+
+                            {% if diferencia_general > 0 %}
+
+                                <i class="bi bi-hourglass-split"></i>
+
+                            {% else %}
+
+                                <i class="bi bi-trophy-fill"></i>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- RESUMEN ADICIONAL -->
+    <!-- ===================================================== -->
+
+    <div class="row g-4 mb-4">
+
+
+        <!-- VENDEDORES QUE CUMPLIERON -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="fs-1 text-success mb-2">
+
+                        <i class="bi bi-trophy-fill"></i>
+
+                    </div>
+
+                    <h2 class="fw-bold mb-1">
+
+                        {{ vendedores_cumplieron }}
+
+                    </h2>
+
+                    <p class="text-muted mb-0">
+
+                        Vendedores que alcanzaron
+                        o superaron su objetivo
+
+                    </p>
+
+                    <small class="text-muted">
+
+                        De {{ vendedores_con_objetivo }}
+                        vendedores con objetivo asignado
+
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- VENTAS POR VISITAS -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="fs-1 text-primary mb-2">
+
+                        <i class="bi bi-geo-alt-fill"></i>
+
+                    </div>
+
+                    <h4 class="fw-bold mb-1">
+
+                        ${{ "{:,.2f}".format(venta_visitas_total) }}
+
+                    </h4>
+
+                    <p class="text-muted mb-0">
+
+                        Ventas generadas
+                        mediante visitas
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- VENTAS POR LLAMADAS -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm border-0 h-100">
+
+                <div class="card-body text-center">
+
+                    <div class="fs-1 text-danger mb-2">
+
+                        <i class="bi bi-telephone-fill"></i>
+
+                    </div>
+
+                    <h4 class="fw-bold mb-1">
+
+                        ${{ "{:,.2f}".format(venta_llamadas_total) }}
+
+                    </h4>
+
+                    <p class="text-muted mb-0">
+
+                        Ventas generadas
+                        mediante llamadas
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- GRÁFICA OBJETIVO VS VENTA -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-4">
+
+                <i class="bi bi-bar-chart-fill text-info"></i>
+
+                Objetivo vs Venta Real
+
+            </h5>
+
+            <div style="height: 400px;">
+
+                <canvas id="graficaObjetivos"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- TABLA DETALLADA -->
+    <!-- ===================================================== -->
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white py-3">
+
+            <div
+                class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h5 class="fw-bold mb-0">
+
+                        <i class="bi bi-table text-info"></i>
+
+                        Detalle por Vendedor
+
+                    </h5>
+
+                </div>
+
+                <span class="badge bg-secondary">
+
+                    {{ reporte|length }} vendedores
+
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th class="ps-4">
+
+                                #
+
+                            </th>
+
+                            <th>
+
+                                Vendedor
+
+                            </th>
+
+                            <th class="text-end">
+
+                                Objetivo
+
+                            </th>
+
+                            <th class="text-end">
+
+                                Visitas
+
+                            </th>
+
+                            <th class="text-end">
+
+                                Llamadas
+
+                            </th>
+
+                            <th class="text-end">
+
+                                Venta Total
+
+                            </th>
+
+                            <th class="text-center">
+
+                                Cumplimiento
+
+                            </th>
+
+                            <th class="text-end pe-4">
+
+                                Diferencia
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for fila in reporte %}
+
+                        <tr>
+
+                            <!-- POSICIÓN -->
+
+                            <td class="ps-4 fw-bold">
+
+                                {{ loop.index }}
+
+                            </td>
+
+
+                            <!-- VENDEDOR -->
+
+                            <td>
+
+                                <div class="fw-semibold">
+
+                                    {{ fila.nombre }}
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- OBJETIVO -->
+
+                            <td class="text-end">
+
+                                ${{ "{:,.2f}".format(fila.objetivo) }}
+
+                            </td>
+
+
+                            <!-- VENTA VISITAS -->
+
+                            <td class="text-end">
+
+                                ${{ "{:,.2f}".format(fila.venta_visitas) }}
+
+                            </td>
+
+
+                            <!-- VENTA LLAMADAS -->
+
+                            <td class="text-end">
+
+                                ${{ "{:,.2f}".format(fila.venta_llamadas) }}
+
+                            </td>
+
+
+                            <!-- VENTA TOTAL -->
+
+                            <td class="text-end fw-bold">
+
+                                ${{ "{:,.2f}".format(fila.venta_total) }}
+
+                            </td>
+
+
+                            <!-- CUMPLIMIENTO -->
+
+                            <td class="text-center">
+
+                                {% if fila.objetivo == 0 %}
+
+                                    <span class="badge bg-secondary">
+
+                                        Sin objetivo
+
+                                    </span>
+
+                                {% elif fila.cumplimiento >= 100 %}
+
+                                    <span class="badge bg-success">
+
+                                        <i class="bi bi-trophy-fill"></i>
+
+                                        {{ fila.cumplimiento }}%
+
+                                    </span>
+
+                                {% elif fila.cumplimiento >= 75 %}
+
+                                    <span class="badge bg-warning text-dark">
+
+                                        <i class="bi bi-exclamation-circle"></i>
+
+                                        {{ fila.cumplimiento }}%
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-danger">
+
+                                        {{ fila.cumplimiento }}%
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- DIFERENCIA -->
+
+                            <td class="text-end pe-4">
+
+                                {% if fila.diferencia > 0 %}
+
+                                    <span class="text-warning fw-semibold">
+
+                                        Faltan
+                                        ${{ "{:,.2f}".format(fila.diferencia) }}
+
+                                    </span>
+
+                                {% elif fila.diferencia < 0 %}
+
+                                    <span class="text-success fw-semibold">
+
+                                        +
+                                        ${{ "{:,.2f}".format(fila.diferencia|abs) }}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="text-success fw-semibold">
+
+                                        <i class="bi bi-check-circle-fill"></i>
+
+                                        Cumplido
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% else %}
+
+                        <tr>
+
+                            <td
+                                colspan="8"
+                                class="text-center text-muted py-5">
+
+                                <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+
+                                No hay vendedores para mostrar.
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+
+                    <!-- TOTALES -->
+
+                    {% if reporte %}
+
+                    <tfoot class="table-light">
+
+                        <tr>
+
+                            <th
+                                colspan="2"
+                                class="ps-4">
+
+                                TOTALES
+
+                            </th>
+
+
+                            <th class="text-end">
+
+                                ${{ "{:,.2f}".format(objetivo_total) }}
+
+                            </th>
+
+
+                            <th class="text-end">
+
+                                ${{ "{:,.2f}".format(venta_visitas_total) }}
+
+                            </th>
+
+
+                            <th class="text-end">
+
+                                ${{ "{:,.2f}".format(venta_llamadas_total) }}
+
+                            </th>
+
+
+                            <th class="text-end">
+
+                                ${{ "{:,.2f}".format(venta_total_general) }}
+
+                            </th>
+
+
+                            <th class="text-center">
+
+                                {{ cumplimiento_general }}%
+
+                            </th>
+
+
+                            <th class="text-end pe-4">
+
+                                {% if diferencia_general > 0 %}
+
+                                    Faltan
+                                    ${{ "{:,.2f}".format(diferencia_general) }}
+
+                                {% elif diferencia_general < 0 %}
+
+                                    +
+                                    ${{ "{:,.2f}".format(diferencia_general|abs) }}
+
+                                {% else %}
+
+                                    Cumplido
+
+                                {% endif %}
+
+                            </th>
+
+                        </tr>
+
+                    </tfoot>
+
+                    {% endif %}
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- CHART.JS -->
+<!-- ===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+const labels = {{ labels|tojson }};
+
+const objetivos = {{ objetivos_grafica|tojson }};
+
+const ventas = {{ ventas_grafica|tojson }};
+
+
+const ctx = document.getElementById(
+    'graficaObjetivos'
+);
+
+
+new Chart(
+
+    ctx,
+
+    {
+
+        type: 'bar',
+
+        data: {
+
+            labels: labels,
+
+            datasets: [
+
+                {
+
+                    label: 'Objetivo',
+
+                    data: objetivos,
+
+                    backgroundColor:
+                        'rgba(13, 202, 240, 0.65)',
+
+                    borderColor:
+                        'rgba(13, 202, 240, 1)',
+
+                    borderWidth: 1
+
+                },
+
+                {
+
+                    label: 'Venta Real',
+
+                    data: ventas,
+
+                    backgroundColor:
+                        'rgba(25, 135, 84, 0.65)',
+
+                    borderColor:
+                        'rgba(25, 135, 84, 1)',
+
+                    borderWidth: 1
+
+                }
+
+            ]
+
+        },
+
+
+        options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+
+            plugins: {
+
+                legend: {
+
+                    position: 'top'
+
+                }
+
+            },
+
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true,
+
+                    ticks: {
+
+                        callback: function(value) {
+
+                            return '$' +
+                                value.toLocaleString();
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+);
+
+</script>
+
+
+{% endblock %}

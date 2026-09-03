@@ -1248,7 +1248,7 @@ def eliminar_visita(id):
 
     db.session.commit()
 
-    return redirect('/historial_visitas')
+    return redirect('/visitas')
 
 
 @app.route('/reportes')
@@ -2921,6 +2921,501 @@ def reporte_prospeccion():
 
     )
 
+
+@app.route('/reporte_objetivos_comerciales')
+@login_required
+def reporte_objetivos_comerciales():
+
+    # =====================================================
+    # VALIDAR PERMISOS
+    # =====================================================
+
+    if current_user.rol not in ['admin', 'supervisor']:
+        return "Acceso denegado"
+
+
+    # =====================================================
+    # OBTENER AÑO Y MES
+    # =====================================================
+
+    ahora = datetime.now()
+
+    anio = request.args.get(
+        'anio',
+        ahora.year,
+        type=int
+    )
+
+    mes = request.args.get(
+        'mes',
+        ahora.month,
+        type=int
+    )
+
+
+    # =====================================================
+    # VALIDAR MES
+    # =====================================================
+
+    if mes < 1 or mes > 12:
+        mes = ahora.month
+
+
+    # =====================================================
+    # FECHA INICIO DEL MES
+    # =====================================================
+
+    fecha_inicio = datetime(
+        anio,
+        mes,
+        1
+    )
+
+
+    # =====================================================
+    # CALCULAR FECHA FIN DEL MES
+    # =====================================================
+
+    if mes == 12:
+
+        fecha_fin = datetime(
+            anio + 1,
+            1,
+            1
+        )
+
+    else:
+
+        fecha_fin = datetime(
+            anio,
+            mes + 1,
+            1
+        )
+
+
+    # =====================================================
+    # OBTENER VENDEDORES ACTIVOS
+    # =====================================================
+
+    vendedores = Usuario.query.filter(
+        Usuario.rol == 'vendedor',
+        Usuario.activo == True
+    ).order_by(
+        Usuario.nombre
+    ).all()
+
+
+    # =====================================================
+    # CONSULTAR OBJETIVOS DEL PERIODO
+    # =====================================================
+
+    objetivos = Objetivo.query.filter(
+        Objetivo.anio == anio,
+        Objetivo.mes == mes
+    ).all()
+
+
+    # =====================================================
+    # CONVERTIR OBJETIVOS A DICCIONARIO
+    # =====================================================
+
+    objetivos_dict = {
+
+        objetivo.usuario_id: float(
+            objetivo.objetivo or 0
+        )
+
+        for objetivo in objetivos
+
+    }
+
+
+    # =====================================================
+    # VENTAS POR VISITAS
+    # =====================================================
+
+    ventas_visitas = db.session.query(
+
+        Visita.usuario_id.label('usuario_id'),
+
+        func.coalesce(
+            func.sum(Visita.monto_venta),
+            0
+        ).label('monto')
+
+    ).filter(
+
+        Visita.fecha >= fecha_inicio,
+
+        Visita.fecha < fecha_fin,
+
+        Visita.monto_venta > 0
+
+    ).group_by(
+
+        Visita.usuario_id
+
+    ).all()
+
+
+    # =====================================================
+    # CONVERTIR VENTAS VISITAS A DICCIONARIO
+    # =====================================================
+
+    ventas_visitas_dict = {
+
+        fila.usuario_id: float(
+            fila.monto or 0
+        )
+
+        for fila in ventas_visitas
+
+    }
+
+
+    # =====================================================
+    # VENTAS POR LLAMADAS
+    # =====================================================
+
+    ventas_llamadas = db.session.query(
+
+        Llamada.usuario_id.label('usuario_id'),
+
+        func.coalesce(
+            func.sum(Llamada.monto_venta),
+            0
+        ).label('monto')
+
+    ).filter(
+
+        Llamada.fecha >= fecha_inicio,
+
+        Llamada.fecha < fecha_fin,
+
+        Llamada.monto_venta > 0
+
+    ).group_by(
+
+        Llamada.usuario_id
+
+    ).all()
+
+
+    # =====================================================
+    # CONVERTIR VENTAS LLAMADAS A DICCIONARIO
+    # =====================================================
+
+    ventas_llamadas_dict = {
+
+        fila.usuario_id: float(
+            fila.monto or 0
+        )
+
+        for fila in ventas_llamadas
+
+    }
+
+
+    # =====================================================
+    # CREAR REPORTE
+    # =====================================================
+
+    reporte = []
+
+
+    for vendedor in vendedores:
+
+
+        # -------------------------------------------------
+        # OBJETIVO
+        # -------------------------------------------------
+
+        objetivo = objetivos_dict.get(
+            vendedor.id,
+            0
+        )
+
+
+        # -------------------------------------------------
+        # VENTAS POR VISITAS
+        # -------------------------------------------------
+
+        venta_visitas = ventas_visitas_dict.get(
+            vendedor.id,
+            0
+        )
+
+
+        # -------------------------------------------------
+        # VENTAS POR LLAMADAS
+        # -------------------------------------------------
+
+        venta_llamadas = ventas_llamadas_dict.get(
+            vendedor.id,
+            0
+        )
+
+
+        # -------------------------------------------------
+        # VENTA TOTAL
+        # -------------------------------------------------
+
+        venta_total = (
+            venta_visitas +
+            venta_llamadas
+        )
+
+
+        # -------------------------------------------------
+        # CUMPLIMIENTO
+        # -------------------------------------------------
+
+        if objetivo > 0:
+
+            cumplimiento = round(
+                (venta_total / objetivo) * 100,
+                1
+            )
+
+        else:
+
+            cumplimiento = 0
+
+
+        # -------------------------------------------------
+        # DIFERENCIA
+        #
+        # Positiva = falta por cumplir
+        # Negativa = superó el objetivo
+        # -------------------------------------------------
+
+        diferencia = (
+            objetivo -
+            venta_total
+        )
+
+
+        # -------------------------------------------------
+        # AGREGAR AL REPORTE
+        # -------------------------------------------------
+
+        reporte.append({
+
+            'usuario_id': vendedor.id,
+
+            'nombre': vendedor.nombre,
+
+            'objetivo': objetivo,
+
+            'venta_visitas': venta_visitas,
+
+            'venta_llamadas': venta_llamadas,
+
+            'venta_total': venta_total,
+
+            'cumplimiento': cumplimiento,
+
+            'diferencia': diferencia
+
+        })
+
+
+    # =====================================================
+    # ORDENAR POR CUMPLIMIENTO
+    # =====================================================
+
+    reporte.sort(
+
+        key=lambda x: x['cumplimiento'],
+
+        reverse=True
+
+    )
+
+
+    # =====================================================
+    # TOTALES GENERALES
+    # =====================================================
+
+    objetivo_total = sum(
+
+        fila['objetivo']
+
+        for fila in reporte
+
+    )
+
+
+    venta_total_general = sum(
+
+        fila['venta_total']
+
+        for fila in reporte
+
+    )
+
+
+    venta_visitas_total = sum(
+
+        fila['venta_visitas']
+
+        for fila in reporte
+
+    )
+
+
+    venta_llamadas_total = sum(
+
+        fila['venta_llamadas']
+
+        for fila in reporte
+
+    )
+
+
+    # =====================================================
+    # CUMPLIMIENTO GENERAL
+    # =====================================================
+
+    if objetivo_total > 0:
+
+        cumplimiento_general = round(
+
+            (
+                venta_total_general /
+                objetivo_total
+            ) * 100,
+
+            1
+
+        )
+
+    else:
+
+        cumplimiento_general = 0
+
+
+    # =====================================================
+    # DIFERENCIA GENERAL
+    # =====================================================
+
+    diferencia_general = (
+
+        objetivo_total -
+        venta_total_general
+
+    )
+
+
+    # =====================================================
+    # CONTADORES
+    # =====================================================
+
+    vendedores_cumplieron = sum(
+
+        1
+
+        for fila in reporte
+
+        if (
+            fila['objetivo'] > 0
+            and
+            fila['cumplimiento'] >= 100
+        )
+
+    )
+
+
+    vendedores_con_objetivo = sum(
+
+        1
+
+        for fila in reporte
+
+        if fila['objetivo'] > 0
+
+    )
+
+
+    # =====================================================
+    # DATOS PARA GRÁFICA
+    # =====================================================
+
+    labels = [
+
+        fila['nombre']
+
+        for fila in reporte
+
+    ]
+
+
+    objetivos_grafica = [
+
+        fila['objetivo']
+
+        for fila in reporte
+
+    ]
+
+
+    ventas_grafica = [
+
+        fila['venta_total']
+
+        for fila in reporte
+
+    ]
+
+
+    cumplimientos_grafica = [
+
+        fila['cumplimiento']
+
+        for fila in reporte
+
+    ]
+
+
+    # =====================================================
+    # RENDER
+    # =====================================================
+
+    return render_template(
+
+        'reporte_objetivos_comerciales.html',
+
+        reporte=reporte,
+
+        anio=anio,
+
+        mes=mes,
+
+        objetivo_total=objetivo_total,
+
+        venta_total_general=venta_total_general,
+
+        venta_visitas_total=venta_visitas_total,
+
+        venta_llamadas_total=venta_llamadas_total,
+
+        cumplimiento_general=cumplimiento_general,
+
+        diferencia_general=diferencia_general,
+
+        vendedores_cumplieron=vendedores_cumplieron,
+
+        vendedores_con_objetivo=vendedores_con_objetivo,
+
+        labels=labels,
+
+        objetivos_grafica=objetivos_grafica,
+
+        ventas_grafica=ventas_grafica,
+
+        cumplimientos_grafica=cumplimientos_grafica
+
+    )
 
 
 
